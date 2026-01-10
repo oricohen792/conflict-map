@@ -1,5 +1,95 @@
 [
   {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Will China invade Taiwan by end of 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Ukraine signs peace deal with Russia by June 30?",
+    "change": "\u2193 2%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "US strikes Iran by March 31, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "US strikes Iran by June 30, 2026?",
+    "change": "\u2191 2%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Israel strikes Iran by January 31, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 10, 2026?",
+    "change": "\u2193 6%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 11, 2026?",
+    "change": "\u2191 6%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "U.S. x Iran Military Engagement by June 30, 2026?",
+    "change": "\u2193 3%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Israel strikes Iran by January 16, 2026?",
+    "change": "\u2191 2%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "US strikes Iran by January 11, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 10, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 11, 2026?",
+    "change": "\u2191 2%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 12, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 31, 2026?",
+    "change": "\u2191 3%"
+  },
+  {
+    "time": "19:28",
+    "type": "CHG",
+    "q": "Russia strike on Kyiv municipality by January 11?",
+    "change": "\u2191 1%"
+  },
+  {
     "time": "20:39",
     "type": "CHG",
     "q": "US strikes Iran by March 31, 2026?",
@@ -28,95 +118,5 @@
     "type": "CHG",
     "q": "Will US or Israel strike Iran by January 10, 2026?",
     "change": "\u2191 1%"
-  },
-  {
-    "time": "20:39",
-    "type": "CHG",
-    "q": "Will US or Israel strike Iran by January 11, 2026?",
-    "change": "\u2193 1%"
-  },
-  {
-    "time": "20:39",
-    "type": "CHG",
-    "q": "Will US or Israel strike Iran by January 31, 2026?",
-    "change": "\u2191 4%"
-  },
-  {
-    "time": "19:10",
-    "type": "CHG",
-    "q": "Israel x Iran ceasefire broken by March 31, 2026?",
-    "change": "\u2193 2%"
-  },
-  {
-    "time": "19:10",
-    "type": "CHG",
-    "q": "US strikes Iran by March 31, 2026?",
-    "change": "\u2193 1%"
-  },
-  {
-    "time": "19:10",
-    "type": "CHG",
-    "q": "US strikes Iran by June 30, 2026?",
-    "change": "\u2193 2%"
-  },
-  {
-    "time": "19:10",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 10, 2026?",
-    "change": "\u2193 1%"
-  },
-  {
-    "time": "19:10",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 11, 2026?",
-    "change": "\u2191 2%"
-  },
-  {
-    "time": "19:10",
-    "type": "CHG",
-    "q": "Will Israel strike Gaza on January 9, 2026?",
-    "change": "\u2193 1%"
-  },
-  {
-    "time": "19:10",
-    "type": "CHG",
-    "q": "Israel strikes Iran by January 16, 2026?",
-    "change": "\u2191 2%"
-  },
-  {
-    "time": "19:00",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 10, 2026?",
-    "change": "\u2193 3%"
-  },
-  {
-    "time": "19:00",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 11, 2026?",
-    "change": "\u2191 1%"
-  },
-  {
-    "time": "19:00",
-    "type": "CHG",
-    "q": "Will Israel strike Gaza on January 9, 2026?",
-    "change": "\u2191 1%"
-  },
-  {
-    "time": "19:00",
-    "type": "CHG",
-    "q": "Will Israel strike Gaza on January 10, 2026?",
-    "change": "\u2191 69%"
-  },
-  {
-    "time": "19:00",
-    "type": "CHG",
-    "q": "Israel strikes Iran by January 16, 2026?",
-    "change": "\u2191 3%"
-  },
-  {
-    "time": "18:50",
-    "type": "CHG",
-    "q": "Will China invade Taiwan by end of 2026?",
-    "change": "\u2193 1%"
   }
 ]
