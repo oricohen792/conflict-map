@@ -280,7 +280,7 @@ def generate_map_html(lines):
 <div id="map"></div>
 
 <div class="filter-box">
-    <h1>Categories</h1>
+    <h1>Conflict</h1>
     <div class="filter-item"><input type="checkbox" id="Military" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Military">Military</label></div>
     <div class="filter-item"><input type="checkbox" id="Trade" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Trade">Trade</label></div>
     <div class="filter-item"><input type="checkbox" id="Drugs & Border" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Drugs & Border">Drugs & Border</label></div>
