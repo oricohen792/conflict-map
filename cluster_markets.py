@@ -202,7 +202,7 @@ def main():
 
 def generate_map_html(lines):
     # Get timestamp of active_markets.jsonl (Market Data Verified - Hourly scan)
-    markets_verified_time = "Unknown"
+    markets_verified_time = "Pending"
     if os.path.exists("active_markets.jsonl"):
         mtime = os.path.getmtime("active_markets.jsonl")
         markets_verified_time = datetime.fromtimestamp(mtime).strftime("%H:%M")
