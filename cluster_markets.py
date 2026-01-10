@@ -153,6 +153,7 @@ def main():
                 "tgt_lat": tgt_coords[0],
                 "tgt_lng": tgt_coords[1],
                 "cat": assigned_cat,
+                "updated": datetime.now().strftime("%H:%M"), 
                 "countries": sorted([src_name, tgt_name]),
                 "slug": m.get("slug", ""),
                 "url": f"https://polymarket.com/event/{parent_slug}",
@@ -572,6 +573,7 @@ def generate_map_html(lines):
                             const polyLink = m.url || `https://polymarket.com/event/${m.slug}`;
                             tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
                                 <span style="font-weight:700; color:#94a3b8;">[${m.date}]</span> 
+                                <span style="font-weight:700; color:#64748b; margin-left:2px;">[${m.updated}]</span> 
                                 <span style="font-weight:700; color:#94a3b8;">[Vol: $${volStr}]</span> 
                                 <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${m.q}</a>
                                 <span style="color:${color}; font-weight:800;">${Math.round(m.price * 100)}%</span>
