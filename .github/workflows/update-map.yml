@@ -1,0 +1,67 @@
+name: Update Conflict Map
+
+on:
+  schedule:
+    # Every 5 minutes for price updates
+    - cron: '*/5 * * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+  # Run on push to main
+  push:
+    branches: [ main ]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests numpy
+      
+      - name: Check if full update needed
+        id: update_type
+        run: |
+          MINUTE=$(date +%M)
+          # Full update every hour (at :00)
+          if [ "$MINUTE" = "00" ]; then
+            echo "type=full" >> $GITHUB_OUTPUT
+            echo "Full market fetch will be performed"
+          else
+            echo "type=price" >> $GITHUB_OUTPUT
+            echo "Price refresh only"
+          fi
+      
+      - name: Full market fetch (every hour)
+        if: steps.update_type.outputs.type == 'full'
+        run: |
+          echo "Fetching all markets..."
+          python fetch_polymarket.py
+          python cluster_markets.py
+      
+      - name: Price refresh (every 5 minutes)
+        if: steps.update_type.outputs.type == 'price'
+        run: |
+          echo "Refreshing prices..."
+          python refresh_prices.py
+      
+      - name: Commit changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add market_report.html conflict_manifest.json recent_changes.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: $(date '+%Y-%m-%d %H:%M:%S')"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
