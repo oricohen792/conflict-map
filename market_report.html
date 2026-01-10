@@ -167,7 +167,7 @@
     <h1 style="font-size: 1.2rem;">Conflict Prediction Map</h1>
     <p id="stats-text">Loading...</p>
     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #334155; font-size: 0.75rem; color: #64748b;">
-        <div style="margin-bottom: 4px; color: #e2e8f0; font-weight: 600;">Last Updated: 2026-01-10 20:34:52</div>
+        <div id="last-updated" style="margin-bottom: 4px; color: #e2e8f0; font-weight: 600;">Last Updated: 2026-01-10 20:34:52</div>
         Arcs are offset by date. Arrows indicate directed action.
     </div>
 </div>
@@ -320,6 +320,7 @@
                 group.polyline.setStyle({ color: newColor });
                 group.hitbox.setStyle({ color: 'transparent' }); 
 
+                const lastUpdatedText = document.getElementById('last-updated')?.innerText;
                 let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${group.pair[0]} & ${group.pair[1]}</div>`;
                 // Group by category
                 const groups = {};
@@ -374,6 +375,9 @@
                         });
                     });
                 });
+                if (lastUpdatedText) {
+                    tooltipHtml += `<div style="margin-top:8px; border-top:1px solid #334155; padding-top:6px; font-size:0.75rem; color:#94a3b8;">${lastUpdatedText}</div>`;
+                }
                 tooltipHtml += `</div>`;
                 group.content = tooltipHtml;
             } else {
