@@ -258,6 +258,35 @@ def generate_map_html(lines):
             max-width: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             pointer-events: auto;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .info-box, .legend { display: none; } /* Hide non-essential boxes on mobile */
+            
+            .filter-box {
+                top: auto; 
+                bottom: 20px; 
+                left: 10px; 
+                right: 10px; 
+                width: auto;
+                max-height: 40vh;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            h1 { font-size: 1.1rem; }
+            .filter-item { padding: 8px 0; border-bottom: 1px solid #334155; }
+            .filter-item:last-child { border-bottom: none; }
+            
+            #country-filters { max-height: 25vh !important; }
+            
+            /* Leaflet controls adjustments */
+            .leaflet-control-zoom { display: none; } /* Use pinch zoom */
+            .leaflet-bottom.leaflet-right { display: none; } /* Hide attribution */
+        }
+        .line-tooltip {
             border: 1px solid #475569;
             background: #0f172a !important;
             color: #f1f5f9 !important;
