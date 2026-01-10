@@ -553,34 +553,39 @@ def generate_map_html(lines):
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                Object.keys(groups).sort().forEach((cat, idx) => {
-                    if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
-                    tooltipHtml += `<div style="font-weight:800; color:#fbbf24; margin-bottom:6px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">${cat}</div>`;
+                if (lines.length > 0) {
+                     // Get update time from the first market
+                    const lastUpdate = lines[0].updated || "";
                     
-                    // Group by topic within category
-                    const topics = {};
-                    groups[cat].forEach(m => {
-                        const topic = getBaseTopic(m.slug, m.q);
-                        if (!topics[topic]) topics[topic] = [];
-                        topics[topic].push(m);
-                    });
+                    tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">Last Updated: ${lastUpdate}</div>`;
 
-                    Object.keys(topics).forEach(topic => {
-                        tooltipHtml += `<div style="font-weight:700; color:#cbd5e1; margin-top:4px; margin-bottom:2px;">${topic}</div>`;
-                        topics[topic].forEach(m => {
-                            const color = getProbColor(m.price);
-                            const volStr = m.vol >= 1000 ? (m.vol / 1000).toFixed(1) + 'k' : Math.round(m.vol);
-                            const polyLink = m.url || `https://polymarket.com/event/${m.slug}`;
-                            tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
-                                <span style="font-weight:700; color:#94a3b8;">[${m.date}]</span> 
-                                <span style="font-weight:700; color:#64748b; margin-left:2px;">[${m.updated}]</span> 
-                                <span style="font-weight:700; color:#94a3b8;">[Vol: $${volStr}]</span> 
-                                <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${m.q}</a>
-                                <span style="color:${color}; font-weight:800;">${Math.round(m.price * 100)}%</span>
-                            </div>`;
+                    Object.keys(groups).sort().forEach((cat, idx) => {
+                        if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
+                        tooltipHtml += `<div style="font-weight:800; color:#fbbf24; margin-bottom:6px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">${cat}</div>`;
+                        
+                        // Group by topic within category
+                        const topics = {};
+                        groups[cat].forEach(m => {
+                            const topic = getBaseTopic(m.slug, m.q);
+                            if (!topics[topic]) topics[topic] = [];
+                            topics[topic].push(m);
+                        });
+    
+                        Object.keys(topics).forEach(topic => {
+                            tooltipHtml += `<div style="font-weight:700; color:#cbd5e1; margin-top:4px; margin-bottom:2px;">${topic}</div>`;
+                            topics[topic].forEach(m => {
+                                const color = getProbColor(m.price);
+                                const volStr = m.vol >= 1000 ? (m.vol / 1000).toFixed(1) + 'k' : Math.round(m.vol);
+                                const polyLink = m.url || `https://polymarket.com/event/${m.slug}`;
+                                tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
+                                    <span style="font-weight:700; color:#94a3b8;">[${m.date}]</span> 
+                                    <span style="font-weight:700; color:#94a3b8;">[Vol: $${volStr}]</span> 
+                                    <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${m.q}</a>
+                                    <span style="color:${color}; font-weight:800;">${Math.round(m.price * 100)}%</span>
+                                </div>`;
+                            });
                         });
                     });
-                });
                 tooltipHtml += `</div>`;
                 group.content = tooltipHtml;
             } else {
