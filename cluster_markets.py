@@ -262,29 +262,65 @@ def generate_map_html(lines):
 
         /* Mobile Optimization */
         @media (max-width: 768px) {
-            .info-box, .legend { display: none; } /* Hide non-essential boxes on mobile */
+            .info-box, .legend { display: none; } 
             
+            /* Mobile Filter Toggle Button */
+            #mobile-filter-btn {
+                display: flex !important;
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1001;
+                background: #3b82f6;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 50px;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                cursor: pointer;
+                border: none;
+                align-items: center;
+                gap: 8px;
+            }
+
             .filter-box {
                 top: auto; 
-                bottom: 20px; 
-                left: 10px; 
-                right: 10px; 
-                width: auto;
-                max-height: 40vh;
+                bottom: 0px; 
+                left: 0; 
+                right: 0; 
+                width: 100%;
+                border-radius: 20px 20px 0 0;
+                max-height: 80vh;
+                transform: translateY(110%); /* Hidden by default */
+                transition: transform 0.3s ease-in-out;
                 overflow-y: auto;
                 display: flex;
                 flex-direction: column;
+                margin: 0;
+                box-sizing: border-box;
             }
             
+            .filter-box.active {
+                transform: translateY(0); /* Visible */
+            }
+            
+            .close-filter {
+                display: block !important;
+                text-align: right;
+                padding-bottom: 10px;
+                color: #94a3b8;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
             h1 { font-size: 1.1rem; }
-            .filter-item { padding: 8px 0; border-bottom: 1px solid #334155; }
-            .filter-item:last-child { border-bottom: none; }
+            .filter-item { padding: 12px 0; border-bottom: 1px solid #334155; }
+            .filter-item input { transform: scale(1.2); margin-right: 15px; }
             
-            #country-filters { max-height: 25vh !important; }
+            #country-filters { max-height: 50vh !important; }
             
-            /* Leaflet controls adjustments */
-            .leaflet-control-zoom { display: none; } /* Use pinch zoom */
-            .leaflet-bottom.leaflet-right { display: none; } /* Hide attribution */
+            .leaflet-control-zoom { display: none; }
+            .leaflet-bottom.leaflet-right { display: none; }
         }
         .line-tooltip {
             border: 1px solid #475569;
@@ -307,8 +343,13 @@ def generate_map_html(lines):
 <body>
 
 <div id="map"></div>
+<button id="mobile-filter-btn" style="display:none;" onclick="document.querySelector('.filter-box').classList.toggle('active')">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+    Filters
+</button>
 
 <div class="filter-box">
+    <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <h1>Conflict</h1>
     <div class="filter-item"><input type="checkbox" id="Military" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Military">Military</label></div>
     <div class="filter-item"><input type="checkbox" id="Trade" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Trade">Trade</label></div>
