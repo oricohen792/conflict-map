@@ -560,9 +560,9 @@ def generate_map_html(lines):
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                if (lines.length > 0) {
+                if (visibleMarkets.length > 0) {
                      // Get update time from the first market
-                    const lastUpdate = lines[0].updated || "";
+                    const lastUpdate = visibleMarkets[0].updated || "";
                     
                     tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
                         <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate}</span></div>
