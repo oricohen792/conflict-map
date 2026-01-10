@@ -505,11 +505,10 @@ def generate_map_html(lines):
             const group = marketGroups[pairKey];
             
             // Check if this arc's endpoints match the selected country filters
-            const arcEndpoints = group.pair; // These are the two countries this arc connects
+            const arcEndpoints = group.pair; 
             const arcMatchesFilter = arcEndpoints.some(country => selectedCountries.includes(country));
             
             if (!arcMatchesFilter) {
-                // If neither endpoint matches selected countries, hide this arc entirely
                 const layerGroup = groupLayers[pairKey];
                 if (map.hasLayer(layerGroup)) map.removeLayer(layerGroup);
                 continue;
@@ -533,8 +532,9 @@ def generate_map_html(lines):
                 group.polyline.setStyle({ color: newColor });
                 group.hitbox.setStyle({ color: 'transparent' }); 
 
+                // Tooltip construction
                 let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${group.pair[0]} & ${group.pair[1]}</div>`;
-                // Group by category
+                
                 const groups = {};
                 visibleMarkets.forEach(m => {
                     if (!groups[m.cat]) groups[m.cat] = [];
@@ -547,55 +547,49 @@ def generate_map_html(lines):
                     const preps = "on|by|before|in|at|during|through|after";
                     const months = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|may|june|july|august|september|october|november|december";
                     
-                    // Match prepositions followed by months or dates or years
-                    base = base.replace(new RegExp(`-(${preps})-(${months}|\\d{1,2}|\\d{4})(-(\\d{1,2}|\\d{4}))?(-.*)?$`, "i"), '');
-                    
-                    // Catch trailing dates like -jan-10, -2025, -jan-2025, -10-jan
-                    base = base.replace(new RegExp(`-(${months})(-(\\d{1,2}|\\d{4}))?(-(\\d{4}))?$`, "i"), '');
-                    base = base.replace(new RegExp(`-(\\d{1,2})-(${months})(-.*)?$`, "i"), '');
+                    // Regex escaping correction: \\d becomes \d in JS string -> \d in Regex
+                    base = base.replace(new RegExp(`-(${preps})-(${months}|\\\\d{1,2}|\\\\d{4})(-(\\\\d{1,2}|\\\\d{4}))?(-.*)?$`, "i"), '');
+                    base = base.replace(new RegExp(`-(${months})(-(\\\\d{1,2}|\\\\d{4}))?(-(\\\\d{4}))?$`, "i"), '');
+                    base = base.replace(new RegExp(`-(\\\\d{1,2})-(${months})(-.*)?$`, "i"), '');
                     base = base.replace(/-(2024|2025|2026|2027|2028)$/, '');
-                    
-                    // Final cleanup
                     base = base.replace(/^will-/, '').replace(/-?any-?$/, '').replace(/-?daily-?$/, '').replace(/-?weekly-?$/, '');
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                if (visibleMarkets.length > 0) {
-                     // Get update time from the first market
-                    const lastUpdate = visibleMarkets[0].updated || "";
-                    
-                    tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
-                        <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate}</span></div>
-                        <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime}</span></div>
-                    </div>`;
+                // Get update time from the first market
+                const lastUpdate = visibleMarkets[0].updated || "";
+                
+                tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
+                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime}</span></div>
+                </div>`;
 
-                    Object.keys(groups).sort().forEach((cat, idx) => {
-                        if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
-                        tooltipHtml += `<div style="font-weight:800; color:#fbbf24; margin-bottom:6px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">${cat}</div>`;
-                        
-                        // Group by topic within category
-                        const topics = {};
-                        groups[cat].forEach(m => {
-                            const topic = getBaseTopic(m.slug, m.q);
-                            if (!topics[topic]) topics[topic] = [];
-                            topics[topic].push(m);
-                        });
-    
-                        Object.keys(topics).forEach(topic => {
-                            tooltipHtml += `<div style="font-weight:700; color:#cbd5e1; margin-top:4px; margin-bottom:2px;">${topic}</div>`;
-                            topics[topic].forEach(m => {
-                                const color = getProbColor(m.price);
-                                const volStr = m.vol >= 1000 ? (m.vol / 1000).toFixed(1) + 'k' : Math.round(m.vol);
-                                const polyLink = m.url || `https://polymarket.com/event/${m.slug}`;
-                                tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
-                                    <span style="font-weight:700; color:#94a3b8;">[${m.date}]</span> 
-                                    <span style="font-weight:700; color:#94a3b8;">[Vol: $${volStr}]</span> 
-                                    <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${m.q}</a>
-                                    <span style="color:${color}; font-weight:800;">${Math.round(m.price * 100)}%</span>
-                                </div>`;
-                            });
+                Object.keys(groups).sort().forEach((cat, idx) => {
+                    if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
+                    tooltipHtml += `<div style="font-weight:800; color:#fbbf24; margin-bottom:6px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">${cat}</div>`;
+                    
+                    const topics = {};
+                    groups[cat].forEach(m => {
+                        const topic = getBaseTopic(m.slug, m.q);
+                        if (!topics[topic]) topics[topic] = [];
+                        topics[topic].push(m);
+                    });
+
+                    Object.keys(topics).forEach(topic => {
+                        tooltipHtml += `<div style="font-weight:700; color:#cbd5e1; margin-top:4px; margin-bottom:2px;">${topic}</div>`;
+                        topics[topic].forEach(m => {
+                            const color = getProbColor(m.price);
+                            const volStr = m.vol >= 1000 ? (m.vol / 1000).toFixed(1) + 'k' : Math.round(m.vol);
+                            const polyLink = m.url || `https://polymarket.com/event/${m.slug}`;
+                            tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
+                                <span style="font-weight:700; color:#94a3b8;">[${m.date}]</span> 
+                                <span style="font-weight:700; color:#94a3b8;">[Vol: $${volStr}]</span> 
+                                <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${m.q}</a>
+                                <span style="color:${color}; font-weight:800;">${Math.round(m.price * 100)}%</span>
+                            </div>`;
                         });
                     });
+                });
                 tooltipHtml += `</div>`;
                 group.content = tooltipHtml;
             } else {
