@@ -201,6 +201,12 @@ def main():
     print("Done! Saved to market_report.html")
 
 def generate_map_html(lines):
+    # Get timestamp of active_markets.jsonl (Market Data Verified - Hourly scan)
+    markets_verified_time = "Unknown"
+    if os.path.exists("active_markets.jsonl"):
+        mtime = os.path.getmtime("active_markets.jsonl")
+        markets_verified_time = datetime.fromtimestamp(mtime).strftime("%H:%M")
+        
     json_lines = json.dumps(lines)
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
@@ -398,6 +404,7 @@ def generate_map_html(lines):
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 }).addTo(map);
 
     const linesData = JSON_LINES_PLACEHOLDER;
+    const marketVerifyTime = "MARKET_VERIFY_PLACEHOLDER";
     const layers = {}; 
     const markers = [];
 
@@ -557,7 +564,10 @@ def generate_map_html(lines):
                      // Get update time from the first market
                     const lastUpdate = lines[0].updated || "";
                     
-                    tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">Last Updated: ${lastUpdate}</div>`;
+                    tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
+                        <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate}</span></div>
+                        <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime}</span></div>
+                    </div>`;
 
                     Object.keys(groups).sort().forEach((cat, idx) => {
                         if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
@@ -724,7 +734,13 @@ def generate_map_html(lines):
         count = all_countries[c]
         country_checks += f"<div class='filter-item'><input type='radio' name='country' class='country-radio' id='{safe_id}' data-country='{c}' {checked} onchange='onCountryChange(\"{c}\")'> <label for='{safe_id}'>{c} ({count})</label></div>"
 
-    return html_template.replace("JSON_LINES_PLACEHOLDER", json_lines).replace("LAST_UPDATE_PLACEHOLDER", now_str).replace("COUNTRY_FILTERS_PLACEHOLDER", country_checks)
+    final_html = html_template.replace("JSON_LINES_PLACEHOLDER", json_lines)
+    final_html = final_html.replace("LAST_UPDATE_PLACEHOLDER", now_str)
+    final_html = final_html.replace("COUNTRY_FILTERS_PLACEHOLDER", country_checks)
+    final_html = final_html.replace("MARKET_VERIFY_PLACEHOLDER", markets_verified_time)
+    
+    return final_html
 
 if __name__ == "__main__":
     main()
+```
