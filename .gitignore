@@ -1,0 +1,37 @@
+# Data files (too large, will be regenerated)
+active_markets.jsonl
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+.cache/
+
+# Keep these files (they're small and important)
+# conflict_manifest.json - keep
+# market_report.html - keep
+# recent_changes.json - keep
