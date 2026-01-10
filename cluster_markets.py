@@ -350,14 +350,14 @@ def generate_map_html(lines):
 
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
-    <h1>Conflict</h1>
+    <h1>Select Conflicts</h1>
     <div class="filter-item"><input type="checkbox" id="Military" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Military">Military</label></div>
     <div class="filter-item"><input type="checkbox" id="Trade" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Trade">Trade</label></div>
     <div class="filter-item"><input type="checkbox" id="Drugs & Border" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Drugs & Border">Drugs & Border</label></div>
     <div class="filter-item"><input type="checkbox" id="Diplomatic" checked onchange="updateCountryCounts(); updateVisibility()"> <label for="Diplomatic">Diplomatic</label></div>
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Countries</h1>
+    <h1 style="margin-bottom: 8px;">Choose Country</h1>
     <div id="country-filters" style="max-height: 200px; overflow-y: auto;">
         COUNTRY_FILTERS_PLACEHOLDER
     </div>
