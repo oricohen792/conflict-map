@@ -39,6 +39,8 @@ def refresh_prices():
     # Track Changes
     price_changes = []
     updated_manifest = []
+    current_time = datetime.now().strftime("%H:%M")
+    
     for entry in manifest:
         m_id = entry.get("id")
         if m_id in updated_data:
@@ -50,7 +52,7 @@ def refresh_prices():
             if abs(diff) >= 0.01: 
                 symbol = "↑" if diff > 0 else "↓"
                 price_changes.append({
-                    "time": datetime.now().strftime("%H:%M"),
+                    "time": current_time,
                     "type": "CHG",
                     "q": entry["q"],
                     "change": f"{symbol} {abs(int(diff*100))}%"
@@ -58,6 +60,8 @@ def refresh_prices():
             
             entry["price"] = new_price
             entry["vol"] = float(latest.get("volume", entry["vol"]) or 0)
+            # Update timestamp for this market
+            entry["updated"] = current_time
         updated_manifest.append(entry)
 
     # Update Change Log

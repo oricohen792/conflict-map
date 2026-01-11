@@ -379,7 +379,10 @@ def generate_map_html(lines):
     <h1 style="font-size: 1.2rem;">Conflict Prediction Map</h1>
     <p id="stats-text">Loading...</p>
     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #334155; font-size: 0.75rem; color: #64748b;">
-        <div style="margin-bottom: 4px; color: #e2e8f0; font-weight: 600;">Last Updated: LAST_UPDATE_PLACEHOLDER</div>
+        <div style="margin-bottom: 6px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6;">
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px;">Last Updated</div>
+            <div style="color: #3b82f6; font-weight: 700; font-size: 0.95rem;">LAST_UPDATE_PLACEHOLDER</div>
+        </div>
         Arcs are offset by date. Arrows indicate directed action.
     </div>
 </div>
@@ -556,10 +559,22 @@ def generate_map_html(lines):
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                // Get update time from the first market
-                const lastUpdate = visibleMarkets[0].updated || "";
+                // Get most recent update time from all visible markets
+                const allUpdateTimes = visibleMarkets.map(m => m.updated || "").filter(t => t);
+                const lastUpdate = allUpdateTimes.length > 0 ? allUpdateTimes[0] : "";
+                
+                // Get overall page update time from info box
+                const pageUpdateElement = document.querySelector('.info-box');
+                let pageUpdateTime = "";
+                if (pageUpdateElement) {
+                    // Match date-time pattern: YYYY-MM-DD HH:MM:SS
+                    const dateTimeRegex = /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/;
+                    const match = pageUpdateElement.textContent.match(dateTimeRegex);
+                    if (match) pageUpdateTime = match[1];
+                }
                 
                 tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
+                    <div style="display:flex; justify-content:space-between;"><span>Page Updated:</span> <span style="color:#3b82f6; font-weight:600;">${pageUpdateTime || lastUpdate}</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate}</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime}</span></div>
                 </div>`;
