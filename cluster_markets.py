@@ -595,19 +595,7 @@ def generate_map_html(lines):
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                // Get most recent update time from all visible markets (sort to get latest)
-                const allUpdateTimes = visibleMarkets.map(m => m.updated || "").filter(t => t);
-                let lastUpdate = "";
-                if (allUpdateTimes.length > 0) {
-                    // Sort by date-time descending to get most recent
-                    allUpdateTimes.sort((a, b) => {
-                        // Compare as strings (YYYY-MM-DD HH:MM:SS format)
-                        return b.localeCompare(a);
-                    });
-                    lastUpdate = allUpdateTimes[0];
-                }
-                
-                // Get overall page update time from info box
+                // Get overall page update time from info box (this is when HTML was generated)
                 const pageUpdateElement = document.querySelector('.info-box');
                 let pageUpdateTime = "";
                 if (pageUpdateElement) {
@@ -617,9 +605,28 @@ def generate_map_html(lines):
                     if (match) pageUpdateTime = match[1];
                 }
                 
+                // Get most recent price update time from all visible markets (sort to get latest)
+                const allUpdateTimes = visibleMarkets.map(m => m.updated || "").filter(t => t);
+                let pricesUpdateTime = "";
+                if (allUpdateTimes.length > 0) {
+                    // Sort by date-time descending to get most recent
+                    allUpdateTimes.sort((a, b) => {
+                        // Compare as strings (YYYY-MM-DD HH:MM:SS format)
+                        return b.localeCompare(a);
+                    });
+                    pricesUpdateTime = allUpdateTimes[0];
+                } else {
+                    // If no market update times available, use page update time
+                    pricesUpdateTime = pageUpdateTime;
+                }
+                
+                // Ensure page update time is always current (use page update time if available, otherwise use prices time)
+                const displayPageTime = pageUpdateTime || pricesUpdateTime || "N/A";
+                const displayPricesTime = pricesUpdateTime || "N/A";
+                
                 tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
-                    <div style="display:flex; justify-content:space-between;"><span>Page Updated:</span> <span style="color:#3b82f6; font-weight:600;">${pageUpdateTime || "N/A"}</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate || "N/A"}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Page Updated:</span> <span style="color:#3b82f6; font-weight:600;">${displayPageTime}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${displayPricesTime}</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime || "N/A"}</span></div>
                 </div>
                 <button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
