@@ -316,7 +316,7 @@ def generate_combined_html():
     const map = L.map('map', {{
         zoomControl: false,
         attributionControl: false
-    }}).setView([40, -100], 4); 
+    }}).setView([20, 0], 2); 
 
     L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{ maxZoom: 20 }}).addTo(map);
 
@@ -375,7 +375,7 @@ def generate_combined_html():
         const sortedZones = Object.keys(all_zones).sort((a, b) => zone_volumes[b] - zone_volumes[a]);
         sortedZones.forEach((z, idx) => {{
             const safe_id = z.replace(/ /g, '_').replace(/\./g, '');
-            const checked = idx === 0 ? 'checked' : '';
+            const checked = ''; // Don't auto-select any zone
             const count = all_zones[z];
             const volume = zone_volumes[z] || 0;
             const radio = document.createElement('div');
@@ -458,7 +458,14 @@ def generate_combined_html():
         markers.length = 0;
 
         if (!selectedZone) {{
-            document.getElementById('total-events-count').innerText = '(0 events)';
+            // Count total events for selected categories when no zone is selected
+            let totalCount = 0;
+            events.forEach(event => {{
+                if (selectedCats.includes(event.cat)) {{
+                    totalCount++;
+                }}
+            }});
+            document.getElementById('total-events-count').innerText = `(${{totalCount}} events)`;
             return;
         }}
 
