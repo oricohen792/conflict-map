@@ -129,23 +129,33 @@ def generate_combined_html():
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         #map {{ 
-            position: relative; 
-            width: 100%; 
-            height: 100vh; 
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100vh !important;
             z-index: 1;
+            background: #0f172a;
         }}
         #globe-container {{ 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100vh !important;
             z-index: 1;
         }}
         .leaflet-container {{
             background: #0f172a !important;
-            height: 100% !important;
+            height: 100vh !important;
             width: 100% !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+        }}
+        .leaflet-map-pane {{
+            width: 100% !important;
+            height: 100% !important;
         }}
         .tooltip-overlay {{
             position: fixed;
@@ -731,10 +741,27 @@ def generate_combined_html():
         // Initialize map type and show markers after map is ready
         setTimeout(() => {{
             if (map) {{
-                switchMapType('conflict');
-                updateZoneCounts();
+                // Force map to recalculate size
+                map.invalidateSize();
+                // Try again after a short delay
+                setTimeout(() => {{
+                    map.invalidateSize();
+                    switchMapType('conflict');
+                    updateZoneCounts();
+                }}, 200);
+            }} else {{
+                console.error('Map not initialized');
+                // Retry initialization
+                setTimeout(() => {{
+                    initMapMode();
+                    if (map) {{
+                        map.invalidateSize();
+                        switchMapType('conflict');
+                        updateZoneCounts();
+                    }}
+                }}, 500);
             }}
-        }}, 300);
+        }}, 500);
     }});
 
     function getProbColor(p) {{
