@@ -196,6 +196,8 @@ except:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          
+          # Stage all files that might have changed
           git add market_report.html conflict_manifest.json recent_changes.json
           # Also commit the last full update timestamp file if it exists
           if [ -f ".last_full_update" ]; then
@@ -205,12 +207,14 @@ except:
           if [ -f "refresh_log.json" ]; then
             git add refresh_log.json
           fi
-          # Only commit if there are changes
-          if ! git diff --quiet || ! git diff --staged --quiet; then
-            git commit -m "Auto-update: $(date '+%Y-%m-%d %H:%M:%S')"
-            echo "Changes committed"
+          
+          # Check for staged changes (more reliable than git diff --quiet)
+          if git diff --cached --quiet; then
+            echo "No changes to commit (all files are up to date)"
           else
-            echo "No changes to commit"
+            echo "Changes detected, committing..."
+            git commit -m "Auto-update: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "✓ Changes committed successfully"
           fi
       
       - name: Push changes
