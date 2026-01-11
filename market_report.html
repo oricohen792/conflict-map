@@ -105,6 +105,15 @@
             .leaflet-bottom.leaflet-right { display: none; }
         }
 
+        .filter-box h1 {
+            font-size: 0.85rem !important;
+        }
+        .filter-box .filter-item label {
+            font-size: 0.8rem !important;
+        }
+        #map-type-selector {
+            font-size: 0.85rem !important;
+        }
         .map-icon {
             font-size: 24px;
             cursor: pointer;
@@ -249,12 +258,12 @@
 
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
-    <div style="font-size: 0.75rem; color: #64748b; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+    <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:18:12 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:19:31 UTC</span>
     </div>
     <h1>Select Map Type</h1>
-    <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 8px 12px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
+    <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
         <option value="conflict" selected>⚔️ Conflict Prediction Map (130 events, $71.1M)</option>
         <option value="sport" >⚽ Sport Events Map (205 events, $28.2M)</option>
         <option value="finance" >💰 Finance Events Map (265 events, $424.5M)</option>
@@ -286,7 +295,7 @@
 
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Choose Zone <span id="total-events-count" style="font-size: 0.9rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
+    <h1 style="margin-bottom: 8px;">Choose Zone <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
     <div id="zone-filters" style="max-height: 200px; overflow-y: auto;">
         ZONE_FILTERS_PLACEHOLDER
     </div>

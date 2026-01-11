@@ -141,7 +141,7 @@ def generate_combined_html():
         map_type_totals[map_type] = {"events": total_events, "volume": total_volume}
     
     # Generate map selector
-    map_selector = '<select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 8px 12px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">\n'
+    map_selector = '<select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">\n'
     for map_type, map_info in all_map_data.items():
         config = map_info["config"]
         selected = 'selected' if map_type == 'conflict' else ''
@@ -175,6 +175,15 @@ def generate_combined_html():
     
     # CSS
     combined_css = """
+        .filter-box h1 {
+            font-size: 0.85rem !important;
+        }
+        .filter-box .filter-item label {
+            font-size: 0.8rem !important;
+        }
+        #map-type-selector {
+            font-size: 0.85rem !important;
+        }
         .map-icon {
             font-size: 24px;
             cursor: pointer;
@@ -317,7 +326,7 @@ def generate_combined_html():
 
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
-    <div style="font-size: 0.75rem; color: #64748b; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+    <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
         <span style="color: #3b82f6; font-weight: 700;">{current_time} UTC</span>
     </div>
@@ -329,7 +338,7 @@ def generate_combined_html():
     {category_filters_html}
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Choose Zone <span id="total-events-count" style="font-size: 0.9rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
+    <h1 style="margin-bottom: 8px;">Choose Zone <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
     <div id="zone-filters" style="max-height: 200px; overflow-y: auto;">
         ZONE_FILTERS_PLACEHOLDER
     </div>
