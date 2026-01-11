@@ -198,11 +198,25 @@ jobs:
       - name: Push changes
         if: github.event_name != 'push'
         run: |
+          # Fetch latest changes from remote
+          echo "Fetching latest changes from remote..."
+          git fetch origin main
+          
           # Check if there are commits to push
           if git log origin/main..HEAD --oneline | grep -q .; then
-            echo "Pushing commits to main branch..."
-            git push origin main
-            echo "✓ Changes pushed successfully"
+            echo "Local commits found, attempting to push..."
+            # Try to rebase our commits on top of remote changes
+            if git rebase origin/main; then
+              echo "Rebase successful, pushing commits..."
+              git push origin main
+              echo "✓ Changes pushed successfully"
+            else
+              echo "⚠ Rebase failed (likely due to concurrent updates)"
+              echo "Resetting to remote state (another run may have already updated)"
+              git rebase --abort 2>/dev/null || true
+              git reset --hard origin/main
+              echo "Skipping push (remote already has updates)"
+            fi
           else
             echo "No new commits to push (workflow may have run but no changes detected)"
           fi
