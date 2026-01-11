@@ -94,7 +94,14 @@ jobs:
         if: steps.update_type.outputs.type == 'price'
         run: |
           echo "Refreshing prices..."
-          python refresh_prices.py
+          # Check if manifest exists, if not do a full update instead
+          if [ ! -f "conflict_manifest.json" ]; then
+            echo "⚠ WARNING: conflict_manifest.json not found, doing full update instead..."
+            python fetch_polymarket.py
+            python cluster_markets.py
+          else
+            python refresh_prices.py
+          fi
       
       - name: Verify HTML update
         run: |
