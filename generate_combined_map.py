@@ -706,11 +706,11 @@ def generate_combined_html():
     
     final_html = html_template.replace("ALL_MAP_DATA_PLACEHOLDER", all_map_data_json)
     
-    output_path = os.path.join(os.path.dirname(__file__), "combined_map.html")
+    output_path = os.path.join(os.path.dirname(__file__), "market_report.html")
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(final_html)
     
-    print(f"Done! Generated combined_map.html with all map types")
+    print(f"Done! Generated market_report.html with all map types")
 
 if __name__ == "__main__":
     generate_combined_html()

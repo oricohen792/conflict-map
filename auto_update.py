@@ -66,13 +66,13 @@ def generate_and_push(skip_fetch=False):
         print("\n[1/3] Skipping data fetch (using existing data)")
     
     # Step 2: Generate combined map with all types
-    print("\n[2/3] Generating combined map with all types...")
+    print("\n[2/3] Generating market report with all map types...")
     success = run_command(
         "python generate_combined_map.py",
-        "Generating Combined Map"
+        "Generating Market Report"
     )
     if not success:
-        print("Failed to generate combined map. Continuing...")
+        print("Failed to generate market report. Continuing...")
     
     # Step 3: Generate market inventory
     print("\n[3/4] Generating market inventory...")
@@ -86,7 +86,7 @@ def generate_and_push(skip_fetch=False):
     # Step 4: Check if there are changes (only HTML files)
     print("\n[4/5] Checking for changes in HTML files...")
     result = subprocess.run(
-        "git status --porcelain combined_map.html market_inventory.html",
+        "git status --porcelain market_report.html market_inventory.html",
         shell=True,
         capture_output=True,
         text=True,
@@ -102,7 +102,7 @@ def generate_and_push(skip_fetch=False):
     commit_message = f"Auto-update maps - {current_time} UTC"
     
     success = run_command(
-        "git add combined_map.html market_inventory.html",
+        "git add market_report.html market_inventory.html",
         "Staging HTML Changes"
     )
     if not success:

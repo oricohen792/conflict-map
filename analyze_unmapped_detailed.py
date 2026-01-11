@@ -1,31 +1,16 @@
 #!/usr/bin/env python3
 """
-Analyze unmapped markets to prioritize new map categories by volume
+Detailed analysis of all unmapped markets
 """
 import json
 from map_base import MapGeneratorBase
 from generate_map_conflict import CAT_KEYWORDS, all_keywords
 from generate_map_sport import SPORT_KEYWORDS, all_sport_keywords, EXCLUSION_KEYWORDS
 from generate_map_finance import FINANCE_KEYWORDS, all_finance_keywords
-from generate_map_elections import ELECTION_KEYWORDS, all_election_keywords
+from generate_map_elections import ELECTION_KEYWORDS, all_election_keywords, EXCLUSION_KEYWORDS as ELECTION_EXCLUSION_KEYWORDS
 from generate_map_technology import TECH_KEYWORDS, all_tech_keywords
 
 # Define potential new categories
-ELECTION_KEYWORDS = {
-    "Presidential": ["president", "presidential election", "presidential nomination", "presidential nominee"],
-    "Congressional": ["senate", "congress", "senator", "representative", "house of representatives"],
-    "Supreme Court": ["supreme court", "scotus", "justice", "judge"],
-    "State/Local": ["governor", "mayor", "state election", "local election"],
-    "Voting": ["vote", "polling", "ballot", "referendum", "primary", "caucus"]
-}
-
-TECH_KEYWORDS = {
-    "Product Launches": ["product launch", "announcement", "release", "unveil"],
-    "Companies": ["apple", "google", "microsoft", "tesla", "meta", "amazon", "nvidia"],
-    "AI/ML": ["ai", "artificial intelligence", "chatgpt", "gpt", "machine learning", "llm"],
-    "Conferences": ["ces", "wwdc", "google i/o", "developer conference"]
-}
-
 ENTERTAINMENT_KEYWORDS = {
     "Awards": ["oscar", "emmy", "grammy", "golden globe", "tony", "award"],
     "Movies/TV": ["movie", "film", "tv show", "series", "premiere", "box office"],
@@ -65,8 +50,8 @@ CRYPTO_KEYWORDS = {
     "Exchanges": ["coinbase", "binance", "exchange"]
 }
 
-def analyze_unmapped():
-    """Analyze unmapped markets and categorize them"""
+def analyze_unmapped_detailed():
+    """Detailed analysis of all unmapped markets"""
     generator = MapGeneratorBase("Analyzer", "dummy.html")
     markets = generator.load_markets()
     
@@ -80,6 +65,7 @@ def analyze_unmapped():
     election_ids = set()
     tech_ids = set()
     
+    print("Identifying mapped markets...")
     for m in markets:
         q = m.get("question", "").lower()
         m_id = m.get("id", "")
@@ -105,7 +91,7 @@ def analyze_unmapped():
                     finance_ids.add(m_id)
         
         # Check elections
-        if not any(excl in q for excl in EXCLUSION_KEYWORDS):
+        if not any(excl in q for excl in ELECTION_EXCLUSION_KEYWORDS):
             if any(k in q for k in all_election_keywords):
                 found_zones = generator.find_zones_in_text(m.get("question", ""))
                 if len(found_zones) >= 1 or any(k in q for k in ["president", "presidential", "senate", "congress", "supreme court"]):
@@ -118,7 +104,8 @@ def analyze_unmapped():
                 if len(found_zones) >= 1 or any(k in q for k in ["apple", "google", "microsoft", "meta", "amazon", "nvidia", "tesla", "openai"]):
                     tech_ids.add(m_id)
     
-    # Analyze unmapped markets
+    # Collect all unmapped markets with zones
+    unmapped_markets = []
     categories = {
         "Entertainment": {"keywords": ENTERTAINMENT_KEYWORDS, "count": 0, "volume": 0, "markets": []},
         "Legal & Judiciary": {"keywords": LEGAL_KEYWORDS, "count": 0, "volume": 0, "markets": []},
@@ -129,6 +116,7 @@ def analyze_unmapped():
         "Crypto & Blockchain": {"keywords": CRYPTO_KEYWORDS, "count": 0, "volume": 0, "markets": []}
     }
     
+    print("Analyzing unmapped markets...")
     for m in markets:
         m_id = m.get("id", "")
         q = m.get("question", "")
@@ -142,15 +130,11 @@ def analyze_unmapped():
         # Check if has zones
         found_zones = generator.find_zones_in_text(q)
         if not found_zones:
-            # For elections, default to US if no zone found
-            if any(k in q_lower for k in ["president", "presidential", "election", "senate", "congress", "supreme court"]):
-                found_zones = {"United States": None}
-            else:
-                continue
+            continue
         
-        # Categorize
+        # Try to categorize
+        categorized = False
         for cat_name, cat_data in categories.items():
-            matched = False
             for subcat, keywords in cat_data["keywords"].items():
                 if any(k in q_lower for k in keywords):
                     categories[cat_name]["count"] += 1
@@ -160,17 +144,34 @@ def analyze_unmapped():
                         "volume": vol,
                         "zones": list(found_zones.keys())
                     })
-                    matched = True
+                    categorized = True
                     break
-            if matched:
+            if categorized:
                 break
+        
+        # If not categorized, add to uncategorized list
+        if not categorized:
+            unmapped_markets.append({
+                "question": q,
+                "volume": vol,
+                "zones": list(found_zones.keys()),
+                "id": m_id
+            })
     
-    # Sort by volume
+    # Sort categories by volume
     sorted_cats = sorted(categories.items(), key=lambda x: x[1]["volume"], reverse=True)
     
+    # Sort uncategorized by volume
+    uncategorized_sorted = sorted(unmapped_markets, key=lambda x: x["volume"], reverse=True)
+    
     print("\n" + "="*80)
-    print("UNMAPPED MARKETS ANALYSIS - PRIORITIZED BY VOLUME")
+    print("DETAILED UNMAPPED MARKETS ANALYSIS")
     print("="*80)
+    
+    print(f"\nTotal unmapped markets with zones: {len(unmapped_markets) + sum(c['count'] for c in categories.values())}")
+    print(f"  - Categorized: {sum(c['count'] for c in categories.values())}")
+    print(f"  - Uncategorized: {len(unmapped_markets)}")
+    
     print(f"\n{'Category':<25} {'Markets':<12} {'Volume ($)':<20} {'Avg Vol/Market':<15}")
     print("-"*80)
     
@@ -181,8 +182,15 @@ def analyze_unmapped():
             avg_str = f"${avg_vol:,.0f}" if avg_vol >= 1000 else f"${avg_vol:.2f}"
             print(f"{cat_name:<25} {cat_data['count']:<12} {vol_str:<20} {avg_str:<15}")
     
+    # Show uncategorized summary
+    uncategorized_vol = sum(m["volume"] for m in unmapped_markets)
+    uncategorized_avg = uncategorized_vol / len(unmapped_markets) if unmapped_markets else 0
+    vol_str = f"${uncategorized_vol:,.0f}" if uncategorized_vol >= 1000 else f"${uncategorized_vol:.2f}"
+    avg_str = f"${uncategorized_avg:,.0f}" if uncategorized_avg >= 1000 else f"${uncategorized_avg:.2f}"
+    print(f"{'Uncategorized':<25} {len(unmapped_markets):<12} {vol_str:<20} {avg_str:<15}")
+    
     print("\n" + "="*80)
-    print("TOP PRIORITY RECOMMENDATIONS:")
+    print("TOP PRIORITY RECOMMENDATIONS (Categorized):")
     print("="*80)
     
     for i, (cat_name, cat_data) in enumerate(sorted_cats[:5], 1):
@@ -192,9 +200,45 @@ def analyze_unmapped():
             print(f"   - ${cat_data['volume']:,.0f} total volume")
             print(f"   - ${cat_data['volume']/cat_data['count']:,.0f} avg volume per market")
             if cat_data["markets"]:
-                print(f"   - Sample: {cat_data['markets'][0]['question'][:70]}...")
+                print(f"   - Sample: {cat_data['markets'][0]['question'][:80]}...")
     
-    return sorted_cats
+    print("\n" + "="*80)
+    print("TOP 20 UNCategorized MARKETS (by volume):")
+    print("="*80)
+    
+    for i, m in enumerate(uncategorized_sorted[:20], 1):
+        vol_str = f"${m['volume']:,.0f}" if m['volume'] >= 1000 else f"${m['volume']:.2f}"
+        zones_str = ", ".join(m['zones'][:3])
+        if len(m['zones']) > 3:
+            zones_str += f" (+{len(m['zones'])-3} more)"
+        print(f"\n{i}. {vol_str} - {zones_str}")
+        print(f"   {m['question'][:100]}...")
+    
+    # Analyze common words in uncategorized
+    print("\n" + "="*80)
+    print("COMMON WORDS IN UNCategorized MARKETS (top 30):")
+    print("="*80)
+    
+    from collections import Counter
+    all_words = []
+    for m in unmapped_markets:
+        words = m["question"].lower().split()
+        # Filter out common words
+        stop_words = {"will", "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by", "from", "as", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did", "this", "that", "these", "those", "i", "you", "he", "she", "it", "we", "they", "what", "which", "who", "where", "when", "why", "how"}
+        words = [w.strip(".,!?;:()[]{}'\"") for w in words if w.strip(".,!?;:()[]{}'\"") not in stop_words and len(w.strip(".,!?;:()[]{}'\"")) > 2]
+        all_words.extend(words)
+    
+    word_counts = Counter(all_words)
+    print("\nTop 30 words:")
+    for word, count in word_counts.most_common(30):
+        print(f"  {word}: {count}")
+    
+    return {
+        "categorized": dict(sorted_cats),
+        "uncategorized": unmapped_markets,
+        "uncategorized_count": len(unmapped_markets),
+        "uncategorized_volume": uncategorized_vol
+    }
 
 if __name__ == "__main__":
-    analyze_unmapped()
+    analyze_unmapped_detailed()
