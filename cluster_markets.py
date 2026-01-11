@@ -165,7 +165,7 @@ def main():
                 "tgt_lat": tgt_coords[0],
                 "tgt_lng": tgt_coords[1],
                 "cat": assigned_cat,
-                "updated": datetime.now().strftime("%H:%M"), 
+                "updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 
                 "countries": sorted([src_name, tgt_name]),
                 "slug": m.get("slug", ""),
                 "url": f"https://polymarket.com/event/{parent_slug}",
@@ -185,7 +185,7 @@ def main():
     for l in line_data:
         if l["id"] not in old_ids:
             new_changes.append({
-                "time": datetime.now().strftime("%H:%M"),
+                "time": datetime.now().strftime("%H:%M"),  # Keep short format for change log
                 "type": "NEW",
                 "q": l["q"],
                 "change": f"{int(l['price']*100)}%"
@@ -220,7 +220,7 @@ def generate_map_html(lines):
     markets_verified_time = "Pending"
     if os.path.exists("active_markets.jsonl"):
         mtime = os.path.getmtime("active_markets.jsonl")
-        markets_verified_time = datetime.fromtimestamp(mtime).strftime("%H:%M")
+        markets_verified_time = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
         
     json_lines = json.dumps(lines)
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -574,9 +574,17 @@ def generate_map_html(lines):
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                // Get most recent update time from all visible markets
+                // Get most recent update time from all visible markets (sort to get latest)
                 const allUpdateTimes = visibleMarkets.map(m => m.updated || "").filter(t => t);
-                const lastUpdate = allUpdateTimes.length > 0 ? allUpdateTimes[0] : "";
+                let lastUpdate = "";
+                if (allUpdateTimes.length > 0) {
+                    // Sort by date-time descending to get most recent
+                    allUpdateTimes.sort((a, b) => {
+                        // Compare as strings (YYYY-MM-DD HH:MM:SS format)
+                        return b.localeCompare(a);
+                    });
+                    lastUpdate = allUpdateTimes[0];
+                }
                 
                 // Get overall page update time from info box
                 const pageUpdateElement = document.querySelector('.info-box');
@@ -589,9 +597,9 @@ def generate_map_html(lines):
                 }
                 
                 tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
-                    <div style="display:flex; justify-content:space-between;"><span>Page Updated:</span> <span style="color:#3b82f6; font-weight:600;">${pageUpdateTime || lastUpdate}</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate}</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Page Updated:</span> <span style="color:#3b82f6; font-weight:600;">${pageUpdateTime || "N/A"}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate || "N/A"}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime || "N/A"}</span></div>
                 </div>`;
 
                 Object.keys(groups).sort().forEach((cat, idx) => {
