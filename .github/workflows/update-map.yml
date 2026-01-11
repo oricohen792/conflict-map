@@ -180,6 +180,7 @@ except:
           echo "=== HTML Verification Complete ==="
       
       - name: Commit changes
+        if: github.event_name != 'push'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -201,6 +202,7 @@ except:
           fi
       
       - name: Push changes
+        if: github.event_name != 'push'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
