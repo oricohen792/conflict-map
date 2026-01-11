@@ -359,8 +359,10 @@ def generate_combined_html():
     let currentMapType = 'conflict';
     const map = L.map('map', {{
         zoomControl: false,
-        attributionControl: false
-    }}).setView([20, 0], 2); 
+        attributionControl: false,
+        minZoom: 1,
+        maxBounds: [[-90, -180], [90, 180]]
+    }}).setView([20, 0], 1); 
 
     L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{ maxZoom: 20 }}).addTo(map);
 
