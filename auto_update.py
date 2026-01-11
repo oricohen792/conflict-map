@@ -6,10 +6,12 @@ import subprocess
 import sys
 import os
 import time
-from datetime import datetime, timezone
+import json
+from datetime import datetime, timezone, timedelta
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(SCRIPT_DIR, "polymarket_data.json")
 
 def run_command(command, description):
     """Run a shell command and return success status"""
@@ -34,27 +36,57 @@ def run_command(command, description):
         print(f"Exception: {e}")
         return False
 
-def generate_and_push():
-    """Generate report, commit, and push to git"""
+def should_fetch_data(skip_fetch=False):
+    """Check if we should fetch new data - defaults to True (always fetch)"""
+    if skip_fetch:
+        return False
+    return True  # Default: always fetch data on every loop
+
+def generate_and_push(skip_fetch=False):
+    """Generate reports, commit, and push to git"""
     current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     print(f"\n{'='*60}")
     print(f"Starting automated update at {current_time} UTC")
     print(f"{'='*60}")
     
-    # Step 1: Generate report
-    print("\n[1/3] Generating conflict map report...")
+    # Step 1: Fetch data (default: always fetch)
+    if should_fetch_data(skip_fetch):
+        print("\n[1/3] Fetching Polymarket data...")
+        success = run_command(
+            "python fetch_polymarket_data.py",
+            "Fetching Data"
+        )
+        if not success:
+            print("Failed to fetch data. Checking if existing data can be used...")
+            if not os.path.exists(DATA_FILE):
+                print("No data available. Skipping generation.")
+                return False
+            print("Using existing data file.")
+    else:
+        print("\n[1/3] Skipping data fetch (using existing data)")
+    
+    # Step 2: Generate conflict map
+    print("\n[2/3] Generating conflict map...")
     success = run_command(
-        "python generate_map.py",
-        "Generating Report"
+        "python generate_map_conflict.py",
+        "Generating Conflict Map"
     )
     if not success:
-        print("Failed to generate report. Skipping commit/push.")
-        return False
+        print("Failed to generate conflict map. Continuing with sport map...")
     
-    # Step 2: Check if there are changes
-    print("\n[2/3] Checking for changes...")
+    # Step 3: Generate sport map
+    print("\n[3/3] Generating sport map...")
+    success = run_command(
+        "python generate_map_sport.py",
+        "Generating Sport Map"
+    )
+    if not success:
+        print("Failed to generate sport map. Continuing with commit check...")
+    
+    # Step 4: Check if there are changes (only HTML files)
+    print("\n[4/4] Checking for changes in HTML files...")
     result = subprocess.run(
-        "git status --porcelain market_report.html",
+        "git status --porcelain market_report.html sport_report.html",
         shell=True,
         capture_output=True,
         text=True,
@@ -62,16 +94,16 @@ def generate_and_push():
     )
     
     if not result.stdout.strip():
-        print("No changes detected in market_report.html. Skipping commit.")
+        print("No changes detected in HTML files. Skipping commit.")
         return True
     
-    # Step 3: Commit changes
-    print("\n[3/3] Committing and pushing changes...")
-    commit_message = f"Auto-update conflict map - {current_time} UTC"
+    # Step 5: Commit changes (only HTML files)
+    print("\n[5/5] Committing and pushing HTML changes...")
+    commit_message = f"Auto-update maps - {current_time} UTC"
     
     success = run_command(
-        "git add market_report.html",
-        "Staging Changes"
+        "git add market_report.html sport_report.html",
+        "Staging HTML Changes"
     )
     if not success:
         return False
@@ -97,23 +129,31 @@ def generate_and_push():
 
 def main():
     """Main loop - run every 30 minutes"""
+    # Check for command line arguments
+    skip_fetch = "--skip-fetch" in sys.argv or "-s" in sys.argv
+    
     print("="*60)
-    print("Conflict Map Auto-Updater")
+    print("Polymarket Maps Auto-Updater")
     print("="*60)
-    print("This script will generate the report, commit, and push")
-    print("every 30 minutes. Press Ctrl+C to stop.")
+    print("This script will generate maps, commit, and push every 30 minutes.")
+    print("Data will be fetched on every loop by default.")
+    if skip_fetch:
+        print("SKIP FETCH MODE: Will use existing data without fetching.")
+    print("Only HTML files (market_report.html, sport_report.html) will be committed.")
+    print("Press Ctrl+C to stop.")
     print("="*60)
     
     # Run immediately on start
-    generate_and_push()
+    generate_and_push(skip_fetch=skip_fetch)
     
     # Then run every 30 minutes
     while True:
         try:
             print(f"\nWaiting 30 minutes until next update...")
-            print(f"Next update at: {(datetime.now(timezone.utc).timestamp() + 1800):.0f}")
+            next_update = datetime.now(timezone.utc) + timedelta(minutes=30)
+            print(f"Next update at: {next_update.strftime('%Y-%m-%d %H:%M:%S')} UTC")
             time.sleep(30 * 60)  # 30 minutes = 1800 seconds
-            generate_and_push()
+            generate_and_push(skip_fetch=skip_fetch)
         except KeyboardInterrupt:
             print("\n\nStopped by user. Exiting...")
             break

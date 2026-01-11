@@ -1,5 +1,6 @@
 # Data files (too large, will be regenerated)
 active_markets.jsonl
+polymarket_data.json
 
 # Python cache
 __pycache__/
