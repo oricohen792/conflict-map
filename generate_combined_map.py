@@ -379,22 +379,32 @@ def generate_combined_html():
         
         const events = mapInfo.events;
         const all_zones = {{}};
+        const zone_volumes = {{}};
+        
         events.forEach(e => {{
             const zone = e.zone;
             all_zones[zone] = (all_zones[zone] || 0) + 1;
+            zone_volumes[zone] = (zone_volumes[zone] || 0) + (e.vol || 0);
         }});
+        
+        function formatVol(vol) {{
+            if (vol >= 1000000) return '$' + (vol / 1000000).toFixed(1) + 'M';
+            if (vol >= 1000) return '$' + (vol / 1000).toFixed(0) + 'K';
+            return '$' + Math.round(vol);
+        }}
         
         const zoneFiltersDiv = document.getElementById('zone-filters');
         zoneFiltersDiv.innerHTML = '';
         
-        const sortedZones = Object.keys(all_zones).sort((a, b) => all_zones[b] - all_zones[a]);
+        const sortedZones = Object.keys(all_zones).sort((a, b) => zone_volumes[b] - zone_volumes[a]);
         sortedZones.forEach((z, idx) => {{
             const safe_id = z.replace(/ /g, '_').replace(/\./g, '');
             const checked = idx === 0 ? 'checked' : '';
             const count = all_zones[z];
+            const volume = zone_volumes[z] || 0;
             const radio = document.createElement('div');
             radio.className = 'filter-item';
-            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${{safe_id}}" data-zone="${{z}}" ${{checked}} onchange="onZoneChange('${{z}}')"> <label for="zone_${{safe_id}}">${{z}} (${{count}})</label>`;
+            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${{safe_id}}" data-zone="${{z}}" ${{checked}} onchange="onZoneChange('${{z}}')"> <label for="zone_${{safe_id}}">${{z}} (${{count}}) - ${{formatVol(volume)}}</label>`;
             zoneFiltersDiv.appendChild(radio);
         }});
     }}

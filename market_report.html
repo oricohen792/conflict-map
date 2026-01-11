@@ -288,7 +288,7 @@
     <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div style="padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 8px;">
             <span style="color: #94a3b8;">Last Updated:</span>
-            <span style="color: #3b82f6; font-weight: 700;">2026-01-11 20:36:32</span>
+            <span style="color: #3b82f6; font-weight: 700;">2026-01-11 20:39:09</span>
         </div>
         <span style="color: #94a3b8;">•</span>
         <div style="padding: 8px; background: rgba(15, 23, 42, 0.8); border-radius: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
@@ -395,22 +395,32 @@
         
         const events = mapInfo.events;
         const all_zones = {};
+        const zone_volumes = {};
+        
         events.forEach(e => {
             const zone = e.zone;
             all_zones[zone] = (all_zones[zone] || 0) + 1;
+            zone_volumes[zone] = (zone_volumes[zone] || 0) + (e.vol || 0);
         });
+        
+        function formatVol(vol) {
+            if (vol >= 1000000) return '$' + (vol / 1000000).toFixed(1) + 'M';
+            if (vol >= 1000) return '$' + (vol / 1000).toFixed(0) + 'K';
+            return '$' + Math.round(vol);
+        }
         
         const zoneFiltersDiv = document.getElementById('zone-filters');
         zoneFiltersDiv.innerHTML = '';
         
-        const sortedZones = Object.keys(all_zones).sort((a, b) => all_zones[b] - all_zones[a]);
+        const sortedZones = Object.keys(all_zones).sort((a, b) => zone_volumes[b] - zone_volumes[a]);
         sortedZones.forEach((z, idx) => {
             const safe_id = z.replace(/ /g, '_').replace(/\./g, '');
             const checked = idx === 0 ? 'checked' : '';
             const count = all_zones[z];
+            const volume = zone_volumes[z] || 0;
             const radio = document.createElement('div');
             radio.className = 'filter-item';
-            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${safe_id}" data-zone="${z}" ${checked} onchange="onZoneChange('${z}')"> <label for="zone_${safe_id}">${z} (${count})</label>`;
+            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${safe_id}" data-zone="${z}" ${checked} onchange="onZoneChange('${z}')"> <label for="zone_${safe_id}">${z} (${count}) - ${formatVol(volume)}</label>`;
             zoneFiltersDiv.appendChild(radio);
         });
     }
