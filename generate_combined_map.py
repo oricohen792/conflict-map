@@ -541,16 +541,12 @@ def generate_combined_html():
             
             const marker = L.marker(coords, {{ icon: icon }}).addTo(map);
             
-            // Only show tooltip for selected zone events
-            if (!isSelected) {{
-                markers.push(marker);
-                visibleCount += events.length;
-                continue;
+            if (isSelected) {{
+                selectedZoneCount += events.length;
             }}
+            visibleCount += events.length;
             
-            selectedZoneCount += events.length;
-            
-            // Build tooltip HTML
+            // Build tooltip HTML for all zones
             let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${{zone}}</div>`;
             
             function getBaseTopic(slug, q) {{
