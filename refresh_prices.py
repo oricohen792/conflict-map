@@ -116,15 +116,16 @@ def refresh_prices():
     with open(manifest_file, "w", encoding="utf-8") as f:
         json.dump(updated_manifest, f, indent=2)
 
-    # Regenerate HTML
+    # Update the last_update_timestamp file BEFORE generating HTML
+    # This ensures the HTML shows the correct timestamp
+    with open(".last_update_timestamp", "w", encoding="utf-8") as f:
+        f.write(current_time)
+
+    # Regenerate HTML (this will now read the updated timestamp)
     import cluster_markets
     html_content = cluster_markets.generate_map_html(updated_manifest)
     with open("market_report.html", "w", encoding="utf-8") as f:
         f.write(html_content)
-    
-    # Always update the last_update_timestamp file to ensure git detects changes
-    with open(".last_update_timestamp", "w", encoding="utf-8") as f:
-        f.write(current_time)
     
     # Report results
     elapsed_time = time.time() - start_time
