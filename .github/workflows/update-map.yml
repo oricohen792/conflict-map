@@ -185,8 +185,13 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
+          # Create/update a timestamp file to ensure we always have something to commit
+          # This tracks when the workflow ran, even if data didn't change
+          UPDATE_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$UPDATE_TIMESTAMP" > .last_update_timestamp
+          
           # Stage all files that might have changed
-          git add market_report.html conflict_manifest.json recent_changes.json
+          git add market_report.html conflict_manifest.json recent_changes.json .last_update_timestamp
           # Also commit the last full update timestamp file if it exists
           if [ -f ".last_full_update" ]; then
             git add .last_full_update
@@ -201,7 +206,7 @@ jobs:
             echo "No changes to commit (all files are up to date)"
           else
             echo "Changes detected, committing..."
-            git commit -m "Auto-update: $(date '+%Y-%m-%d %H:%M:%S')"
+            git commit -m "Auto-update: $UPDATE_TIMESTAMP"
             echo "✓ Changes committed successfully"
           fi
       
