@@ -5,7 +5,7 @@ on:
   schedule:
     # Every 5 minutes for price updates (GitHub Actions minimum interval)
     # Runs at :00, :05, :10, :15, :20, :25, :30, :35, :40, :45, :50, :55 of each hour
-    # Full market data refresh happens at :00 minutes of each hour
+    # Full market data refresh happens when 60+ minutes have passed since last market verification
     - cron: '*/5 * * * *'
   # Allow manual trigger
   workflow_dispatch:
@@ -43,54 +43,65 @@ jobs:
           HOUR=$(date +%H)
           CURRENT_TIME=$(date +%s)
           
-          # Track last full update time in a file
+          # Check when markets were last verified (full update timestamp)
+          MARKETS_VERIFIED_FILE=".markets_verified_time"
           LAST_UPDATE_FILE=".last_full_update"
           
-          # Check if this is a scheduled :00 run (or delayed :00 run)
-          # Cron runs at :00, :05, :10, :15, :20, :25, :30, :35, :40, :45, :50, :55
-          # Full update should happen at :00 of each hour
-          
           IS_FULL_UPDATE=false
+          TIME_SINCE_VERIFIED=0
           
-          # Case 1: Exactly :00 - definitely a full update
-          if [ "$MINUTE" = "00" ]; then
-            IS_FULL_UPDATE=true
-            echo "Scheduled :00 run detected"
-          
-          # Case 2: :01 or :02 - could be delayed :00 run, check if last update was >50 minutes ago
-          elif [ "$MINUTE" = "01" ] || [ "$MINUTE" = "02" ]; then
-            if [ -f "$LAST_UPDATE_FILE" ]; then
-              LAST_UPDATE=$(cat "$LAST_UPDATE_FILE")
-              TIME_SINCE_UPDATE=$((CURRENT_TIME - LAST_UPDATE))
-              # If last full update was more than 50 minutes ago, this is likely a delayed :00
-              if [ "$TIME_SINCE_UPDATE" -gt 3000 ]; then  # 50 minutes = 3000 seconds
+          # Check if markets verified time file exists
+          if [ -f "$MARKETS_VERIFIED_FILE" ]; then
+            # Read the timestamp (format: "YYYY-MM-DD HH:MM:SS")
+            VERIFIED_TIMESTAMP=$(cat "$MARKETS_VERIFIED_FILE" | tr -d '\n\r')
+            
+            # Convert to Unix timestamp using Python (more reliable across systems)
+            VERIFIED_UNIX=$(python3 -c "
+import sys
+from datetime import datetime, timezone
+try:
+    dt = datetime.strptime('$VERIFIED_TIMESTAMP', '%Y-%m-%d %H:%M:%S')
+    dt = dt.replace(tzinfo=timezone.utc)
+    print(int(dt.timestamp()))
+except:
+    print('0')
+" 2>/dev/null || echo "0")
+            
+            if [ "$VERIFIED_UNIX" != "0" ] && [ "$VERIFIED_UNIX" != "" ] && [ "$VERIFIED_UNIX" -gt 0 ]; then
+              TIME_SINCE_VERIFIED=$((CURRENT_TIME - VERIFIED_UNIX))
+              MINUTES_SINCE=$((TIME_SINCE_VERIFIED / 60))
+              
+              echo "Last market verification: $VERIFIED_TIMESTAMP"
+              echo "Time since last verification: $MINUTES_SINCE minutes ($TIME_SINCE_VERIFIED seconds)"
+              
+              # If 60 minutes (3600 seconds) have passed, do full update
+              if [ "$TIME_SINCE_VERIFIED" -ge 3600 ]; then
                 IS_FULL_UPDATE=true
-                echo "Delayed :00 run detected (last update was $((TIME_SINCE_UPDATE / 60)) minutes ago)"
+                echo "Full update needed: 60+ minutes since last market verification"
               else
-                echo "Not a delayed :00 (last update was $((TIME_SINCE_UPDATE / 60)) minutes ago)"
+                echo "Price refresh only: Only $MINUTES_SINCE minutes since last verification (need 60+)"
               fi
             else
-              # No previous update file - assume this is the first run (delayed :00)
+              echo "Warning: Could not parse markets verified timestamp '$VERIFIED_TIMESTAMP', assuming full update needed"
               IS_FULL_UPDATE=true
-              echo "First run detected (no previous update file)"
             fi
-          
-          # Case 3: Any other minute - price refresh only
           else
-            echo "Price refresh run (MINUTE=$MINUTE)"
+            # No markets verified file exists - this is first run or file missing
+            echo "No .markets_verified_time file found - performing full update"
+            IS_FULL_UPDATE=true
           fi
           
           if [ "$IS_FULL_UPDATE" = true ]; then
             echo "type=full" >> $GITHUB_OUTPUT
             echo "Full market fetch will be performed (MINUTE=$MINUTE, HOUR=$HOUR)"
-            # Update the last full update timestamp
+            # Update the last full update timestamp (Unix time)
             echo "$CURRENT_TIME" > "$LAST_UPDATE_FILE"
           else
             echo "type=price" >> $GITHUB_OUTPUT
             echo "Price refresh only (MINUTE=$MINUTE)"
           fi
       
-      - name: Full market fetch (every hour)
+      - name: Full market fetch (when 60+ minutes since last verification)
         if: steps.update_type.outputs.type == 'full' && github.event_name != 'push'
         run: |
           echo "Fetching all markets..."
