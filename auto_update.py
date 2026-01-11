@@ -65,53 +65,17 @@ def generate_and_push(skip_fetch=False):
     else:
         print("\n[1/3] Skipping data fetch (using existing data)")
     
-    # Step 2: Generate conflict map
-    print("\n[2/7] Generating conflict map...")
+    # Step 2: Generate all maps using unified generator
+    print("\n[2/3] Generating all maps using unified generator...")
     success = run_command(
-        "python generate_map_conflict.py",
-        "Generating Conflict Map"
+        "python unified_generate_map.py",
+        "Generating All Maps"
     )
     if not success:
-        print("Failed to generate conflict map. Continuing...")
+        print("Failed to generate maps. Continuing...")
     
-    # Step 3: Generate sport map
-    print("\n[3/7] Generating sport map...")
-    success = run_command(
-        "python generate_map_sport.py",
-        "Generating Sport Map"
-    )
-    if not success:
-        print("Failed to generate sport map. Continuing...")
-    
-    # Step 4: Generate finance map
-    print("\n[4/7] Generating finance map...")
-    success = run_command(
-        "python generate_map_finance.py",
-        "Generating Finance Map"
-    )
-    if not success:
-        print("Failed to generate finance map. Continuing...")
-    
-    # Step 5: Generate elections map
-    print("\n[5/8] Generating elections map...")
-    success = run_command(
-        "python generate_map_elections.py",
-        "Generating Elections Map"
-    )
-    if not success:
-        print("Failed to generate elections map. Continuing...")
-    
-    # Step 6: Generate technology map
-    print("\n[6/9] Generating technology map...")
-    success = run_command(
-        "python generate_map_technology.py",
-        "Generating Technology Map"
-    )
-    if not success:
-        print("Failed to generate technology map. Continuing...")
-    
-    # Step 7: Generate market inventory
-    print("\n[7/9] Generating market inventory...")
+    # Step 3: Generate market inventory
+    print("\n[3/4] Generating market inventory...")
     success = run_command(
         "python generate_market_inventory.py",
         "Generating Market Inventory"
@@ -119,10 +83,10 @@ def generate_and_push(skip_fetch=False):
     if not success:
         print("Failed to generate market inventory. Continuing with commit check...")
     
-    # Step 8: Check if there are changes (only HTML files)
-    print("\n[8/9] Checking for changes in HTML files...")
+    # Step 4: Check if there are changes (only HTML files)
+    print("\n[4/5] Checking for changes in HTML files...")
     result = subprocess.run(
-        "git status --porcelain market_report.html sport_report.html finance_report.html elections_report.html technology_report.html market_inventory.html",
+        "git status --porcelain market_report.html sport_report.html finance_report.html elections_report.html technology_report.html political_leadership_report.html market_inventory.html",
         shell=True,
         capture_output=True,
         text=True,
@@ -133,12 +97,12 @@ def generate_and_push(skip_fetch=False):
         print("No changes detected in HTML files. Skipping commit.")
         return True
     
-    # Step 9: Commit changes (only HTML files)
-    print("\n[9/9] Committing and pushing HTML changes...")
+    # Step 5: Commit changes (only HTML files)
+    print("\n[5/5] Committing and pushing HTML changes...")
     commit_message = f"Auto-update maps - {current_time} UTC"
     
     success = run_command(
-        "git add market_report.html sport_report.html finance_report.html elections_report.html technology_report.html market_inventory.html",
+        "git add market_report.html sport_report.html finance_report.html elections_report.html technology_report.html political_leadership_report.html market_inventory.html",
         "Staging HTML Changes"
     )
     if not success:
@@ -175,7 +139,7 @@ def main():
     print("Data will be fetched on every loop by default.")
     if skip_fetch:
         print("SKIP FETCH MODE: Will use existing data without fetching.")
-    print("Generates: Conflict Map, Sport Map, Finance Map, Elections Map, Technology Map, and Market Inventory")
+    print("Generates: All maps using unified generator (Conflict, Sport, Finance, Elections, Technology, Political Leadership) and Market Inventory")
     print("Only HTML files will be committed.")
     print("Press Ctrl+C to stop.")
     print("="*60)

@@ -1,0 +1,148 @@
+{
+  "maps": {
+    "conflict": {
+      "name": "Conflict Prediction Map",
+      "html_file": "market_report.html",
+      "icon": "⚔️",
+      "color": "#ef4444",
+      "description": "Icons show conflict event locations. Click icons for details.",
+      "min_zones": 2,
+      "default_zone": null,
+      "keywords": {
+        "Military": ["war", "conflict", "invasion", "invade", "attack", "strike", "missile", "bomb", "blast", "military", "army", "navy", "nuclear", "weapon", "killed", "assassination", "escalation", "idf"],
+        "Trade": ["trade", "tariff", "tax", "sanction", "ban", "embargo", "economic", "trade war"],
+        "Drugs & Border": ["drug", "fentanyl", "cocaine", "cartel", "smuggling", "trafficking", "border"],
+        "Diplomatic": ["ceasefire", "peace", "treaty", "relation", "summit", "deal", "agreement", "talks", "truce", "diplomatic"]
+      },
+      "exclusion_keywords": [],
+      "default_zone_keywords": []
+    },
+    "sport": {
+      "name": "Sport Events Map",
+      "html_file": "sport_report.html",
+      "icon": "⚽",
+      "color": "#22c55e",
+      "description": "Flags show sport event locations. Click flags for details.",
+      "min_zones": 1,
+      "default_zone": null,
+      "keywords": {
+        "Football": ["football", "nfl", "super bowl", "ncaa", "college football", "nfl game", "touchdown", "quarterback"],
+        "Basketball": ["basketball", "nba", "ncaa basketball", "march madness", "nba game", "basketball game"],
+        "Baseball": ["baseball", "mlb", "world series", "baseball game", "mlb game"],
+        "Soccer": ["soccer", "football match", "premier league", "champions league", "world cup", "fifa", "euro", "copa"],
+        "Tennis": ["tennis", "wimbledon", "us open", "french open", "australian open", "atp", "wta"],
+        "Hockey": ["hockey", "nhl", "stanley cup", "hockey game"],
+        "Other Sports": ["golf", "boxing", "mma", "ufc", "olympics", "racing", "formula", "nascar", "cricket", "rugby"]
+      },
+      "exclusion_keywords": [
+        "inflation", "cpi", "consumer price index", "economic", "economy", "gdp", "unemployment",
+        "interest rate", "fed rate", "federal reserve", "central bank", "monetary policy",
+        "stock market", "dow", "nasdaq", "s&p", "sp500", "market crash", "recession",
+        "election", "president", "senate", "congress", "vote", "polling", "candidate",
+        "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
+        "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft"
+      ],
+      "default_zone_keywords": []
+    },
+    "finance": {
+      "name": "Finance Events Map",
+      "html_file": "finance_report.html",
+      "icon": "💰",
+      "color": "#fbbf24",
+      "description": "Icons show finance event locations. Click icons for details.",
+      "min_zones": 1,
+      "default_zone": "United States",
+      "keywords": {
+        "Federal Reserve": ["fed", "federal reserve", "fomc", "fed meeting", "fed decision", "fed rate", "fed chair", "jerome powell", "central bank"],
+        "Interest Rates": ["interest rate", "rate cut", "rate hike", "basis point", "fed funds rate", "monetary policy"],
+        "Inflation": ["inflation", "cpi", "consumer price index", "pce", "price index", "inflation rate"],
+        "Economic Indicators": ["gdp", "unemployment", "jobs report", "employment", "economic growth", "recession", "gdp growth"],
+        "Stock Market": ["stock market", "dow", "nasdaq", "s&p", "sp500", "s&p 500", "market crash", "market rally", "stock index"],
+        "Currency": ["dollar", "euro", "yen", "yuan", "currency", "exchange rate", "forex"],
+        "Other Financial": ["treasury", "bond", "yield", "debt", "deficit", "budget", "fiscal policy"]
+      },
+      "exclusion_keywords": [
+        "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
+        "football", "basketball", "baseball", "soccer", "tennis", "hockey", "sport", "game",
+        "election", "president", "senate", "congress", "vote", "polling", "candidate",
+        "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft"
+      ],
+      "default_zone_keywords": ["fed", "federal reserve", "fomc", "jerome powell"]
+    },
+    "elections": {
+      "name": "Elections & Politics Map",
+      "html_file": "elections_report.html",
+      "icon": "🗳️",
+      "color": "#a855f7",
+      "description": "Icons show political event locations. Click icons for details.",
+      "min_zones": 1,
+      "default_zone": "United States",
+      "keywords": {
+        "Presidential": ["president", "presidential election", "presidential nomination", "presidential nominee", "presidential candidate"],
+        "Congressional": ["senate", "congress", "senator", "representative", "house of representatives", "congressional"],
+        "Supreme Court": ["supreme court", "scotus", "justice", "judge", "supreme court justice"],
+        "State/Local": ["governor", "mayor", "state election", "local election", "state governor"],
+        "Voting": ["vote", "polling", "ballot", "referendum", "primary", "caucus", "election"]
+      },
+      "exclusion_keywords": [
+        "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
+        "football", "basketball", "baseball", "soccer", "tennis", "hockey", "sport", "game",
+        "inflation", "cpi", "consumer price index", "economic", "economy", "gdp", "unemployment",
+        "interest rate", "fed rate", "federal reserve", "central bank", "monetary policy",
+        "stock market", "dow", "nasdaq", "s&p", "sp500", "market crash", "recession",
+        "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft"
+      ],
+      "default_zone_keywords": ["president", "presidential", "senate", "congress", "supreme court"]
+    },
+    "technology": {
+      "name": "Technology Events Map",
+      "html_file": "technology_report.html",
+      "icon": "💻",
+      "color": "#06b6d4",
+      "description": "Icons show technology event locations. Click icons for details.",
+      "min_zones": 1,
+      "default_zone": "United States",
+      "keywords": {
+        "Product Launches": ["product launch", "announcement", "release", "unveil", "launch"],
+        "Companies": ["apple", "google", "microsoft", "tesla", "meta", "amazon", "nvidia", "openai"],
+        "AI/ML": ["ai", "artificial intelligence", "chatgpt", "gpt", "machine learning", "llm", "large language model"],
+        "Conferences": ["ces", "wwdc", "google i/o", "developer conference", "tech conference"]
+      },
+      "exclusion_keywords": [
+        "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
+        "football", "basketball", "baseball", "soccer", "tennis", "hockey", "sport", "game",
+        "election", "president", "senate", "congress", "vote", "polling", "candidate",
+        "inflation", "cpi", "consumer price index", "economic", "economy", "gdp", "unemployment",
+        "interest rate", "fed rate", "federal reserve", "central bank", "monetary policy",
+        "stock market", "dow", "nasdaq", "s&p", "sp500", "market crash", "recession",
+        "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft"
+      ],
+      "default_zone_keywords": ["apple", "google", "microsoft", "meta", "amazon", "nvidia", "tesla", "openai"]
+    },
+    "political_leadership": {
+      "name": "Political Events & Leadership Map",
+      "html_file": "political_leadership_report.html",
+      "icon": "🏛️",
+      "color": "#dc2626",
+      "description": "Icons show political leadership and regime change events. Click icons for details.",
+      "min_zones": 1,
+      "default_zone": null,
+      "keywords": {
+        "Leadership Changes": ["out as", "leave", "resign", "step down", "removed", "ousted", "deposed", "overthrown", "regime fall", "regime change"],
+        "Nominations": ["nominate", "nomination", "appoint", "appointment", "cabinet", "fed chair"],
+        "Government Operations": ["government shutdown", "shutdown", "deport", "deportation", "acquire", "acquisition"],
+        "International Relations": ["visit", "meet", "summit", "talks", "agreement", "treaty"],
+        "Awards & Recognition": ["nobel peace prize", "nobel", "award", "prize"]
+      },
+      "exclusion_keywords": [
+        "football", "basketball", "baseball", "soccer", "tennis", "hockey", "sport", "game",
+        "inflation", "cpi", "consumer price index", "economic", "economy", "gdp", "unemployment",
+        "interest rate", "fed rate", "federal reserve", "central bank", "monetary policy",
+        "stock market", "dow", "nasdaq", "s&p", "sp500", "market crash", "recession",
+        "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft",
+        "election", "presidential election", "senate election", "congressional election", "vote", "polling", "ballot", "primary", "caucus"
+      ],
+      "default_zone_keywords": []
+    }
+  }
+}
