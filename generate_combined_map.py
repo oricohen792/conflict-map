@@ -115,20 +115,23 @@ def generate_combined_html():
         }
         print(f"    Found {len(event_data)} events")
     
-    # Get base HTML components - use custom head for Three.js globe
+    # Get base HTML components - include both Leaflet and Three.js
     html_head = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Combined Map Generator - Polymarket</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         #map {{ position: relative; }}
+        #globe-container {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; }}
         .tooltip-overlay {{
-            position: absolute;
+            position: fixed;
             background: rgba(15, 23, 42, 0.98);
             border: 1px solid #475569;
             color: #f1f5f9;
@@ -139,6 +142,7 @@ def generate_combined_html():
             z-index: 10000;
             pointer-events: auto;
             display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }}
     </style>"""
     
@@ -344,6 +348,7 @@ def generate_combined_html():
 <body>
 
 <div id="map"></div>
+<div id="globe-container" style="display: none;"></div>
 <button id="mobile-filter-btn" style="display:none;" onclick="document.querySelector('.filter-box').classList.toggle('active')">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
     Filters
@@ -354,6 +359,18 @@ def generate_combined_html():
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
         <span style="color: #3b82f6; font-weight: 700;">{current_time} UTC</span>
+    </div>
+    <div style="margin-bottom: 12px; padding: 8px; background: #1e293b; border-radius: 6px; border: 1px solid #475569;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <span style="font-size: 0.75rem; color: #94a3b8;">View Mode:</span>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="globe-mode-toggle" onchange="toggleViewMode()" style="cursor: pointer;">
+                <span style="font-size: 0.75rem; color: #e2e8f0;">🌍 Globe</span>
+            </label>
+        </div>
+        <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">
+            <span id="view-mode-label">🗺️ Map</span>
+        </div>
     </div>
     <h1>Select Map Type</h1>
     {map_selector}
@@ -382,27 +399,84 @@ def generate_combined_html():
 <script>
     const allMapData = ALL_MAP_DATA_PLACEHOLDER;
     let currentMapType = 'conflict';
+    let isGlobeMode = false;
+    let map = null;
+    let scene = null;
+    let camera = null;
+    let renderer = null;
+    let controls = null;
+    let markerGroup = null;
+    let globe = null;
     
-    // Three.js Globe Setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0f172a);
+    // Initialize Leaflet Map
+    function initMapMode() {{
+        if (map) return; // Already initialized
+        
+        const mapContainer = document.getElementById('map');
+        mapContainer.style.display = 'block';
+        
+        map = L.map('map', {{
+            zoomControl: false,
+            attributionControl: false,
+            minZoom: 2,
+            maxZoom: 18,
+            worldCopyJump: false
+        }}).setView([20, 0], 2);
+
+        // Set strict bounds to prevent wrapping
+        const southWest = L.latLng(-85, -180);
+        const northEast = L.latLng(85, 180);
+        const bounds = L.latLngBounds(southWest, northEast);
+        map.setMaxBounds(bounds);
+        map.setMaxBoundsViscosity(1.0);
+
+        L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
+            maxZoom: 18,
+            noWrap: true
+        }}).addTo(map);
+        
+        // Prevent wrapping on move
+        map.on('moveend', function() {{
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+            if (center.lng < -180 || center.lng > 180) {{
+                map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
+            }}
+        }});
+    }}
     
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 2.5;
+    // Initialize Three.js Globe
+    function initGlobeMode() {{
+        if (renderer) return; // Already initialized
+        
+        const globeContainer = document.getElementById('globe-container');
+        globeContainer.style.display = 'block';
+        globeContainer.style.position = 'absolute';
+        globeContainer.style.top = '0';
+        globeContainer.style.left = '0';
+        globeContainer.style.width = '100%';
+        globeContainer.style.height = '100%';
+        
+        // Three.js Globe Setup
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0f172a);
+        
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 2.5;
+        
+        renderer = new THREE.WebGLRenderer({{ antialias: true }});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        globeContainer.appendChild(renderer.domElement);
     
-    const renderer = new THREE.WebGLRenderer({{ antialias: true }});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    document.getElementById('map').appendChild(renderer.domElement);
-    
-    // Orbit controls for rotation
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.minDistance = 1.5;
-    controls.maxDistance = 5;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.5;
+        // Orbit controls for rotation
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 1.5;
+        controls.maxDistance = 5;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
     
     // Create globe sphere with dark theme
     const globeGeometry = new THREE.SphereGeometry(1, 64, 64);
@@ -428,17 +502,38 @@ def generate_combined_html():
         }}
     );
     
-    const globe = new THREE.Mesh(globeGeometry, globeMaterial);
-    scene.add(globe);
-    
-    // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-    
-    // Add directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 3, 5);
-    scene.add(directionalLight);
+        globe = new THREE.Mesh(globeGeometry, globeMaterial);
+        scene.add(globe);
+        
+        // Add ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        // Add directional light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 3, 5);
+        scene.add(directionalLight);
+        
+        markerGroup = new THREE.Group();
+        scene.add(markerGroup);
+        
+        // Animation loop
+        function animate() {{
+            requestAnimationFrame(animate);
+            if (controls) controls.update();
+            if (renderer && scene && camera) renderer.render(scene, camera);
+        }}
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {{
+            if (camera && renderer) {{
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }}
+        }});
+    }}
     
     // Helper function to convert lat/lng to 3D position on sphere
     function latLngToVector3(lat, lng, radius = 1) {{
@@ -451,8 +546,6 @@ def generate_combined_html():
     }}
     
     const markers = [];
-    const markerGroup = new THREE.Group();
-    scene.add(markerGroup);
     
     // Raycaster for click detection
     const raycaster = new THREE.Raycaster();
@@ -526,23 +619,43 @@ def generate_combined_html():
         }}
     }}
     
-    renderer.domElement.addEventListener('click', onMouseClick);
-    renderer.domElement.addEventListener('mousemove', onMouseMove);
-    
-    // Animation loop
-    function animate() {{
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
+    // Toggle between globe and map mode
+    function toggleViewMode() {{
+        const toggle = document.getElementById('globe-mode-toggle');
+        isGlobeMode = toggle.checked;
+        const mapContainer = document.getElementById('map');
+        const globeContainer = document.getElementById('globe-container');
+        const viewModeLabel = document.getElementById('view-mode-label');
+        
+        if (isGlobeMode) {{
+            mapContainer.style.display = 'none';
+            globeContainer.style.display = 'block';
+            viewModeLabel.textContent = '🌍 Globe';
+            initGlobeMode();
+            // Re-attach event listeners if renderer exists
+            setTimeout(() => {{
+                if (renderer && renderer.domElement) {{
+                    renderer.domElement.addEventListener('click', onMouseClick);
+                    renderer.domElement.addEventListener('mousemove', onMouseMove);
+                }}
+            }}, 100);
+        }} else {{
+            globeContainer.style.display = 'none';
+            mapContainer.style.display = 'block';
+            viewModeLabel.textContent = '🗺️ Map';
+            initMapMode();
+            if (renderer && renderer.domElement) {{
+                renderer.domElement.removeEventListener('click', onMouseClick);
+                renderer.domElement.removeEventListener('mousemove', onMouseMove);
+            }}
+        }}
+        
+        // Update visibility to show markers in current mode
+        updateVisibility();
     }}
-    animate();
     
-    // Handle window resize
-    window.addEventListener('resize', () => {{
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    }});
+    // Initialize with map mode by default
+    initMapMode();
 
     function getProbColor(p) {{
         if (p >= 0.70) return '#22c55e';
@@ -611,22 +724,26 @@ def generate_combined_html():
         const coords = ZONE_COORDS[zoneName];
         if (coords) {{
             const [lat, lng] = coords;
-            const targetPos = latLngToVector3(lat, lng, 1.0);
-            // Animate camera to look at selected zone
-            const startPos = camera.position.clone();
-            const endPos = new THREE.Vector3(targetPos.x * 2.2, targetPos.y * 2.2, targetPos.z * 2.2);
-            let progress = 0;
-            const animateCamera = () => {{
-                progress += 0.03;
-                if (progress < 1) {{
-                    camera.position.lerpVectors(startPos, endPos, progress);
-                    camera.lookAt(targetPos);
-                    requestAnimationFrame(animateCamera);
-                }} else {{
-                    camera.lookAt(targetPos);
-                }}
-            }};
-            animateCamera();
+            if (isGlobeMode && camera) {{
+                const targetPos = latLngToVector3(lat, lng, 1.0);
+                // Animate camera to look at selected zone
+                const startPos = camera.position.clone();
+                const endPos = new THREE.Vector3(targetPos.x * 2.2, targetPos.y * 2.2, targetPos.z * 2.2);
+                let progress = 0;
+                const animateCamera = () => {{
+                    progress += 0.03;
+                    if (progress < 1) {{
+                        camera.position.lerpVectors(startPos, endPos, progress);
+                        camera.lookAt(targetPos);
+                        requestAnimationFrame(animateCamera);
+                    }} else {{
+                        camera.lookAt(targetPos);
+                    }}
+                }};
+                animateCamera();
+            }} else if (map) {{
+                map.setView([lat, lng], 5, {{ animate: true, duration: 0.5 }});
+            }}
         }}
         updateVisibility();
         
@@ -634,14 +751,19 @@ def generate_combined_html():
         setTimeout(() => {{
             const selectedMarker = markers.find(m => m.zoneName === zoneName);
             if (selectedMarker && selectedMarker.tooltipHtml) {{
-                const tooltip = createTooltipOverlay();
-                tooltip.innerHTML = selectedMarker.tooltipHtml;
-                tooltip.style.display = 'block';
-                tooltip.style.left = (window.innerWidth / 2) + 'px';
-                tooltip.style.top = (window.innerHeight / 2) + 'px';
-                tooltip.style.transform = 'translate(-50%, -50%)';
+                if (isGlobeMode) {{
+                    const tooltip = createTooltipOverlay();
+                    tooltip.innerHTML = selectedMarker.tooltipHtml;
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (window.innerWidth / 2) + 'px';
+                    tooltip.style.top = (window.innerHeight / 2) + 'px';
+                    tooltip.style.transform = 'translate(-50%, -50%)';
+                }} else if (selectedMarker.openPopup) {{
+                    selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                    selectedMarker.openPopup(selectedMarker.getLatLng());
+                }}
             }}
-        }}, 500);
+        }}, isGlobeMode ? 500 : 150);
     }}
 
     function updateZoneCounts() {{
@@ -696,7 +818,11 @@ def generate_combined_html():
         const selectedZone = selectedRadio ? selectedRadio.getAttribute('data-zone') : null;
 
         // Remove all markers
-        markers.forEach(marker => markerGroup.remove(marker));
+        if (isGlobeMode && markerGroup) {{
+            markers.forEach(marker => markerGroup.remove(marker));
+        }} else if (map) {{
+            markers.forEach(marker => map.removeLayer(marker));
+        }}
         markers.length = 0;
 
         // Group events by zone - show ALL zones that match selected categories
@@ -735,16 +861,9 @@ def generate_combined_html():
                 const color = config.color || '#3b82f6';
                 const [lat, lng] = coords;
                 
-                // Create 3D marker on globe
-                const position = latLngToVector3(lat, lng, 1.02);
-                const markerGeometry = new THREE.SphereGeometry(0.02, 16, 16);
-                const markerMaterial = new THREE.MeshBasicMaterial({{ color: color, opacity: 0.8, transparent: true }});
-                const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-                marker.position.copy(position);
-                marker.zoneName = zone;
-                markerGroup.add(marker);
+                let marker = null;
                 
-                // Build tooltip
+                // Build tooltip first (needed for both modes)
                 const eventsByCat = {{}};
                 events.forEach(e => {{
                     if (!eventsByCat[e.cat]) eventsByCat[e.cat] = [];
@@ -817,40 +936,105 @@ def generate_combined_html():
                 
                 tooltipHtml += `</div>`;
                 
-                marker.zoneName = zone;
-                marker.tooltipHtml = tooltipHtml;
-                marker.lat = lat;
-                marker.lng = lng;
-                markers.push(marker);
+                // Now create marker with tooltip
+                if (isGlobeMode && markerGroup) {{
+                    // Create 3D marker on globe
+                    const position = latLngToVector3(lat, lng, 1.02);
+                    const markerGeometry = new THREE.SphereGeometry(0.02, 16, 16);
+                    const markerMaterial = new THREE.MeshBasicMaterial({{ color: color, opacity: 0.8, transparent: true }});
+                    marker = new THREE.Mesh(markerGeometry, markerMaterial);
+                    marker.position.copy(position);
+                    marker.zoneName = zone;
+                    marker.tooltipHtml = tooltipHtml;
+                    marker.lat = lat;
+                    marker.lng = lng;
+                    markerGroup.add(marker);
+                }} else if (map) {{
+                    // Create Leaflet marker
+                    const iconSize = 20;
+                    const icon = L.divIcon({{
+                        className: 'map-icon',
+                        html: `<span style="color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; opacity: 0.6;">${{config.icon}}</span>`,
+                        iconSize: [iconSize, iconSize],
+                        iconAnchor: [iconSize/2, iconSize/2]
+                    }});
+                    marker = L.marker([lat, lng], {{ icon: icon }}).addTo(map);
+                    marker.zoneName = zone;
+                    marker.tooltipHtml = tooltipHtml;
+                    marker.lat = lat;
+                    marker.lng = lng;
+                    
+                    // Add Leaflet popup handlers
+                    marker.bindPopup("", {{
+                        closeButton: false,
+                        autoClose: false,
+                        className: 'line-popup',
+                        minWidth: 400,
+                        maxWidth: 2000,
+                        offset: [0, -10]
+                    }});
+                    
+                    let popupTimeout;
+                    marker.on('mouseover', function(e) {{
+                        clearTimeout(popupTimeout);
+                        this.setPopupContent(tooltipHtml);
+                        this.openPopup(e.latlng);
+                    }});
+                    
+                    marker.on('mouseout', function(e) {{
+                        popupTimeout = setTimeout(() => {{
+                            this.closePopup();
+                        }}, 400);
+                    }});
+                    
+                    marker.on('click', function(e) {{
+                        const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+                        const radio = document.getElementById(`zone_${{safe_id}}`);
+                        if (radio) {{
+                            radio.checked = true;
+                            updateVisibility();
+                            setTimeout(() => {{
+                                const selectedMarker = markers.find(m => m.zoneName === zone);
+                                if (selectedMarker && selectedMarker.tooltipHtml) {{
+                                    selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                    selectedMarker.openPopup(selectedMarker.getLatLng());
+                                }}
+                            }}, 150);
+                        }}
+                    }});
+                }}
+                
+                if (marker) {{
+                    markers.push(marker);
+                }}
             }});
             return;
         }}
 
-        // Center camera on selected zone
+        // Center camera/map on selected zone
         const selectedCoords = ZONE_COORDS[selectedZone];
         if (selectedCoords) {{
             const [lat, lng] = selectedCoords;
-            const targetPos = latLngToVector3(lat, lng, 1.0);
-            // Animate camera to look at selected zone
-            const startPos = camera.position.clone();
-            const startLookAt = new THREE.Vector3();
-            camera.getWorldDirection(startLookAt);
-            startLookAt.multiplyScalar(2.5).add(camera.position);
-            
-            const endPos = new THREE.Vector3(targetPos.x * 2.2, targetPos.y * 2.2, targetPos.z * 2.2);
-            let progress = 0;
-            const animateCamera = () => {{
-                progress += 0.03;
-                if (progress < 1) {{
-                    camera.position.lerpVectors(startPos, endPos, progress);
-                    const lookAtPos = new THREE.Vector3().lerpVectors(startLookAt, targetPos, progress);
-                    camera.lookAt(lookAtPos);
-                    requestAnimationFrame(animateCamera);
-                }} else {{
-                    camera.lookAt(targetPos);
-                }}
-            }};
-            animateCamera();
+            if (isGlobeMode && camera) {{
+                const targetPos = latLngToVector3(lat, lng, 1.0);
+                // Animate camera to look at selected zone
+                const startPos = camera.position.clone();
+                const endPos = new THREE.Vector3(targetPos.x * 2.2, targetPos.y * 2.2, targetPos.z * 2.2);
+                let progress = 0;
+                const animateCamera = () => {{
+                    progress += 0.03;
+                    if (progress < 1) {{
+                        camera.position.lerpVectors(startPos, endPos, progress);
+                        camera.lookAt(targetPos);
+                        requestAnimationFrame(animateCamera);
+                    }} else {{
+                        camera.lookAt(targetPos);
+                    }}
+                }};
+                animateCamera();
+            }} else if (map) {{
+                map.setView([lat, lng], 5, {{ animate: true, duration: 0.5 }});
+            }}
         }}
 
         let visibleCount = 0;
@@ -875,18 +1059,75 @@ def generate_combined_html():
             // Highlight selected zone with larger marker
             const isSelected = zone === selectedZone;
             const [lat, lng] = coords;
-            const position = latLngToVector3(lat, lng, isSelected ? 1.05 : 1.02);
-            const markerSize = isSelected ? 0.04 : 0.02;
-            const markerGeometry = new THREE.SphereGeometry(markerSize, 16, 16);
-            const markerMaterial = new THREE.MeshBasicMaterial({{
-                color: color,
-                opacity: isSelected ? 1.0 : 0.6,
-                transparent: true
-            }});
-            const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-            marker.position.copy(position);
-            marker.zoneName = zone;
-            markerGroup.add(marker);
+            let marker;
+            
+            if (isGlobeMode && markerGroup) {{
+                const position = latLngToVector3(lat, lng, isSelected ? 1.05 : 1.02);
+                const markerSize = isSelected ? 0.04 : 0.02;
+                const markerGeometry = new THREE.SphereGeometry(markerSize, 16, 16);
+                const markerMaterial = new THREE.MeshBasicMaterial({{
+                    color: color,
+                    opacity: isSelected ? 1.0 : 0.6,
+                    transparent: true
+                }});
+                marker = new THREE.Mesh(markerGeometry, markerMaterial);
+                marker.position.copy(position);
+                marker.zoneName = zone;
+                markerGroup.add(marker);
+            }} else if (map) {{
+                const iconSize = isSelected ? 36 : 28;
+                const iconAnchor = isSelected ? 18 : 14;
+                const iconStyle = isSelected 
+                    ? `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; filter: drop-shadow(0 0 8px ${{color}}) drop-shadow(0 0 12px rgba(255,255,255,0.3));`
+                    : `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; opacity: 0.6;`;
+                const icon = L.divIcon({{
+                    className: isSelected ? 'map-icon selected-zone-icon' : 'map-icon',
+                    html: `<span style="${{iconStyle}}">${{config.icon}}</span>`,
+                    iconSize: [iconSize, iconSize],
+                    iconAnchor: [iconAnchor, iconSize]
+                }});
+                marker = L.marker([lat, lng], {{ icon: icon }}).addTo(map);
+                marker.zoneName = zone;
+                
+                // Add Leaflet popup handlers
+                marker.bindPopup("", {{
+                    closeButton: false,
+                    autoClose: false,
+                    className: 'line-popup',
+                    minWidth: 400,
+                    maxWidth: 2000,
+                    offset: [0, -10]
+                }});
+                
+                let popupTimeout;
+                marker.on('mouseover', function(e) {{
+                    clearTimeout(popupTimeout);
+                    this.setPopupContent(tooltipHtml);
+                    this.openPopup(e.latlng);
+                }});
+                
+                marker.on('mouseout', function(e) {{
+                    popupTimeout = setTimeout(() => {{
+                        this.closePopup();
+                    }}, 400);
+                }});
+                
+                marker.on('click', function(e) {{
+                    const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+                    const radio = document.getElementById(`zone_${{safe_id}}`);
+                    if (radio) {{
+                        radio.checked = true;
+                        updateVisibility();
+                        setTimeout(() => {{
+                            const selectedMarker = markers.find(m => m.zoneName === zone);
+                            if (selectedMarker && selectedMarker.tooltipHtml) {{
+                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                selectedMarker.openPopup(selectedMarker.getLatLng());
+                            }}
+                        }}, 150);
+                    }}
+                }});
+            }}
             
             if (isSelected) {{
                 selectedZoneCount += events.length;
