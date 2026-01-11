@@ -240,6 +240,16 @@ class ConflictMapGenerator(MapGeneratorBase):
                 <span>⚽</span> View Sport Events Map →
             </a>
         </div>
+        <div style="margin-top: 8px; padding: 8px; background: rgba(251, 191, 36, 0.1); border-radius: 6px; border-left: 3px solid #fbbf24;">
+            <a href="finance_report.html" style="color: #fbbf24; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <span>💰</span> View Finance Map →
+            </a>
+        </div>
+        <div style="margin-top: 8px; padding: 8px; background: rgba(168, 85, 247, 0.1); border-radius: 6px; border-left: 3px solid #a855f7;">
+            <a href="market_inventory.html" style="color: #a855f7; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <span>📊</span> View Market Inventory →
+            </a>
+        </div>
         Arcs are offset by date. Arrows indicate directed action.
     </div>
 </div>

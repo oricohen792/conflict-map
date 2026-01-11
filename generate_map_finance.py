@@ -1,51 +1,49 @@
 #!/usr/bin/env python3
 """
-Generate sport map from saved Polymarket data - uses base class
-Shows sport events as flags at their locations
+Generate finance map from saved Polymarket data - uses base class
+Shows financial/economic events like Fed decisions, interest rates, inflation, etc.
 """
 import json
 from datetime import datetime, timezone
 from map_base import MapGeneratorBase, ZONE_COORD_MAP
 
-# Category Keywords for sports
-SPORT_KEYWORDS = {
-    "Football": ["football", "nfl", "super bowl", "ncaa", "college football", "nfl game", "touchdown", "quarterback"],
-    "Basketball": ["basketball", "nba", "ncaa basketball", "march madness", "nba game", "basketball game"],
-    "Baseball": ["baseball", "mlb", "world series", "baseball game", "mlb game"],
-    "Soccer": ["soccer", "football match", "premier league", "champions league", "world cup", "fifa", "euro", "copa"],
-    "Tennis": ["tennis", "wimbledon", "us open", "french open", "australian open", "atp", "wta"],
-    "Hockey": ["hockey", "nhl", "stanley cup", "hockey game"],
-    "Other Sports": ["golf", "boxing", "mma", "ufc", "olympics", "racing", "formula", "nascar", "cricket", "rugby"]
+# Category Keywords for financial/economic events
+FINANCE_KEYWORDS = {
+    "Federal Reserve": ["fed", "federal reserve", "fomc", "fed meeting", "fed decision", "fed rate", "fed chair", "jerome powell", "central bank"],
+    "Interest Rates": ["interest rate", "rate cut", "rate hike", "basis point", "fed funds rate", "monetary policy"],
+    "Inflation": ["inflation", "cpi", "consumer price index", "pce", "price index", "inflation rate"],
+    "Economic Indicators": ["gdp", "unemployment", "jobs report", "employment", "economic growth", "recession", "gdp growth"],
+    "Stock Market": ["stock market", "dow", "nasdaq", "s&p", "sp500", "s&p 500", "market crash", "market rally", "stock index"],
+    "Currency": ["dollar", "euro", "yen", "yuan", "currency", "exchange rate", "forex"],
+    "Other Financial": ["treasury", "bond", "yield", "debt", "deficit", "budget", "fiscal policy"]
 }
 
 # Combined list for initial check
-all_sport_keywords = []
-for k in SPORT_KEYWORDS.values():
-    all_sport_keywords.extend(k)
+all_finance_keywords = []
+for k in FINANCE_KEYWORDS.values():
+    all_finance_keywords.extend(k)
 
-# Exclusion keywords - markets containing these should NOT be considered sports
+# Exclusion keywords - markets containing these should NOT be considered financial
 EXCLUSION_KEYWORDS = [
-    "inflation", "cpi", "consumer price index", "economic", "economy", "gdp", "unemployment",
-    "interest rate", "fed rate", "federal reserve", "central bank", "monetary policy",
-    "stock market", "dow", "nasdaq", "s&p", "sp500", "market crash", "recession",
-    "election", "president", "senate", "congress", "vote", "polling", "candidate",
     "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
+    "football", "basketball", "baseball", "soccer", "tennis", "hockey", "sport", "game",
+    "election", "president", "senate", "congress", "vote", "polling", "candidate",
     "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft"
 ]
 
 
-class SportMapGenerator(MapGeneratorBase):
-    """Sport map generator - shows sport events as flags at locations"""
+class FinanceMapGenerator(MapGeneratorBase):
+    """Finance map generator - shows financial/economic events as markers at locations"""
     
     def __init__(self):
-        super().__init__("Sport Events Map Generator", "sport_report.html")
+        super().__init__("Finance Events Map Generator", "finance_report.html")
     
     def filter_markets(self):
-        """Filter and categorize sport markets"""
+        """Filter and categorize finance markets"""
         event_data = []
         current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         
-        print("Filtering and categorizing sport events...")
+        print("Filtering and categorizing finance events...")
         
         for m in self.markets:
             q = m.get("question", "")
@@ -54,29 +52,33 @@ class SportMapGenerator(MapGeneratorBase):
             price = float(m.get("lastTradePrice", 0) or 0)
             end_date = m.get("endDate", "")[:10]
             
-            # First check for exclusion keywords - skip non-sport markets
+            # First check for exclusion keywords - skip non-finance markets
             if any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
                 continue
             
-            assigned_cat = "Other Sports"
-            for cat, keywords in SPORT_KEYWORDS.items():
+            assigned_cat = "Other Financial"
+            for cat, keywords in FINANCE_KEYWORDS.items():
                 if any(k in q_lower for k in keywords):
                     assigned_cat = cat
                     break
             
-            if assigned_cat == "Other Sports" and not any(k in q_lower for k in all_sport_keywords):
+            if assigned_cat == "Other Financial" and not any(k in q_lower for k in all_finance_keywords):
                 continue
                 
             # Find location(s) mentioned in the question
             found_zones = self.find_zones_in_text(q)
             
-            # Use first zone found, or default to a central location if none found
+            # Use first zone found, or default to US for Fed/economic events if none found
             if found_zones:
                 zone_name = list(found_zones.keys())[0]
                 coords = ZONE_COORD_MAP[zone_name]
             else:
-                # Try to find any location mention, if none use default
-                continue  # Skip if no location found
+                # For Fed/central bank events, default to US
+                if any(k in q_lower for k in ["fed", "federal reserve", "fomc", "jerome powell"]):
+                    zone_name = "United States"
+                    coords = ZONE_COORD_MAP[zone_name]
+                else:
+                    continue  # Skip if no location found
             
             parent_slug = m.get("slug", "")
             events = m.get("events", [])
@@ -85,7 +87,7 @@ class SportMapGenerator(MapGeneratorBase):
             
             event_data.append({
                 "id": m.get("id", ""),
-                "unique_id": f"E{len(event_data)}", 
+                "unique_id": f"F{len(event_data)}", 
                 "q": q,
                 "price": price,
                 "date": end_date,
@@ -100,17 +102,17 @@ class SportMapGenerator(MapGeneratorBase):
                 "clobTokenIds": m.get("clobTokenIds", "")
             })
 
-        print(f"Found {len(event_data)} sport events.")
+        print(f"Found {len(event_data)} finance events.")
         return event_data
     
     def generate_html(self, events):
-        """Generate HTML map from filtered sport event data"""
+        """Generate HTML map from filtered finance event data"""
         current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         json_events = json.dumps(events)
         
         # Generate category filters
         category_checks = ""
-        for cat in SPORT_KEYWORDS.keys():
+        for cat in FINANCE_KEYWORDS.keys():
             safe_id = cat.replace(" ", "_").replace("&", "")
             category_checks += f"<div class='filter-item'><input type='checkbox' id='{safe_id}' checked onchange='updateZoneCounts(); updateVisibility()'> <label for='{safe_id}'>{cat}</label></div>"
         
@@ -133,9 +135,9 @@ class SportMapGenerator(MapGeneratorBase):
         analytics_code = self.get_analytics_code()
         zone_coords_js = self.get_zone_coords_js()
         
-        # Add sport-specific CSS (insert before closing </style> tag)
-        sport_css = """
-        .flag-icon {
+        # Add finance-specific CSS (insert before closing </style> tag)
+        finance_css = """
+        .finance-icon {
             font-size: 24px;
             cursor: pointer;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
@@ -164,8 +166,6 @@ class SportMapGenerator(MapGeneratorBase):
         .leaflet-popup-content { margin: 8px 12px; }
         .line-tooltip a { color: #38bdf8; text-decoration: none; font-weight: 500; }
         .line-tooltip a:hover { text-decoration: underline; color: #7dd3fc; }
-        .info-box a { transition: opacity 0.2s; }
-        .info-box a:hover { opacity: 0.8; }
         
         .snapshot-btn {
             background: #3b82f6;
@@ -227,10 +227,10 @@ class SportMapGenerator(MapGeneratorBase):
         #zone-filters { max-height: 200px; overflow-y: auto; }
         """
         
-        # Insert sport_css before the closing </style> tag
-        css_with_sport = css.replace("    </style>", sport_css + "    </style>")
+        # Insert finance_css before the closing </style> tag
+        css_with_finance = css.replace("    </style>", finance_css + "    </style>")
         
-        html_template = html_head + css_with_sport + analytics_code + """
+        html_template = html_head + css_with_finance + analytics_code + """
 </head>
 <body>
 
@@ -242,7 +242,7 @@ class SportMapGenerator(MapGeneratorBase):
 
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
-    <h1>Select Sports</h1>
+    <h1>Select Finance Categories</h1>
     CATEGORY_FILTERS_PLACEHOLDER
     
     <hr style="margin: 10px 0;">
@@ -253,7 +253,7 @@ class SportMapGenerator(MapGeneratorBase):
 </div>
 
 <div class="info-box">
-    <h1 style="font-size: 1.2rem;">Sport Events Map</h1>
+    <h1 style="font-size: 1.2rem;">Finance Events Map</h1>
     <p id="stats-text">Loading...</p>
     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #334155; font-size: 0.75rem; color: #64748b;">
         <div style="margin-bottom: 6px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6;">
@@ -262,12 +262,12 @@ class SportMapGenerator(MapGeneratorBase):
         </div>
         <div style="margin-top: 8px; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 3px solid #ef4444;">
             <a href="market_report.html" style="color: #ef4444; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
-                <span>⚔️</span> View Conflict Prediction Map →
+                <span>⚔️</span> View Conflict Map →
             </a>
         </div>
-        <div style="margin-top: 8px; padding: 8px; background: rgba(251, 191, 36, 0.1); border-radius: 6px; border-left: 3px solid #fbbf24;">
-            <a href="finance_report.html" style="color: #fbbf24; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
-                <span>💰</span> View Finance Map →
+        <div style="margin-top: 8px; padding: 8px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; border-left: 3px solid #22c55e;">
+            <a href="sport_report.html" style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <span>⚽</span> View Sport Map →
             </a>
         </div>
         <div style="margin-top: 8px; padding: 8px; background: rgba(168, 85, 247, 0.1); border-radius: 6px; border-left: 3px solid #a855f7;">
@@ -275,7 +275,7 @@ class SportMapGenerator(MapGeneratorBase):
                 <span>📊</span> View Market Inventory →
             </a>
         </div>
-        Flags show sport event locations. Click flags for details.
+        Icons show finance event locations. Click icons for details.
     </div>
 </div>
 
@@ -394,10 +394,10 @@ class SportMapGenerator(MapGeneratorBase):
             const maxProb = Math.max(...events.map(e => e.price));
             const color = getProbColor(maxProb);
             
-            // Create flag icon
+            // Create finance icon (dollar sign)
             const icon = L.divIcon({
-                className: 'flag-icon',
-                html: `<span style="color: ${color}; font-size: 28px;">🚩</span>`,
+                className: 'finance-icon',
+                html: `<span style="color: ${color}; font-size: 28px; font-weight: bold;">💰</span>`,
                 iconSize: [28, 28],
                 iconAnchor: [14, 28]
             });
@@ -506,7 +506,7 @@ class SportMapGenerator(MapGeneratorBase):
             visibleCount += events.length;
         }
         
-        document.getElementById('stats-text').innerText = `Visualizing ${visibleCount} sport events.`;
+        document.getElementById('stats-text').innerText = `Visualizing ${visibleCount} finance events.`;
     }
     
     // Initialize visibility
@@ -610,7 +610,7 @@ class SportMapGenerator(MapGeneratorBase):
 
 
 def main():
-    generator = SportMapGenerator()
+    generator = FinanceMapGenerator()
     generator.run()
 
 
