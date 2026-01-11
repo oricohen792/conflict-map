@@ -1,101 +1,118 @@
+#!/usr/bin/env python3
+"""
+Single script to fetch Polymarket data, filter conflict markets, and generate HTML map
+"""
 import json
-import os
 import requests
-import numpy as np
 import time
 from datetime import datetime, timezone
 
-def fetch_and_load_markets():
-    markets_file = "active_markets.jsonl"
-    if not os.path.exists(markets_file):
-        print(f"Error: {markets_file} not found. Run fetch_polymarket.py first.")
-        return []
-    
+# Category Keywords
+CAT_KEYWORDS = {
+    "Military": ["war", "conflict", "invasion", "invade", "attack", "strike", "missile", "bomb", "blast", "military", "army", "navy", "nuclear", "weapon", "killed", "assassination", "escalation", "idf"],
+    "Trade": ["trade", "tariff", "tax", "sanction", "ban", "embargo", "economic", "trade war"],
+    "Drugs & Border": ["drug", "fentanyl", "cocaine", "cartel", "smuggling", "trafficking", "border"],
+    "Diplomatic": ["ceasefire", "peace", "treaty", "relation", "summit", "deal", "agreement", "talks", "truce", "diplomatic"]
+}
+
+# Combined list for initial check
+all_keywords = []
+for k in CAT_KEYWORDS.values():
+    all_keywords.extend(k)
+
+# Country/Location Dictionary with Canonical Names
+COUNTRY_MAP = {
+    "United States": ["united states", "usa", "u.s.", "us", "america", "biden", "trump"],
+    "China": ["china", "beijing", "xi"],
+    "Taiwan": ["taiwan", "taipei"],
+    "Russia": ["russia", "moscow", "putin"],
+    "Ukraine": ["ukraine", "kiev", "kyiv", "zelensky"],
+    "Israel": ["israel", "jerusalem", "tel aviv", "idf", "netanyahu"],
+    "Iran": ["iran", "tehran"],
+    "Palestine": ["palestine", "gaza", "hamas", "rafah"],
+    "Lebanon": ["lebanon", "beirut", "hezbollah"],
+    "Yemen": ["yemen", "houthi"],
+    "Syria": ["syria", "damascus"],
+    "Iraq": ["iraq", "baghdad"],
+    "North Korea": ["north korea", "pyongyang", "dprk", "kim jong un"],
+    "South Korea": ["south korea", "seoul"],
+    "Japan": ["japan", "tokyo"],
+    "Mexico": ["mexico", "mexico city"],
+    "Canada": ["canada", "ottawa"],
+    "UK": ["uk", "united kingdom", "britain", "london"],
+    "France": ["france", "paris", "macron"],
+    "Germany": ["germany", "berlin"],
+    "EU": ["eu", "european union", "brussels"],
+    "India": ["india", "new delhi", "modi"],
+    "Pakistan": ["pakistan", "islamabad"],
+    "Venezuela": ["venezuela", "caracas", "maduro"],
+    "Brazil": ["brazil", "brasilia"],
+    "Sudan": ["sudan", "khartoum"]
+}
+
+COORD_MAP = {
+    "United States": [38.9072, -77.0369], "China": [39.9042, 116.4074], "Taiwan": [25.0330, 121.5654],
+    "Russia": [55.7558, 37.6173], "Ukraine": [50.4501, 30.5234], "Israel": [31.7683, 35.2137],
+    "Iran": [35.6892, 51.3890], "Palestine": [31.9522, 35.2332], "Lebanon": [33.8938, 35.5018],
+    "Yemen": [15.5527, 48.5164], "Syria": [33.5138, 36.2765], "Iraq": [33.3152, 44.3661],
+    "North Korea": [39.0392, 125.7625], "South Korea": [37.5665, 126.9780], "Japan": [35.6762, 139.6503],
+    "Mexico": [19.4326, -99.1332], "Canada": [45.4215, -75.6972], "UK": [51.5074, -0.1278],
+    "France": [48.8566, 2.3522], "Germany": [52.5200, 13.4050], "EU": [50.8503, 4.3517],
+    "India": [28.6139, 77.2090], "Pakistan": [33.6844, 73.0479], "Venezuela": [10.4806, -66.9036],
+    "Brazil": [-15.8267, -47.9218], "Sudan": [15.5007, 32.5599]
+}
+
+def fetch_markets():
+    """Fetch all active markets from Polymarket API"""
+    url = "https://gamma-api.polymarket.com/markets"
     markets = []
-    with open(markets_file, "r", encoding="utf-8") as f:
-        for line in f:
-            try:
-                markets.append(json.loads(line))
-            except:
-                continue
+    
+    params = {
+        "active": "true",
+        "closed": "false",
+        "limit": 100,
+        "offset": 0
+    }
+    
+    print("Fetching markets from Polymarket API...")
+    total_fetched = 0
+    
+    try:
+        while True:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            if not isinstance(data, list):
+                print(f"Unexpected response format: {type(data)}")
+                break
+
+            batch_size = len(data)
+            if batch_size == 0:
+                print("No more markets found.")
+                break
+            
+            markets.extend(data)
+            total_fetched += batch_size
+            print(f"Fetched batch of {batch_size}. Total: {total_fetched}")
+            
+            params["offset"] += batch_size
+            time.sleep(0.1)  # Rate limiting
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+    
+    print(f"Total markets fetched: {len(markets)}")
     return markets
 
-def main():
-    start_time = time.time()
-    print("Loading markets...")
-    markets = fetch_and_load_markets()
-    if not markets:
-        return
-    
-    print(f"Loaded {len(markets)} markets.")
-    
-    # Category Keywords
-    CAT_KEYWORDS = {
-        "Military": ["war", "conflict", "invasion", "invade", "attack", "strike", "missile", "bomb", "blast", "military", "army", "navy", "nuclear", "weapon", "killed", "assassination", "escalation", "idf"],
-        "Trade": ["trade", "tariff", "tax", "sanction", "ban", "embargo", "economic", "trade war"],
-        "Drugs & Border": ["drug", "fentanyl", "cocaine", "cartel", "smuggling", "trafficking", "border"],
-        "Diplomatic": ["ceasefire", "peace", "treaty", "relation", "summit", "deal", "agreement", "talks", "truce", "diplomatic"]
-    }
-    
-    # Combined list for initial check
-    all_keywords = []
-    for k in CAT_KEYWORDS.values():
-        all_keywords.extend(k)
-
-    # 2. Country/Location Dictionary with Canonical Names
-    COUNTRY_MAP = {
-        "United States": ["united states", "usa", "u.s.", "us", "america", "biden", "trump"],
-        "China": ["china", "beijing", "xi"],
-        "Taiwan": ["taiwan", "taipei"],
-        "Russia": ["russia", "moscow", "putin"],
-        "Ukraine": ["ukraine", "kiev", "kyiv", "zelensky"],
-        "Israel": ["israel", "jerusalem", "tel aviv", "idf", "netanyahu"],
-        "Iran": ["iran", "tehran"],
-        "Palestine": ["palestine", "gaza", "hamas", "rafah"],
-        "Lebanon": ["lebanon", "beirut", "hezbollah"],
-        "Yemen": ["yemen", "houthi"],
-        "Syria": ["syria", "damascus"],
-        "Iraq": ["iraq", "baghdad"],
-        "North Korea": ["north korea", "pyongyang", "dprk", "kim jong un"],
-        "South Korea": ["south korea", "seoul"],
-        "Japan": ["japan", "tokyo"],
-        "Mexico": ["mexico", "mexico city"],
-        "Canada": ["canada", "ottawa"],
-        "UK": ["uk", "united kingdom", "britain", "london"],
-        "France": ["france", "paris", "macron"],
-        "Germany": ["germany", "berlin"],
-        "EU": ["eu", "european union", "brussels"],
-        "India": ["india", "new delhi", "modi"],
-        "Pakistan": ["pakistan", "islamabad"],
-        "Venezuela": ["venezuela", "caracas", "maduro"],
-        "Brazil": ["brazil", "brasilia"],
-        "Sudan": ["sudan", "khartoum"]
-    }
-    
-    # Flatten for lookup
-    COUNTRIES = {}
-    for canonical, aliases in COUNTRY_MAP.items():
-        # Coordinates for the canonical country (using the first alias as key for coordinates)
-        # We need a fixed coord for each canonical name.
-        # Let's use a separate coord map.
-        pass
-
-    COORD_MAP = {
-        "United States": [38.9072, -77.0369], "China": [39.9042, 116.4074], "Taiwan": [25.0330, 121.5654],
-        "Russia": [55.7558, 37.6173], "Ukraine": [50.4501, 30.5234], "Israel": [31.7683, 35.2137],
-        "Iran": [35.6892, 51.3890], "Palestine": [31.9522, 35.2332], "Lebanon": [33.8938, 35.5018],
-        "Yemen": [15.5527, 48.5164], "Syria": [33.5138, 36.2765], "Iraq": [33.3152, 44.3661],
-        "North Korea": [39.0392, 125.7625], "South Korea": [37.5665, 126.9780], "Japan": [35.6762, 139.6503],
-        "Mexico": [19.4326, -99.1332], "Canada": [45.4215, -75.6972], "UK": [51.5074, -0.1278],
-        "France": [48.8566, 2.3522], "Germany": [52.5200, 13.4050], "EU": [50.8503, 4.3517],
-        "India": [28.6139, 77.2090], "Pakistan": [33.6844, 73.0479], "Venezuela": [10.4806, -66.9036],
-        "Brazil": [-15.8267, -47.9218], "Sudan": [15.5007, 32.5599]
-    }
-
+def filter_markets(markets):
+    """Filter and categorize conflict markets"""
     line_data = []
-
+    current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    
     print("Filtering and categorizing conflict bets...")
-
+    
     for m in markets:
         q = m.get("question", "")
         q_lower = q.lower()
@@ -126,18 +143,14 @@ def main():
                          break
         
         unique_names = list(found_canonical.keys())
-        unique_coords = list(found_canonical.values())
         
         if len(unique_names) >= 2:
-            # Sort country names to match JavaScript grouping
             sorted_names = sorted(unique_names[:2])
             src_name = sorted_names[0]
             tgt_name = sorted_names[1]
-            # Use canonical coordinates from COORD_MAP to ensure consistency
             src_coords = COORD_MAP[src_name]
             tgt_coords = COORD_MAP[tgt_name]
             
-            # Extract parent event slug if this is a child market
             parent_slug = m.get("slug", "")
             events = m.get("events", [])
             if events and len(events) > 0:
@@ -155,7 +168,7 @@ def main():
                 "tgt_lat": tgt_coords[0],
                 "tgt_lng": tgt_coords[1],
                 "cat": assigned_cat,
-                "updated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"), 
+                "updated": current_time,
                 "countries": sorted([src_name, tgt_name]),
                 "slug": m.get("slug", ""),
                 "url": f"https://polymarket.com/event/{parent_slug}",
@@ -163,62 +176,27 @@ def main():
             })
 
     print(f"Found {len(line_data)} conflict bets between countries.")
+    return line_data
 
-    # Save manifest for fast updates
-    with open("conflict_manifest.json", "w", encoding="utf-8") as f:
-        json.dump(line_data, f, indent=2)
-    print("Saved manifest to conflict_manifest.json")
-    
-    html_content = generate_map_html(line_data)
-    with open("market_report.html", "w", encoding="utf-8") as f:
-        f.write(html_content)
-    
-    print("Done! Saved to market_report.html")
-
-def generate_map_html(lines):
-    # Get timestamp of active_markets.jsonl (Market Data Verified - Hourly scan)
-    # Markets Verified is updated every 1 hour during full update
-    # Never show "Pending" - use current time if file doesn't exist (first run)
-    markets_verified_time = None
-    
-    # If active_markets.jsonl exists (during full update), update the timestamp
-    if os.path.exists("active_markets.jsonl"):
-        mtime = os.path.getmtime("active_markets.jsonl")
-        # Use UTC for consistency (file mtime is system time, convert to UTC)
-        markets_verified_time = datetime.fromtimestamp(mtime, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        # Save to committed file so it persists for price refresh runs
-        with open(".markets_verified_time", "w", encoding="utf-8") as f:
-            f.write(markets_verified_time)
-    else:
-        # Check committed timestamp file (for price refresh runs)
-        if os.path.exists(".markets_verified_time"):
-            with open(".markets_verified_time", "r", encoding="utf-8") as f:
-                markets_verified_time = f.read().strip()
-        else:
-            # First run - use current time (page first date) instead of "Pending"
-            # Use UTC for consistency
-            markets_verified_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        
+def generate_html(lines):
+    """Generate HTML map from filtered market data"""
+    current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     json_lines = json.dumps(lines)
     
-    # Get "Last Updated" timestamp - updated on every full update (when active_markets.jsonl exists)
-    # This shows when the page was last updated/committed, not when HTML was generated
-    if os.path.exists("active_markets.jsonl"):
-        # Full update - update the timestamp to current time
-        last_update_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        # Save to committed file so it persists
-        with open(".last_update_timestamp", "w", encoding="utf-8") as f:
-            f.write(last_update_str)
-    elif os.path.exists(".last_update_timestamp"):
-        # Price refresh run - use existing timestamp
-        with open(".last_update_timestamp", "r", encoding="utf-8") as f:
-            last_update_str = f.read().strip()
-    else:
-        # Fallback to current time if file doesn't exist
-        # Use UTC for consistency
-        last_update_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    # Generate country filters
+    all_countries = {}
+    for l in lines:
+        for c in l["countries"]:
+            all_countries[c] = all_countries.get(c, 0) + 1
     
-    html_template = """
+    country_checks = ""
+    for c in sorted(all_countries.keys(), key=lambda x: all_countries[x], reverse=True):
+        safe_id = c.replace(" ", "_").replace(".", "")
+        checked = "checked" if c == "Israel" else ""
+        count = all_countries[c]
+        country_checks += f"<div class='filter-item'><input type='radio' name='country' class='country-radio' id='{safe_id}' data-country='{c}' {checked} onchange='onCountryChange(\"{c}\")'> <label for='{safe_id}'>{c} ({count})</label></div>"
+    
+    html_template = r"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -276,11 +254,9 @@ def generate_map_html(lines):
             pointer-events: auto;
         }
 
-        /* Mobile Optimization */
         @media (max-width: 768px) {
             .info-box, .legend { display: none; } 
             
-            /* Mobile Filter Toggle Button */
             #mobile-filter-btn {
                 display: flex !important;
                 position: absolute;
@@ -307,7 +283,7 @@ def generate_map_html(lines):
                 width: 100%;
                 border-radius: 20px 20px 0 0;
                 max-height: 80vh;
-                transform: translateY(110%); /* Hidden by default */
+                transform: translateY(110%);
                 transition: transform 0.3s ease-in-out;
                 overflow-y: auto;
                 display: flex;
@@ -317,7 +293,7 @@ def generate_map_html(lines):
             }
             
             .filter-box.active {
-                transform: translateY(0); /* Visible */
+                transform: translateY(0);
             }
             
             .close-filter {
@@ -384,11 +360,6 @@ def generate_map_html(lines):
     Filters
 </button>
 
-<button id="mobile-filter-btn" style="display:none;" onclick="document.querySelector('.filter-box').classList.toggle('active')">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
-    Filters
-</button>
-
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <h1>Select Conflicts</h1>
@@ -436,7 +407,6 @@ def generate_map_html(lines):
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 }).addTo(map);
 
     const linesData = JSON_LINES_PLACEHOLDER;
-    const marketVerifyTime = "MARKET_VERIFY_PLACEHOLDER";
     const layers = {}; 
     const markers = [];
 
@@ -447,7 +417,6 @@ def generate_map_html(lines):
         return '#ef4444';
     }
     
-    // Country coordinates for map focusing
     const COUNTRY_COORDS = {
         "Brazil": [-15.8267, -47.9218],
         "Canada": [45.4215, -75.6972],
@@ -475,7 +444,6 @@ def generate_map_html(lines):
     };
     
     function onCountryChange(countryName) {
-        // Focus map on selected country
         const coords = COUNTRY_COORDS[countryName];
         if (coords) {
             map.setView(coords, 5, { animate: true, duration: 0.5 });
@@ -483,20 +451,9 @@ def generate_map_html(lines):
         updateVisibility();
     }
 
-    function addArrowhead(map, latlngs, color, layerGroup) {
-        if (latlngs.length < 2) return;
-        const p1 = latlngs[latlngs.length - 2];
-        const p2 = latlngs[latlngs.length - 1];
-        const angle = Math.atan2(p2[0] - p1[0], p2[1] - p1[1]) * 180 / Math.PI;
-        const arrowSvg = `<svg viewBox="0 0 10 10" width="12" height="12" style="transform: rotate(${90 - angle}deg)"><path d="M 0 0 L 10 5 L 0 10 z" fill="${color}" /></svg>`;
-        const icon = L.divIcon({ className: 'custom-arrowhead', html: arrowSvg, iconSize: [12, 12], iconAnchor: [6, 6] });
-        L.marker(p2, { icon: icon, interactive: false }).addTo(layerGroup);
-    }
-
     function updateCountryCounts() {
         const selectedCats = Array.from(document.querySelectorAll('.filter-box input[type="checkbox"]:not(.country-radio)')).filter(i => i.checked).map(i => i.id);
         
-        // Count markets and total volume per country for selected categories
         const countryCounts = {};
         const countryVolumes = {};
         linesData.forEach(market => {
@@ -508,14 +465,12 @@ def generate_map_html(lines):
             }
         });
         
-        // Format volume display
         function formatVol(vol) {
             if (vol >= 1000000) return '$' + (vol / 1000000).toFixed(1) + 'M';
             if (vol >= 1000) return '$' + (vol / 1000).toFixed(0) + 'K';
             return '$' + Math.round(vol);
         }
         
-        // Update each country label
         document.querySelectorAll('.country-radio').forEach(radio => {
             const country = radio.getAttribute('data-country');
             const count = countryCounts[country] || 0;
@@ -536,7 +491,6 @@ def generate_map_html(lines):
         for (const pairKey in groupLayers) {
             const group = marketGroups[pairKey];
             
-            // Check if this arc's endpoints match the selected country filters
             const arcEndpoints = group.pair; 
             const arcMatchesFilter = arcEndpoints.some(country => selectedCountries.includes(country));
             
@@ -550,7 +504,6 @@ def generate_map_html(lines):
                 selectedCats.includes(m.cat) && m.countries.some(c => selectedCountries.includes(c))
             );
 
-            // Sort by date ascending
             visibleMarkets.sort((a, b) => a.date.localeCompare(b.date));
 
             const layerGroup = groupLayers[pairKey];
@@ -558,13 +511,11 @@ def generate_map_html(lines):
                 if (!map.hasLayer(layerGroup)) map.addLayer(layerGroup);
                 visibleCount += visibleMarkets.length;
                 
-                // Update line color based on max probability of VISIBLE markets
                 const maxProb = Math.max(...visibleMarkets.map(m => m.price));
                 const newColor = getProbColor(maxProb);
                 group.polyline.setStyle({ color: newColor });
                 group.hitbox.setStyle({ color: 'transparent' }); 
 
-                // Tooltip construction
                 let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${group.pair[0]} & ${group.pair[1]}</div>`;
                 
                 const groups = {};
@@ -579,7 +530,6 @@ def generate_map_html(lines):
                     const preps = "on|by|before|in|at|during|through|after";
                     const months = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|may|june|july|august|september|october|november|december";
                     
-                    // Regex escaping correction: \\d becomes \d in JS string -> \d in Regex
                     base = base.replace(new RegExp(`-(${preps})-(${months}|\\\\d{1,2}|\\\\d{4})(-(\\\\d{1,2}|\\\\d{4}))?(-.*)?$`, "i"), '');
                     base = base.replace(new RegExp(`-(${months})(-(\\\\d{1,2}|\\\\d{4}))?(-(\\\\d{4}))?$`, "i"), '');
                     base = base.replace(new RegExp(`-(\\\\d{1,2})-(${months})(-.*)?$`, "i"), '');
@@ -588,29 +538,7 @@ def generate_map_html(lines):
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                // Get most recent price update time from ALL markets (not just visible ones)
-                // This ensures "Prices Updated" shows the actual latest price update regardless of filters
-                // Prices are updated every 5 minutes via refresh_prices.py
-                const allUpdateTimes = linesData.map(m => m.updated || "").filter(t => t);
-                let pricesUpdateTime = "N/A";
-                if (allUpdateTimes.length > 0) {
-                    // Sort by date-time descending to get most recent
-                    allUpdateTimes.sort((a, b) => {
-                        // Compare as strings (YYYY-MM-DD HH:MM:SS format)
-                        return b.localeCompare(a);
-                    });
-                    pricesUpdateTime = allUpdateTimes[0];
-                }
-                
-                // Markets Verified is updated every 1 hour during full update
-                // Should never be "Pending" - always show a timestamp or "N/A" if truly unavailable
-                const displayMarketsVerified = (marketVerifyTime && marketVerifyTime !== "Pending" && marketVerifyTime.trim() !== "") ? marketVerifyTime : "N/A";
-                
-                tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
-                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${pricesUpdateTime}</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${displayMarketsVerified}</span></div>
-                </div>
-                <button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
+                tooltipHtml += `<button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
 
                 Object.keys(groups).sort().forEach((cat, idx) => {
                     if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
@@ -647,11 +575,6 @@ def generate_map_html(lines):
         document.getElementById('stats-text').innerText = `Visualizing ${visibleCount} conflict bets.`;
     }
 
-    function setAllCountries(val) {
-        document.querySelectorAll('.country-check').forEach(i => i.checked = val);
-        updateVisibility();
-    }
-
     const groupLayers = {}; 
     const marketGroups = {};
 
@@ -660,7 +583,6 @@ def generate_map_html(lines):
             const pair = l.countries.sort();
             const pairKey = pair.join("-");
             if (!marketGroups[pairKey]) {
-                // Use COUNTRY_COORDS to get canonical coordinates for each country
                 const srcCoords = COUNTRY_COORDS[pair[0]] || [l.src_lat, l.src_lng];
                 const tgtCoords = COUNTRY_COORDS[pair[1]] || [l.tgt_lat, l.tgt_lng];
                 
@@ -676,7 +598,7 @@ def generate_map_html(lines):
 
         for (const pairKey in marketGroups) {
             const group = marketGroups[pairKey];
-            const itemGroup = L.layerGroup(); // Not added to map yet, updateVisibility will handle it
+            const itemGroup = L.layerGroup();
             groupLayers[pairKey] = itemGroup;
 
             const lat1 = group.src_coords[0], lng1 = group.src_coords[1];
@@ -760,32 +682,26 @@ def generate_map_html(lines):
         updateVisibility();
     } catch (err) { console.error(err); }
     
-    // Function to capture tooltip as image
     function captureTooltipSnapshot(button) {
-        // Find the tooltip container (parent of the button)
         const tooltipElement = button.closest('.line-tooltip');
         if (!tooltipElement) {
             console.error('Tooltip element not found');
             return;
         }
         
-        // Temporarily hide the button to avoid capturing it
         const originalDisplay = button.style.display;
         button.style.display = 'none';
         
-        // Get the country pair name for filename
         const headerText = tooltipElement.querySelector('div').textContent || 'tooltip';
         const filename = headerText.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + '_' + new Date().toISOString().slice(0, 10) + '.png';
         
-        // Use html2canvas to capture the tooltip
         if (typeof html2canvas !== 'undefined') {
             html2canvas(tooltipElement, {
                 backgroundColor: '#0f172a',
-                scale: 2, // Higher quality
+                scale: 2,
                 logging: false,
                 useCORS: true
             }).then(canvas => {
-                // Convert canvas to blob and trigger download
                 canvas.toBlob(function(blob) {
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
@@ -796,10 +712,8 @@ def generate_map_html(lines):
                     document.body.removeChild(link);
                     URL.revokeObjectURL(url);
                     
-                    // Restore button visibility
                     button.style.display = originalDisplay;
                     
-                    // Show brief feedback
                     const originalText = button.textContent;
                     button.textContent = '✓ Saved!';
                     button.style.background = '#22c55e';
@@ -822,29 +736,41 @@ def generate_map_html(lines):
 </body>
 </html>
 """
-    # Load country filters with counts
-    all_countries = {}
-    for l in lines:
-        for c in l["countries"]:
-            all_countries[c] = all_countries.get(c, 0) + 1
     
-    country_checks = ""
-    for c in sorted(all_countries.keys(), key=lambda x: all_countries[x], reverse=True):
-        safe_id = c.replace(" ", "_").replace(".", "")
-        checked = "checked" if c == "Israel" else ""
-        count = all_countries[c]
-        country_checks += f"<div class='filter-item'><input type='radio' name='country' class='country-radio' id='{safe_id}' data-country='{c}' {checked} onchange='onCountryChange(\"{c}\")'> <label for='{safe_id}'>{c} ({count})</label></div>"
-
     final_html = html_template.replace("JSON_LINES_PLACEHOLDER", json_lines)
-    final_html = final_html.replace("LAST_UPDATE_PLACEHOLDER", last_update_str)
+    final_html = final_html.replace("LAST_UPDATE_PLACEHOLDER", current_time)
     final_html = final_html.replace("COUNTRY_FILTERS_PLACEHOLDER", country_checks)
-    # Ensure markets_verified_time is never None or empty
-    if not markets_verified_time:
-        markets_verified_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    final_html = final_html.replace("MARKET_VERIFY_PLACEHOLDER", markets_verified_time)
     
     return final_html
 
+def main():
+    print("=" * 60)
+    print("Conflict Map Generator")
+    print("=" * 60)
+    print(f"Started at: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC\n")
+    
+    # Step 1: Fetch markets
+    markets = fetch_markets()
+    if not markets:
+        print("Error: No markets fetched")
+        return
+    
+    # Step 2: Filter markets
+    filtered_markets = filter_markets(markets)
+    if not filtered_markets:
+        print("Error: No conflict markets found")
+        return
+    
+    # Step 3: Generate HTML
+    print("\nGenerating HTML map...")
+    html_content = generate_html(filtered_markets)
+    
+    # Step 4: Save HTML
+    with open("market_report.html", "w", encoding="utf-8") as f:
+        f.write(html_content)
+    
+    print(f"\nDone! Generated market_report.html with {len(filtered_markets)} conflict markets")
+    print(f"Completed at: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC")
+
 if __name__ == "__main__":
     main()
-
