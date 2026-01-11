@@ -2,7 +2,6 @@
   "maps": {
     "conflict": {
       "name": "Conflict Prediction Map",
-      "html_file": "market_report.html",
       "icon": "⚔️",
       "color": "#ef4444",
       "description": "Icons show conflict event locations. Click icons for details.",
@@ -19,7 +18,6 @@
     },
     "sport": {
       "name": "Sport Events Map",
-      "html_file": "sport_report.html",
       "icon": "⚽",
       "color": "#22c55e",
       "description": "Flags show sport event locations. Click flags for details.",
@@ -46,7 +44,6 @@
     },
     "finance": {
       "name": "Finance Events Map",
-      "html_file": "finance_report.html",
       "icon": "💰",
       "color": "#fbbf24",
       "description": "Icons show finance event locations. Click icons for details.",
@@ -71,7 +68,6 @@
     },
     "elections": {
       "name": "Elections & Politics Map",
-      "html_file": "elections_report.html",
       "icon": "🗳️",
       "color": "#a855f7",
       "description": "Icons show political event locations. Click icons for details.",
@@ -96,7 +92,6 @@
     },
     "technology": {
       "name": "Technology Events Map",
-      "html_file": "technology_report.html",
       "icon": "💻",
       "color": "#06b6d4",
       "description": "Icons show technology event locations. Click icons for details.",
@@ -121,7 +116,6 @@
     },
     "political_leadership": {
       "name": "Political Events & Leadership Map",
-      "html_file": "political_leadership_report.html",
       "icon": "🏛️",
       "color": "#dc2626",
       "description": "Icons show political leadership and regime change events. Click icons for details.",
