@@ -362,24 +362,27 @@ def generate_combined_html():
         attributionControl: false,
         minZoom: 2,
         maxZoom: 18,
-        worldCopyJump: false,
-        maxBounds: [[-85, -180], [85, 180]],
-        maxBoundsViscosity: 1.0,
-        crs: L.CRS.EPSG3857
+        worldCopyJump: false
     }}).setView([20, 0], 2);
 
-    const tileLayer = L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
+    // Set strict bounds to prevent wrapping
+    const southWest = L.latLng(-85, -180);
+    const northEast = L.latLng(85, 180);
+    const bounds = L.latLngBounds(southWest, northEast);
+    map.setMaxBounds(bounds);
+    map.setMaxBoundsViscosity(1.0);
+
+    L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
         maxZoom: 18,
-        noWrap: true,
-        continuousWorld: false
+        noWrap: true
     }}).addTo(map);
     
-    // Prevent map from wrapping
-    map.on('drag', function() {{
-        const bounds = map.getBounds();
-        const maxBounds = [[-85, -180], [85, 180]];
-        if (bounds.getWest() < -180 || bounds.getEast() > 180) {{
-            map.setMaxBounds(maxBounds);
+    // Prevent wrapping on move
+    map.on('moveend', function() {{
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        if (center.lng < -180 || center.lng > 180) {{
+            map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
         }}
     }});
 

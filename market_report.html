@@ -260,7 +260,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:38:51 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:39:09 UTC</span>
     </div>
     <h1>Select Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -319,24 +319,27 @@
         attributionControl: false,
         minZoom: 2,
         maxZoom: 18,
-        worldCopyJump: false,
-        maxBounds: [[-85, -180], [85, 180]],
-        maxBoundsViscosity: 1.0,
-        crs: L.CRS.EPSG3857
+        worldCopyJump: false
     }).setView([20, 0], 2);
 
-    const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Set strict bounds to prevent wrapping
+    const southWest = L.latLng(-85, -180);
+    const northEast = L.latLng(85, 180);
+    const bounds = L.latLngBounds(southWest, northEast);
+    map.setMaxBounds(bounds);
+    map.setMaxBoundsViscosity(1.0);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 18,
-        noWrap: true,
-        continuousWorld: false
+        noWrap: true
     }).addTo(map);
     
-    // Prevent map from wrapping
-    map.on('drag', function() {
-        const bounds = map.getBounds();
-        const maxBounds = [[-85, -180], [85, 180]];
-        if (bounds.getWest() < -180 || bounds.getEast() > 180) {
-            map.setMaxBounds(maxBounds);
+    // Prevent wrapping on move
+    map.on('moveend', function() {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        if (center.lng < -180 || center.lng > 180) {
+            map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
         }
     });
 
