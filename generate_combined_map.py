@@ -619,6 +619,19 @@ def generate_combined_html():
                 offset: [0, -10]
             }});
             
+            // Store zone name on marker for click handler
+            marker.zoneName = zone;
+            
+            // Click handler to select zone
+            marker.on('click', function(e) {{
+                const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+                const radio = document.getElementById(`zone_${{safe_id}}`);
+                if (radio) {{
+                    radio.checked = true;
+                    onZoneChange(zone);
+                }}
+            }});
+            
             let popupTimeout;
             marker.on('mouseover', function(e) {{
                 clearTimeout(popupTimeout);
