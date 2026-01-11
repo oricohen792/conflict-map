@@ -30,6 +30,7 @@ jobs:
           pip install requests numpy
       
       - name: Check if full update needed
+        if: github.event_name != 'push'
         id: update_type
         run: |
           MINUTE=$(date +%M)
@@ -220,13 +221,16 @@ except:
           branch: main
           force: false
       
-      - name: Workflow complete
+      - name: Skip processing for push events
+        if: github.event_name == 'push'
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            echo "✓ Workflow triggered by push event"
-            echo "✓ Data processing skipped (push events only update workflow files)"
-            echo "✓ Scheduled runs will process data and commit changes automatically"
-          else
-            echo "✓ Workflow completed successfully"
-            echo "✓ Changes have been committed and pushed"
-          fi
+          echo "✓ Workflow triggered by push event"
+          echo "✓ Data processing skipped (push events only update workflow files)"
+          echo "✓ Scheduled runs will process data and commit changes automatically"
+          echo "✓ Workflow completed successfully"
+      
+      - name: Workflow complete
+        if: github.event_name != 'push'
+        run: |
+          echo "✓ Workflow completed successfully"
+          echo "✓ Changes have been committed and pushed"
