@@ -66,27 +66,45 @@ def generate_and_push(skip_fetch=False):
         print("\n[1/3] Skipping data fetch (using existing data)")
     
     # Step 2: Generate conflict map
-    print("\n[2/3] Generating conflict map...")
+    print("\n[2/7] Generating conflict map...")
     success = run_command(
         "python generate_map_conflict.py",
         "Generating Conflict Map"
     )
     if not success:
-        print("Failed to generate conflict map. Continuing with sport map...")
+        print("Failed to generate conflict map. Continuing...")
     
     # Step 3: Generate sport map
-    print("\n[3/3] Generating sport map...")
+    print("\n[3/7] Generating sport map...")
     success = run_command(
         "python generate_map_sport.py",
         "Generating Sport Map"
     )
     if not success:
-        print("Failed to generate sport map. Continuing with commit check...")
+        print("Failed to generate sport map. Continuing...")
     
-    # Step 4: Check if there are changes (only HTML files)
-    print("\n[4/4] Checking for changes in HTML files...")
+    # Step 4: Generate finance map
+    print("\n[4/7] Generating finance map...")
+    success = run_command(
+        "python generate_map_finance.py",
+        "Generating Finance Map"
+    )
+    if not success:
+        print("Failed to generate finance map. Continuing...")
+    
+    # Step 5: Generate market inventory
+    print("\n[5/7] Generating market inventory...")
+    success = run_command(
+        "python generate_market_inventory.py",
+        "Generating Market Inventory"
+    )
+    if not success:
+        print("Failed to generate market inventory. Continuing with commit check...")
+    
+    # Step 6: Check if there are changes (only HTML files)
+    print("\n[6/7] Checking for changes in HTML files...")
     result = subprocess.run(
-        "git status --porcelain market_report.html sport_report.html",
+        "git status --porcelain market_report.html sport_report.html finance_report.html market_inventory.html",
         shell=True,
         capture_output=True,
         text=True,
@@ -97,12 +115,12 @@ def generate_and_push(skip_fetch=False):
         print("No changes detected in HTML files. Skipping commit.")
         return True
     
-    # Step 5: Commit changes (only HTML files)
-    print("\n[5/5] Committing and pushing HTML changes...")
+    # Step 7: Commit changes (only HTML files)
+    print("\n[7/7] Committing and pushing HTML changes...")
     commit_message = f"Auto-update maps - {current_time} UTC"
     
     success = run_command(
-        "git add market_report.html sport_report.html",
+        "git add market_report.html sport_report.html finance_report.html market_inventory.html",
         "Staging HTML Changes"
     )
     if not success:
@@ -139,7 +157,8 @@ def main():
     print("Data will be fetched on every loop by default.")
     if skip_fetch:
         print("SKIP FETCH MODE: Will use existing data without fetching.")
-    print("Only HTML files (market_report.html, sport_report.html) will be committed.")
+    print("Generates: Conflict Map, Sport Map, Finance Map, and Market Inventory")
+    print("Only HTML files will be committed.")
     print("Press Ctrl+C to stop.")
     print("="*60)
     
