@@ -11,7 +11,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -32,7 +32,7 @@
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "China",
       "Taiwan"
@@ -53,7 +53,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -74,7 +74,7 @@
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "China",
       "Taiwan"
@@ -95,7 +95,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -116,7 +116,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "United States"
@@ -137,7 +137,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -158,7 +158,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -179,7 +179,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -200,7 +200,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -221,7 +221,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -242,7 +242,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -263,7 +263,7 @@
     "tgt_lat": 37.5665,
     "tgt_lng": 126.978,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "North Korea",
       "South Korea"
@@ -284,7 +284,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Palestine",
       "United States"
@@ -305,7 +305,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -326,7 +326,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "EU",
       "United States"
@@ -347,7 +347,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "India",
       "United States"
@@ -368,7 +368,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Canada",
       "United States"
@@ -389,7 +389,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Brazil",
       "United States"
@@ -410,7 +410,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Japan",
       "United States"
@@ -431,7 +431,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Mexico",
       "United States"
@@ -452,7 +452,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "South Korea",
       "United States"
@@ -473,7 +473,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "United States"
@@ -494,7 +494,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Pakistan",
       "United States"
@@ -515,7 +515,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "UK",
       "United States"
@@ -536,7 +536,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "United States"
@@ -557,7 +557,7 @@
     "tgt_lat": 33.5138,
     "tgt_lng": 36.2765,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Syria"
@@ -578,7 +578,7 @@
     "tgt_lat": 33.5138,
     "tgt_lng": 36.2765,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Syria"
@@ -599,7 +599,7 @@
     "tgt_lat": 33.5138,
     "tgt_lng": 36.2765,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Syria"
@@ -620,7 +620,7 @@
     "tgt_lat": 33.6844,
     "tgt_lng": 73.0479,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "India",
       "Pakistan"
@@ -641,7 +641,7 @@
     "tgt_lat": 33.6844,
     "tgt_lng": 73.0479,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "India",
       "Pakistan"
@@ -662,7 +662,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -683,7 +683,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -704,7 +704,7 @@
     "tgt_lat": 28.6139,
     "tgt_lng": 77.209,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "China",
       "India"
@@ -725,7 +725,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -746,7 +746,7 @@
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "China",
       "Taiwan"
@@ -767,7 +767,7 @@
     "tgt_lat": 35.6762,
     "tgt_lng": 139.6503,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "China",
       "Japan"
@@ -788,7 +788,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -809,7 +809,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -830,7 +830,7 @@
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "China",
       "Taiwan"
@@ -851,7 +851,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -872,7 +872,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -893,7 +893,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -914,7 +914,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Ukraine",
       "United States"
@@ -935,7 +935,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Ukraine",
       "United States"
@@ -956,7 +956,7 @@
     "tgt_lat": 33.5138,
     "tgt_lng": 36.2765,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Syria"
@@ -977,7 +977,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -998,7 +998,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "United States"
@@ -1019,7 +1019,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "United States"
@@ -1040,7 +1040,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1061,7 +1061,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -1082,7 +1082,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -1103,7 +1103,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1124,7 +1124,7 @@
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "China",
       "Taiwan"
@@ -1145,7 +1145,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1166,7 +1166,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1187,7 +1187,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -1208,7 +1208,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -1229,7 +1229,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -1250,7 +1250,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -1271,7 +1271,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1292,7 +1292,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1313,7 +1313,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1334,7 +1334,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1355,7 +1355,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1376,7 +1376,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1397,7 +1397,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1418,7 +1418,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1439,7 +1439,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1460,7 +1460,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1481,7 +1481,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1502,7 +1502,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1523,7 +1523,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1544,7 +1544,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1565,7 +1565,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1586,7 +1586,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1607,7 +1607,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Palestine"
@@ -1628,7 +1628,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -1649,7 +1649,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Palestine",
       "United States"
@@ -1670,7 +1670,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1691,7 +1691,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1712,7 +1712,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1733,7 +1733,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1754,7 +1754,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1775,7 +1775,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1796,7 +1796,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1817,7 +1817,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1838,7 +1838,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Mexico",
       "United States"
@@ -1859,7 +1859,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Mexico",
       "United States"
@@ -1880,7 +1880,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Mexico",
       "United States"
@@ -1901,7 +1901,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1922,7 +1922,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1943,7 +1943,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -1964,7 +1964,7 @@
     "tgt_lat": 33.5138,
     "tgt_lng": 36.2765,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Syria"
@@ -1985,7 +1985,7 @@
     "tgt_lat": 33.5138,
     "tgt_lng": 36.2765,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Syria"
@@ -2006,7 +2006,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Mexico",
       "United States"
@@ -2027,7 +2027,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -2048,7 +2048,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -2069,7 +2069,7 @@
     "tgt_lat": 15.5527,
     "tgt_lng": 48.5164,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Yemen"
@@ -2090,7 +2090,7 @@
     "tgt_lat": 15.5527,
     "tgt_lng": 48.5164,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Yemen"
@@ -2111,7 +2111,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -2132,7 +2132,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -2153,7 +2153,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -2174,7 +2174,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iraq",
       "Israel"
@@ -2195,7 +2195,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -2216,7 +2216,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -2237,7 +2237,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "United States"
@@ -2258,7 +2258,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "United States"
@@ -2279,7 +2279,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Trade",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "Lebanon"
@@ -2300,7 +2300,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -2321,7 +2321,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -2342,7 +2342,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "United States"
@@ -2363,7 +2363,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "United States"
@@ -2384,7 +2384,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "United States"
@@ -2405,7 +2405,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Drugs & Border",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Mexico",
       "United States"
@@ -2426,7 +2426,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -2447,7 +2447,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Russia",
       "Ukraine"
@@ -2468,7 +2468,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -2489,7 +2489,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "Israel"
@@ -2510,7 +2510,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Israel",
       "United States"
@@ -2531,7 +2531,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -2552,7 +2552,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -2573,7 +2573,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -2594,7 +2594,7 @@
     "tgt_lat": 51.5074,
     "tgt_lng": -0.1278,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "UK"
@@ -2615,7 +2615,7 @@
     "tgt_lat": 15.5527,
     "tgt_lng": 48.5164,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Yemen"
@@ -2636,7 +2636,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "United States",
       "Venezuela"
@@ -2657,7 +2657,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iraq",
       "United States"
@@ -2678,7 +2678,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Iran",
       "United States"
@@ -2699,7 +2699,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Syria",
       "United States"
@@ -2720,7 +2720,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:55:51",
+    "updated": "2026-01-11 11:58:06",
     "countries": [
       "Mexico",
       "United States"

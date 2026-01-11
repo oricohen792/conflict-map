@@ -378,6 +378,48 @@ def generate_map_html(lines):
         .snapshot-btn:active {
             background: #1d4ed8;
         }
+        
+        .share-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            flex: 1;
+            min-width: 60px;
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .share-btn.telegram { background: #0088cc; }
+        .share-btn.telegram:hover { background: #006ba3; }
+        
+        .share-btn.whatsapp { background: #25D366; }
+        .share-btn.whatsapp:hover { background: #1da851; }
+        
+        .share-btn.instagram { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); }
+        .share-btn.instagram:hover { opacity: 0.9; }
+        
+        .share-btn.facebook { background: #1877F2; }
+        .share-btn.facebook:hover { background: #1565c0; }
         .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.8rem; }
         .legend-color { width: 24px; height: 3px; border-radius: 2px; margin-right: 12px; }
         hr { border: 0; border-top: 1px solid #334155; margin: 12px 0; }
@@ -622,7 +664,13 @@ def generate_map_html(lines):
                     <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate || "N/A"}</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime || "N/A"}</span></div>
                 </div>
-                <button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
+                <button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>
+                <div class="share-buttons">
+                    <button class="share-btn telegram" onclick="shareToTelegram(this)" title="Share on Telegram">📱 TG</button>
+                    <button class="share-btn whatsapp" onclick="shareToWhatsApp(this)" title="Share on WhatsApp">💬 WA</button>
+                    <button class="share-btn instagram" onclick="shareToInstagram(this)" title="Share on Instagram">📸 IG</button>
+                    <button class="share-btn facebook" onclick="shareToFacebook(this)" title="Share on Facebook">👥 FB</button>
+                </div>`;
 
                 Object.keys(groups).sort().forEach((cat, idx) => {
                     if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
@@ -829,6 +877,90 @@ def generate_map_html(lines):
             button.style.display = originalDisplay;
             alert('html2canvas library not loaded. Please refresh the page.');
         }
+    }
+    
+    // Function to get share text from tooltip
+    function getTooltipShareText(button) {
+        const tooltipElement = button.closest('.line-tooltip');
+        if (!tooltipElement) return '';
+        
+        const headerText = tooltipElement.querySelector('div').textContent || '';
+        const pageUrl = window.location.href;
+        
+        // Get a summary of markets (first few)
+        const marketTexts = [];
+        const marketDivs = tooltipElement.querySelectorAll('a[href*="polymarket.com"]');
+        marketDivs.forEach((link, idx) => {
+            if (idx < 3) { // Limit to first 3 markets
+                const marketText = link.textContent.trim();
+                const priceSpan = link.parentElement.querySelector('span[style*="font-weight:800"]');
+                const price = priceSpan ? priceSpan.textContent : '';
+                marketTexts.push(`${marketText} ${price}`);
+            }
+        });
+        
+        const marketsSummary = marketTexts.length > 0 ? marketTexts.join(' | ') : '';
+        const shareText = `${headerText} - Conflict Prediction Markets\n\n${marketsSummary}\n\nView full map: ${pageUrl}`;
+        
+        return encodeURIComponent(shareText);
+    }
+    
+    // Share to Telegram
+    function shareToTelegram(button) {
+        const text = getTooltipShareText(button);
+        const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${text}`;
+        window.open(url, '_blank', 'width=600,height=400');
+    }
+    
+    // Share to WhatsApp
+    function shareToWhatsApp(button) {
+        const text = getTooltipShareText(button);
+        const url = `https://wa.me/?text=${text}`;
+        window.open(url, '_blank', 'width=600,height=400');
+    }
+    
+    // Share to Instagram (opens in new tab - Instagram doesn't have direct share API)
+    function shareToInstagram(button) {
+        // Instagram doesn't support direct URL sharing, so we'll copy to clipboard and show message
+        const text = getTooltipShareText(button);
+        const fullText = decodeURIComponent(text) + '\n\n' + window.location.href;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(fullText).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1500);
+                alert('Text copied! Paste it in your Instagram post/story.');
+            }).catch(() => {
+                alert('Please copy manually:\n\n' + fullText);
+            });
+        } else {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = fullText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1500);
+                alert('Text copied! Paste it in your Instagram post/story.');
+            } catch (err) {
+                alert('Please copy manually:\n\n' + fullText);
+            }
+            document.body.removeChild(textarea);
+        }
+    }
+    
+    // Share to Facebook
+    function shareToFacebook(button) {
+        const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+        window.open(url, '_blank', 'width=600,height=400');
     }
 </script>
 </body>
