@@ -226,6 +226,12 @@ def generate_combined_html():
             display: block;
         }
         #zone-filters { max-height: 200px; overflow-y: auto; }
+        .selected-zone-icon {
+            z-index: 1000;
+        }
+        .map-icon {
+            transition: opacity 0.3s;
+        }
         .info-box {
             left: 50%;
             transform: translateX(-50%);
@@ -477,13 +483,20 @@ def generate_combined_html():
             return;
         }}
 
-        // Group events by zone
+        // Center map on selected zone
+        const selectedCoords = ZONE_COORDS[selectedZone];
+        if (selectedCoords) {{
+            map.setView(selectedCoords, 5, {{ animate: true, duration: 0.5 }});
+        }}
+
+        // Group events by zone - show ALL zones that match selected categories
         const zoneEvents = {{}};
         events.forEach(event => {{
             const eventCat = event.cat;
             const eventZone = event.zone;
             
-            if (eventZone === selectedZone && selectedCats.includes(eventCat)) {{
+            // Show all zones that match selected categories (not just selected zone)
+            if (selectedCats.includes(eventCat)) {{
                 if (!zoneEvents[eventZone]) {{
                     zoneEvents[eventZone] = [];
                 }}
@@ -492,6 +505,7 @@ def generate_combined_html():
         }});
 
         let visibleCount = 0;
+        let selectedZoneCount = 0;
         
         // Create markers grouped by zone
         for (const zone in zoneEvents) {{
@@ -509,15 +523,32 @@ def generate_combined_html():
             const maxProb = Math.max(...events.map(e => e.price));
             const color = getProbColor(maxProb);
             
+            // Highlight selected zone with larger icon and border
+            const isSelected = zone === selectedZone;
+            const iconSize = isSelected ? 36 : 28;
+            const iconAnchor = isSelected ? 18 : 14;
+            const iconStyle = isSelected 
+                ? `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; filter: drop-shadow(0 0 8px ${{color}}) drop-shadow(0 0 12px rgba(255,255,255,0.3));`
+                : `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; opacity: 0.6;`;
+            
             // Create icon
             const icon = L.divIcon({{
-                className: 'map-icon',
-                html: `<span style="color: ${{color}}; font-size: 28px; font-weight: bold;">${{config.icon}}</span>`,
-                iconSize: [28, 28],
-                iconAnchor: [14, 28]
+                className: isSelected ? 'map-icon selected-zone-icon' : 'map-icon',
+                html: `<span style="${{iconStyle}}">${{config.icon}}</span>`,
+                iconSize: [iconSize, iconSize],
+                iconAnchor: [iconAnchor, iconSize]
             }});
             
             const marker = L.marker(coords, {{ icon: icon }}).addTo(map);
+            
+            // Only show tooltip for selected zone events
+            if (!isSelected) {{
+                markers.push(marker);
+                visibleCount += events.length;
+                continue;
+            }}
+            
+            selectedZoneCount += events.length;
             
             // Build tooltip HTML
             let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${{zone}}</div>`;
