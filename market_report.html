@@ -325,7 +325,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:11:01 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:14:03 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -624,13 +624,23 @@
         updateVisibility();
         
         // After visibility updates, show tooltip for selected zone marker
+        // Try multiple times with increasing delays to ensure marker is ready
         setTimeout(() => {
-            const selectedMarker = markers.find(m => m.zoneName === zoneName);
-            if (selectedMarker && selectedMarker.tooltipHtml && selectedMarker.openPopup) {
+            let selectedMarker = markers.find(m => m.zoneName === zoneName);
+            if (selectedMarker && selectedMarker.tooltipHtml) {
                 selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
                 selectedMarker.openPopup(selectedMarker.getLatLng());
+            } else {
+                // Retry after a bit more time
+                setTimeout(() => {
+                    selectedMarker = markers.find(m => m.zoneName === zoneName);
+                    if (selectedMarker && selectedMarker.tooltipHtml) {
+                        selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                        selectedMarker.openPopup(selectedMarker.getLatLng());
+                    }
+                }, 200);
             }
-        }, 150);
+        }, 200);
     }
 
     function updateZoneCounts() {
@@ -830,7 +840,7 @@
                     let popupTimeout;
                     marker.on('mouseover', function(e) {
                         clearTimeout(popupTimeout);
-                        this.setPopupContent(tooltipHtml);
+                        this.setPopupContent(this.tooltipHtml);
                         this.openPopup(e.latlng);
                     });
                     
@@ -841,18 +851,35 @@
                     });
                     
                     marker.on('click', function(e) {
+                        // Open tooltip immediately before updating visibility
+                        if (this.tooltipHtml) {
+                            this.setPopupContent(this.tooltipHtml);
+                            this.openPopup(e.latlng);
+                        }
+                        
                         const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
                         const radio = document.getElementById(`zone_${safe_id}`);
                         if (radio) {
                             radio.checked = true;
                             updateVisibility();
+                            
+                            // After visibility updates, ensure tooltip is still open
                             setTimeout(() => {
-                                const selectedMarker = markers.find(m => m.zoneName === zone);
+                                let selectedMarker = markers.find(m => m.zoneName === zone);
                                 if (selectedMarker && selectedMarker.tooltipHtml) {
                                     selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
                                     selectedMarker.openPopup(selectedMarker.getLatLng());
+                                } else {
+                                    // Retry if marker not found yet
+                                    setTimeout(() => {
+                                        selectedMarker = markers.find(m => m.zoneName === zone);
+                                        if (selectedMarker && selectedMarker.tooltipHtml) {
+                                            selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                            selectedMarker.openPopup(selectedMarker.getLatLng());
+                                        }
+                                    }, 200);
                                 }
-                            }, 150);
+                            }, 200);
                         }
                     });
                 }
@@ -894,74 +921,8 @@
             // Highlight selected zone with larger marker (if zone is selected)
             const isSelected = selectedZone && zone === selectedZone;
             const [lat, lng] = coords;
-            let marker;
             
-            if (map) {
-                const iconSize = isSelected ? 36 : 28;
-                const iconAnchor = isSelected ? 18 : 14;
-                const iconStyle = isSelected 
-                    ? `color: ${color}; font-size: ${iconSize}px; font-weight: bold; filter: drop-shadow(0 0 8px ${color}) drop-shadow(0 0 12px rgba(255,255,255,0.3));`
-                    : `color: ${color}; font-size: ${iconSize}px; font-weight: bold; opacity: 0.6;`;
-                const icon = L.divIcon({
-                    className: isSelected ? 'map-icon selected-zone-icon' : 'map-icon',
-                    html: `<span style="${iconStyle}">${config.icon}</span>`,
-                    iconSize: [iconSize, iconSize],
-                    iconAnchor: [iconAnchor, iconSize]
-                });
-                marker = L.marker([lat, lng], { icon: icon }).addTo(map);
-                marker.zoneName = zone;
-                
-                // Add Leaflet popup handlers
-                marker.bindPopup("", {
-                    closeButton: false,
-                    autoClose: false,
-                    className: 'line-popup',
-                    minWidth: 400,
-                    maxWidth: 2000,
-                    offset: [0, -10]
-                });
-                
-                let popupTimeout;
-                marker.on('mouseover', function(e) {
-                    clearTimeout(popupTimeout);
-                    this.setPopupContent(tooltipHtml);
-                    this.openPopup(e.latlng);
-                });
-                
-                marker.on('mouseout', function(e) {
-                    popupTimeout = setTimeout(() => {
-                        this.closePopup();
-                    }, 400);
-                });
-                
-                marker.on('click', function(e) {
-                    const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
-                    const radio = document.getElementById(`zone_${safe_id}`);
-                    if (radio) {
-                        radio.checked = true;
-                        updateVisibility();
-                        setTimeout(() => {
-                            const selectedMarker = markers.find(m => m.zoneName === zone);
-                            if (selectedMarker && selectedMarker.tooltipHtml) {
-                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
-                                selectedMarker.openPopup(selectedMarker.getLatLng());
-                            }
-                        }, 150);
-                    }
-                });
-            }
-            
-            if (isSelected) {
-                selectedZoneCount += events.length;
-            }
-            visibleCount += events.length;
-            
-            // Make marker interactive
-            marker.userData = { zone: zone, events: events };
-            
-            // Build tooltip HTML for all zones
-            let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${zone}</div>`;
-            
+            // Build tooltip HTML BEFORE creating marker
             function getBaseTopic(slug, q) {
                 if (!slug) return q;
                 let base = slug.replace(/-\d+$/, '');
@@ -975,6 +936,8 @@
                 base = base.replace(/^will-/, '').replace(/-?any-?$/, '').replace(/-?daily-?$/, '').replace(/-?weekly-?$/, '');
                 return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
             }
+            
+            let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${zone}</div>`;
             
             tooltipHtml += `<button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
             
@@ -1029,12 +992,92 @@
             
             tooltipHtml += `</div>`;
             
-            // Store zone name and tooltip HTML on marker
-            marker.tooltipHtml = tooltipHtml;
-            marker.lat = lat;
-            marker.lng = lng;
-            markers.push(marker);
+            let marker;
+            if (map) {
+                const iconSize = isSelected ? 36 : 28;
+                const iconAnchor = isSelected ? 18 : 14;
+                const iconStyle = isSelected 
+                    ? `color: ${color}; font-size: ${iconSize}px; font-weight: bold; filter: drop-shadow(0 0 8px ${color}) drop-shadow(0 0 12px rgba(255,255,255,0.3));`
+                    : `color: ${color}; font-size: ${iconSize}px; font-weight: bold; opacity: 0.6;`;
+                const icon = L.divIcon({
+                    className: isSelected ? 'map-icon selected-zone-icon' : 'map-icon',
+                    html: `<span style="${iconStyle}">${config.icon}</span>`,
+                    iconSize: [iconSize, iconSize],
+                    iconAnchor: [iconAnchor, iconSize]
+                });
+                marker = L.marker([lat, lng], { icon: icon }).addTo(map);
+                marker.zoneName = zone;
+                marker.tooltipHtml = tooltipHtml;
+                marker.lat = lat;
+                marker.lng = lng;
+                
+                // Add Leaflet popup handlers
+                marker.bindPopup("", {
+                    closeButton: false,
+                    autoClose: false,
+                    className: 'line-popup',
+                    minWidth: 400,
+                    maxWidth: 2000,
+                    offset: [0, -10]
+                });
+                
+                let popupTimeout;
+                marker.on('mouseover', function(e) {
+                    clearTimeout(popupTimeout);
+                    this.setPopupContent(this.tooltipHtml);
+                    this.openPopup(e.latlng);
+                });
+                
+                marker.on('mouseout', function(e) {
+                    popupTimeout = setTimeout(() => {
+                        this.closePopup();
+                    }, 400);
+                });
+                
+                marker.on('click', function(e) {
+                    // Open tooltip immediately before updating visibility
+                    if (this.tooltipHtml) {
+                        this.setPopupContent(this.tooltipHtml);
+                        this.openPopup(e.latlng);
+                    }
+                    
+                    const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+                    const radio = document.getElementById(`zone_${safe_id}`);
+                    if (radio) {
+                        radio.checked = true;
+                        updateVisibility();
+                        
+                        // After visibility updates, ensure tooltip is still open
+                        setTimeout(() => {
+                            let selectedMarker = markers.find(m => m.zoneName === zone);
+                            if (selectedMarker && selectedMarker.tooltipHtml) {
+                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                selectedMarker.openPopup(selectedMarker.getLatLng());
+                            } else {
+                                // Retry if marker not found yet
+                                setTimeout(() => {
+                                    selectedMarker = markers.find(m => m.zoneName === zone);
+                                    if (selectedMarker && selectedMarker.tooltipHtml) {
+                                        selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                        selectedMarker.openPopup(selectedMarker.getLatLng());
+                                    }
+                                }, 200);
+                            }
+                        }, 200);
+                    }
+                });
+            }
+            
+            if (isSelected) {
+                selectedZoneCount += events.length;
+            }
             visibleCount += events.length;
+            
+            // Make marker interactive
+            if (marker) {
+                marker.userData = { zone: zone, events: events };
+                markers.push(marker);
+            }
         }
         
         document.getElementById('total-events-count').innerText = `(${visibleCount} events)`;
