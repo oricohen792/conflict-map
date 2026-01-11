@@ -65,14 +65,14 @@ def generate_and_push(skip_fetch=False):
     else:
         print("\n[1/3] Skipping data fetch (using existing data)")
     
-    # Step 2: Generate all maps using unified generator
-    print("\n[2/3] Generating all maps using unified generator...")
+    # Step 2: Generate combined map with all types
+    print("\n[2/3] Generating combined map with all types...")
     success = run_command(
-        "python unified_generate_map.py",
-        "Generating All Maps"
+        "python generate_combined_map.py",
+        "Generating Combined Map"
     )
     if not success:
-        print("Failed to generate maps. Continuing...")
+        print("Failed to generate combined map. Continuing...")
     
     # Step 3: Generate market inventory
     print("\n[3/4] Generating market inventory...")
@@ -86,7 +86,7 @@ def generate_and_push(skip_fetch=False):
     # Step 4: Check if there are changes (only HTML files)
     print("\n[4/5] Checking for changes in HTML files...")
     result = subprocess.run(
-        "git status --porcelain market_report.html sport_report.html finance_report.html elections_report.html technology_report.html political_leadership_report.html market_inventory.html",
+        "git status --porcelain combined_map.html market_inventory.html",
         shell=True,
         capture_output=True,
         text=True,
@@ -102,7 +102,7 @@ def generate_and_push(skip_fetch=False):
     commit_message = f"Auto-update maps - {current_time} UTC"
     
     success = run_command(
-        "git add market_report.html sport_report.html finance_report.html elections_report.html technology_report.html political_leadership_report.html market_inventory.html",
+        "git add combined_map.html market_inventory.html",
         "Staging HTML Changes"
     )
     if not success:
@@ -139,7 +139,7 @@ def main():
     print("Data will be fetched on every loop by default.")
     if skip_fetch:
         print("SKIP FETCH MODE: Will use existing data without fetching.")
-    print("Generates: All maps using unified generator (Conflict, Sport, Finance, Elections, Technology, Political Leadership) and Market Inventory")
+    print("Generates: Combined map with all types (Conflict, Sport, Finance, Elections, Technology, Political Leadership) and Market Inventory")
     print("Only HTML files will be committed.")
     print("Press Ctrl+C to stop.")
     print("="*60)
