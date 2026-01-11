@@ -1,49 +1,49 @@
 #!/usr/bin/env python3
 """
-Generate finance map from saved Polymarket data - uses base class
-Shows financial/economic events like Fed decisions, interest rates, inflation, etc.
+Generate elections/politics map from saved Polymarket data - uses base class
+Shows political events like elections, court decisions, appointments, etc.
 """
 import json
 from datetime import datetime, timezone
 from map_base import MapGeneratorBase, ZONE_COORD_MAP
 
-# Category Keywords for financial/economic events
-FINANCE_KEYWORDS = {
-    "Federal Reserve": ["fed", "federal reserve", "fomc", "fed meeting", "fed decision", "fed rate", "fed chair", "jerome powell", "central bank"],
-    "Interest Rates": ["interest rate", "rate cut", "rate hike", "basis point", "fed funds rate", "monetary policy"],
-    "Inflation": ["inflation", "cpi", "consumer price index", "pce", "price index", "inflation rate"],
-    "Economic Indicators": ["gdp", "unemployment", "jobs report", "employment", "economic growth", "recession", "gdp growth"],
-    "Stock Market": ["stock market", "dow", "nasdaq", "s&p", "sp500", "s&p 500", "market crash", "market rally", "stock index"],
-    "Currency": ["dollar", "euro", "yen", "yuan", "currency", "exchange rate", "forex"],
-    "Other Financial": ["treasury", "bond", "yield", "debt", "deficit", "budget", "fiscal policy"]
+# Category Keywords for elections/politics
+ELECTION_KEYWORDS = {
+    "Presidential": ["president", "presidential election", "presidential nomination", "presidential nominee", "presidential candidate"],
+    "Congressional": ["senate", "congress", "senator", "representative", "house of representatives", "congressional"],
+    "Supreme Court": ["supreme court", "scotus", "justice", "judge", "supreme court justice"],
+    "State/Local": ["governor", "mayor", "state election", "local election", "state governor"],
+    "Voting": ["vote", "polling", "ballot", "referendum", "primary", "caucus", "election"]
 }
 
 # Combined list for initial check
-all_finance_keywords = []
-for k in FINANCE_KEYWORDS.values():
-    all_finance_keywords.extend(k)
+all_election_keywords = []
+for k in ELECTION_KEYWORDS.values():
+    all_election_keywords.extend(k)
 
-# Exclusion keywords - markets containing these should NOT be considered financial
+# Exclusion keywords - markets containing these should NOT be considered elections
 EXCLUSION_KEYWORDS = [
     "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
     "football", "basketball", "baseball", "soccer", "tennis", "hockey", "sport", "game",
-    "election", "president", "senate", "congress", "vote", "polling", "candidate",
+    "inflation", "cpi", "consumer price index", "economic", "economy", "gdp", "unemployment",
+    "interest rate", "fed rate", "federal reserve", "central bank", "monetary policy",
+    "stock market", "dow", "nasdaq", "s&p", "sp500", "market crash", "recession",
     "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft"
 ]
 
 
-class FinanceMapGenerator(MapGeneratorBase):
-    """Finance map generator - shows financial/economic events as markers at locations"""
+class ElectionsMapGenerator(MapGeneratorBase):
+    """Elections map generator - shows political events as markers at locations"""
     
     def __init__(self):
-        super().__init__("Finance Events Map Generator", "finance_report.html")
+        super().__init__("Elections & Politics Map Generator", "elections_report.html")
     
     def filter_markets(self):
-        """Filter and categorize finance markets"""
+        """Filter and categorize election/politics markets"""
         event_data = []
         current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         
-        print("Filtering and categorizing finance events...")
+        print("Filtering and categorizing election/politics events...")
         
         for m in self.markets:
             q = m.get("question", "")
@@ -52,29 +52,29 @@ class FinanceMapGenerator(MapGeneratorBase):
             price = float(m.get("lastTradePrice", 0) or 0)
             end_date = m.get("endDate", "")[:10]
             
-            # First check for exclusion keywords - skip non-finance markets
+            # First check for exclusion keywords - skip non-election markets
             if any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
                 continue
             
-            assigned_cat = "Other Financial"
-            for cat, keywords in FINANCE_KEYWORDS.items():
+            assigned_cat = "Voting"
+            for cat, keywords in ELECTION_KEYWORDS.items():
                 if any(k in q_lower for k in keywords):
                     assigned_cat = cat
                     break
             
-            if assigned_cat == "Other Financial" and not any(k in q_lower for k in all_finance_keywords):
+            if assigned_cat == "Voting" and not any(k in q_lower for k in all_election_keywords):
                 continue
                 
             # Find location(s) mentioned in the question
             found_zones = self.find_zones_in_text(q)
             
-            # Use first zone found, or default to US for Fed/economic events if none found
+            # Use first zone found, or default to US for US political events if none found
             if found_zones:
                 zone_name = list(found_zones.keys())[0]
                 coords = ZONE_COORD_MAP[zone_name]
             else:
-                # For Fed/central bank events, default to US
-                if any(k in q_lower for k in ["fed", "federal reserve", "fomc", "jerome powell"]):
+                # For US political events, default to US
+                if any(k in q_lower for k in ["president", "presidential", "senate", "congress", "supreme court", "governor", "mayor"]):
                     zone_name = "United States"
                     coords = ZONE_COORD_MAP[zone_name]
                 else:
@@ -87,7 +87,7 @@ class FinanceMapGenerator(MapGeneratorBase):
             
             event_data.append({
                 "id": m.get("id", ""),
-                "unique_id": f"F{len(event_data)}", 
+                "unique_id": f"E{len(event_data)}", 
                 "q": q,
                 "price": price,
                 "date": end_date,
@@ -102,18 +102,18 @@ class FinanceMapGenerator(MapGeneratorBase):
                 "clobTokenIds": m.get("clobTokenIds", "")
             })
 
-        print(f"Found {len(event_data)} finance events.")
+        print(f"Found {len(event_data)} election/politics events.")
         return event_data
     
     def generate_html(self, events):
-        """Generate HTML map from filtered finance event data"""
+        """Generate HTML map from filtered election event data"""
         current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         json_events = json.dumps(events)
         
         # Generate category filters
         category_checks = ""
-        for cat in FINANCE_KEYWORDS.keys():
-            safe_id = cat.replace(" ", "_").replace("&", "")
+        for cat in ELECTION_KEYWORDS.keys():
+            safe_id = cat.replace(" ", "_").replace("/", "_")
             category_checks += f"<div class='filter-item'><input type='checkbox' id='{safe_id}' checked onchange='updateZoneCounts(); updateVisibility()'> <label for='{safe_id}'>{cat}</label></div>"
         
         # Generate zone filters
@@ -135,9 +135,9 @@ class FinanceMapGenerator(MapGeneratorBase):
         analytics_code = self.get_analytics_code()
         zone_coords_js = self.get_zone_coords_js()
         
-        # Add finance-specific CSS (insert before closing </style> tag)
-        finance_css = """
-        .finance-icon {
+        # Add elections-specific CSS (insert before closing </style> tag)
+        elections_css = """
+        .elections-icon {
             font-size: 24px;
             cursor: pointer;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
@@ -248,10 +248,10 @@ class FinanceMapGenerator(MapGeneratorBase):
         }
         """
         
-        # Insert finance_css before the closing </style> tag
-        css_with_finance = css.replace("    </style>", finance_css + "    </style>")
+        # Insert elections_css before the closing </style> tag
+        css_with_elections = css.replace("    </style>", elections_css + "    </style>")
         
-        html_template = html_head + css_with_finance + analytics_code + """
+        html_template = html_head + css_with_elections + analytics_code + """
 </head>
 <body>
 
@@ -263,7 +263,7 @@ class FinanceMapGenerator(MapGeneratorBase):
 
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
-    <h1>Select Finance Categories</h1>
+    <h1>Select Categories</h1>
     CATEGORY_FILTERS_PLACEHOLDER
     
     <hr style="margin: 10px 0;">
@@ -274,14 +274,14 @@ class FinanceMapGenerator(MapGeneratorBase):
 </div>
 
 <div class="info-box">
-    <h1 style="font-size: 1.2rem;">Finance Events Map</h1>
+    <h1 style="font-size: 1.2rem;">Elections & Politics Map</h1>
     <p id="stats-text">Loading...</p>
     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #334155; font-size: 0.75rem; color: #64748b;">
         <div style="margin-bottom: 6px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6;">
             <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px;">Last Updated</div>
             <div style="color: #3b82f6; font-weight: 700; font-size: 0.95rem;">LAST_UPDATE_PLACEHOLDER</div>
         </div>
-        Icons show finance event locations. Click icons for details.
+        Icons show political event locations. Click icons for details.
     </div>
 </div>
 
@@ -291,11 +291,10 @@ class FinanceMapGenerator(MapGeneratorBase):
     <div class="legend-item"><div class="legend-color" style="background:#eab308"></div>Medium (40-70%)</div>
     <div class="legend-item"><div class="legend-color" style="background:#f97316"></div>Low (10-40%)</div>
     <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div>Remote ( < 10%)</div>
-    <hr style="margin: 12px 0; border-color: #334155;">
     <div class="nav-links">
         <a href="market_report.html" class="nav-link">⚔️ Conflict</a>
         <a href="sport_report.html" class="nav-link">⚽ Sport</a>
-        <a href="elections_report.html" class="nav-link">🗳️ Elections</a>
+        <a href="finance_report.html" class="nav-link">💰 Finance</a>
     </div>
 </div>
 
@@ -406,10 +405,10 @@ class FinanceMapGenerator(MapGeneratorBase):
             const maxProb = Math.max(...events.map(e => e.price));
             const color = getProbColor(maxProb);
             
-            // Create finance icon (dollar sign)
+            // Create elections icon (ballot box)
             const icon = L.divIcon({
-                className: 'finance-icon',
-                html: `<span style="color: ${color}; font-size: 28px; font-weight: bold;">💰</span>`,
+                className: 'elections-icon',
+                html: `<span style="color: ${color}; font-size: 28px; font-weight: bold;">🗳️</span>`,
                 iconSize: [28, 28],
                 iconAnchor: [14, 28]
             });
@@ -518,7 +517,7 @@ class FinanceMapGenerator(MapGeneratorBase):
             visibleCount += events.length;
         }
         
-        document.getElementById('stats-text').innerText = `Visualizing ${visibleCount} finance events.`;
+        document.getElementById('stats-text').innerText = `Visualizing ${visibleCount} election/politics events.`;
     }
     
     // Initialize visibility
@@ -622,7 +621,7 @@ class FinanceMapGenerator(MapGeneratorBase):
 
 
 def main():
-    generator = FinanceMapGenerator()
+    generator = ElectionsMapGenerator()
     generator.run()
 
 

@@ -197,6 +197,27 @@ class ConflictMapGenerator(MapGeneratorBase):
             display: block;
         }
         #zone-filters { max-height: 50vh !important; }
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .nav-link {
+            padding: 8px 12px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid #3b82f6;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .nav-link:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
         """
         
         # Insert conflict_css before the closing </style> tag
@@ -235,21 +256,6 @@ class ConflictMapGenerator(MapGeneratorBase):
             <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px;">Last Updated</div>
             <div style="color: #3b82f6; font-weight: 700; font-size: 0.95rem;">LAST_UPDATE_PLACEHOLDER</div>
         </div>
-        <div style="margin-top: 8px; padding: 8px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; border-left: 3px solid #22c55e;">
-            <a href="sport_report.html" style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
-                <span>⚽</span> View Sport Events Map →
-            </a>
-        </div>
-        <div style="margin-top: 8px; padding: 8px; background: rgba(251, 191, 36, 0.1); border-radius: 6px; border-left: 3px solid #fbbf24;">
-            <a href="finance_report.html" style="color: #fbbf24; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
-                <span>💰</span> View Finance Map →
-            </a>
-        </div>
-        <div style="margin-top: 8px; padding: 8px; background: rgba(168, 85, 247, 0.1); border-radius: 6px; border-left: 3px solid #a855f7;">
-            <a href="market_inventory.html" style="color: #a855f7; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
-                <span>📊</span> View Market Inventory →
-            </a>
-        </div>
         Arcs are offset by date. Arrows indicate directed action.
     </div>
 </div>
@@ -260,6 +266,12 @@ class ConflictMapGenerator(MapGeneratorBase):
     <div class="legend-item"><div class="legend-color" style="background:#eab308"></div>Medium (40-70%)</div>
     <div class="legend-item"><div class="legend-color" style="background:#f97316"></div>Low (10-40%)</div>
     <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div>Remote ( < 10%)</div>
+    <hr style="margin: 12px 0; border-color: #334155;">
+    <div class="nav-links">
+        <a href="sport_report.html" class="nav-link">⚽ Sport</a>
+        <a href="finance_report.html" class="nav-link">💰 Finance</a>
+        <a href="elections_report.html" class="nav-link">🗳️ Elections</a>
+    </div>
 </div>
 
 </div>
