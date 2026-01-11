@@ -91,6 +91,9 @@ class ConflictMapGenerator(MapGeneratorBase):
         current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         json_lines = json.dumps(lines)
         
+        # Calculate market statistics
+        stats = self.calculate_market_stats()
+        
         # Generate zone filters
         all_zones = {}
         for l in lines:
@@ -286,10 +289,19 @@ class ConflictMapGenerator(MapGeneratorBase):
 <div class="info-box">
     <h1 style="font-size: 1.2rem;">Conflict Prediction Map</h1>
     <p id="stats-text">Loading...</p>
-    <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 12px;">
+    <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div style="padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 8px;">
             <span style="color: #94a3b8;">Last Updated:</span>
             <span style="color: #3b82f6; font-weight: 700;">LAST_UPDATE_PLACEHOLDER</span>
+        </div>
+        <span style="color: #94a3b8;">•</span>
+        <div style="padding: 8px; background: rgba(15, 23, 42, 0.8); border-radius: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="color: #e2e8f0;">Total: <strong>STATS_TOTAL</strong></span>
+            <span style="color: #ef4444;">⚔️ <strong>STATS_CONFLICTS</strong></span>
+            <span style="color: #22c55e;">⚽ <strong>STATS_SPORTS</strong></span>
+            <span style="color: #fbbf24;">💰 <strong>STATS_FINANCE</strong></span>
+            <span style="color: #a855f7;">🗳️ <strong>STATS_ELECTIONS</strong></span>
+            <span style="color: #94a3b8;">Unmapped: <strong>STATS_UNMAPPED</strong></span>
         </div>
         <span style="color: #94a3b8;">•</span>
         <span style="color: #94a3b8;">Arcs are offset by date. Arrows indicate directed action.</span>
@@ -681,6 +693,12 @@ class ConflictMapGenerator(MapGeneratorBase):
         final_html = html_template.replace("JSON_LINES_PLACEHOLDER", json_lines)
         final_html = final_html.replace("LAST_UPDATE_PLACEHOLDER", current_time)
         final_html = final_html.replace("ZONE_FILTERS_PLACEHOLDER", zone_checks)
+        final_html = final_html.replace("STATS_TOTAL", str(stats["total"]))
+        final_html = final_html.replace("STATS_CONFLICTS", str(stats["conflicts"]))
+        final_html = final_html.replace("STATS_SPORTS", str(stats["sports"]))
+        final_html = final_html.replace("STATS_FINANCE", str(stats["finance"]))
+        final_html = final_html.replace("STATS_ELECTIONS", str(stats["elections"]))
+        final_html = final_html.replace("STATS_UNMAPPED", str(stats["unmapped"]))
         
         return final_html
 

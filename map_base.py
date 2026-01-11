@@ -241,6 +241,91 @@ class MapGeneratorBase:
         coords_js = coords_js.rstrip(",\n") + "\n    };"
         return coords_js
     
+    def calculate_market_stats(self):
+        """Calculate statistics about all markets with zones"""
+        from generate_map_conflict import CAT_KEYWORDS, all_keywords
+        from generate_map_sport import SPORT_KEYWORDS, all_sport_keywords, EXCLUSION_KEYWORDS
+        from generate_map_finance import FINANCE_KEYWORDS, all_finance_keywords
+        from generate_map_elections import ELECTION_KEYWORDS, all_election_keywords
+        
+        conflict_ids = set()
+        sport_ids = set()
+        finance_ids = set()
+        election_ids = set()
+        markets_with_zones = 0
+        
+        for m in self.markets:
+            q = m.get("question", "")
+            q_lower = q.lower()
+            m_id = m.get("id", "")
+            
+            found_zones = self.find_zones_in_text(q)
+            if not found_zones:
+                # Check for default zones (US for elections/fed)
+                if any(k in q_lower for k in ["president", "presidential", "senate", "congress", "supreme court"]):
+                    found_zones = {"United States": None}
+                elif any(k in q_lower for k in ["fed", "federal reserve", "fomc", "jerome powell"]):
+                    found_zones = {"United States": None}
+                else:
+                    continue
+            
+            markets_with_zones += 1
+            
+            # Check conflict
+            assigned_cat = "Other"
+            for cat, keywords in CAT_KEYWORDS.items():
+                if any(k in q_lower for k in keywords):
+                    assigned_cat = cat
+                    break
+            if assigned_cat != "Other" or any(k in q_lower for k in all_keywords):
+                if len(found_zones) >= 2:
+                    conflict_ids.add(m_id)
+            
+            # Check sport
+            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+                assigned_sport_cat = "Other Sports"
+                for cat, keywords in SPORT_KEYWORDS.items():
+                    if any(k in q_lower for k in keywords):
+                        assigned_sport_cat = cat
+                        break
+                if assigned_sport_cat != "Other Sports" or any(k in q_lower for k in all_sport_keywords):
+                    if len(found_zones) >= 1:
+                        sport_ids.add(m_id)
+            
+            # Check finance
+            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+                assigned_finance_cat = "Other Financial"
+                for cat, keywords in FINANCE_KEYWORDS.items():
+                    if any(k in q_lower for k in keywords):
+                        assigned_finance_cat = cat
+                        break
+                if assigned_finance_cat != "Other Financial" or any(k in q_lower for k in all_finance_keywords):
+                    if len(found_zones) >= 1 or any(k in q_lower for k in ["fed", "federal reserve", "fomc", "jerome powell"]):
+                        finance_ids.add(m_id)
+            
+            # Check elections
+            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+                assigned_election_cat = "Voting"
+                for cat, keywords in ELECTION_KEYWORDS.items():
+                    if any(k in q_lower for k in keywords):
+                        assigned_election_cat = cat
+                        break
+                if assigned_election_cat != "Voting" or any(k in q_lower for k in all_election_keywords):
+                    if len(found_zones) >= 1 or any(k in q_lower for k in ["president", "presidential", "senate", "congress", "supreme court"]):
+                        election_ids.add(m_id)
+        
+        mapped_count = len(conflict_ids) + len(sport_ids) + len(finance_ids) + len(election_ids)
+        unmapped_count = markets_with_zones - mapped_count
+        
+        return {
+            "total": markets_with_zones,
+            "conflicts": len(conflict_ids),
+            "sports": len(sport_ids),
+            "finance": len(finance_ids),
+            "elections": len(election_ids),
+            "unmapped": unmapped_count
+        }
+    
     def filter_markets(self):
         """Filter markets - to be implemented by subclasses"""
         raise NotImplementedError("Subclasses must implement filter_markets")
