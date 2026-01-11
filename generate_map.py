@@ -7,6 +7,11 @@ import requests
 import time
 from datetime import datetime, timezone
 
+# Google Analytics 4 Configuration
+# Set to your GA4 Measurement ID (format: G-XXXXXXXXXX) or None to disable
+# Get your ID from: https://analytics.google.com/ → Admin → Data Streams
+GA4_TRACKING_ID = "G-SW0C4Y2FC5"
+
 # Category Keywords
 CAT_KEYWORDS = {
     "Military": ["war", "conflict", "invasion", "invade", "attack", "strike", "missile", "bomb", "blast", "military", "army", "navy", "nuclear", "weapon", "killed", "assassination", "escalation", "idf"],
@@ -177,6 +182,21 @@ def filter_markets(markets):
 
     print(f"Found {len(line_data)} conflict bets between countries.")
     return line_data
+
+def get_analytics_code(tracking_id):
+    """Generate Google Analytics 4 tracking code"""
+    if not tracking_id:
+        return ""
+    return f"""
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={tracking_id}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){{dataLayer.push(arguments);}}
+      gtag('js', new Date());
+      gtag('config', '{tracking_id}');
+    </script>
+"""
 
 def generate_html(lines):
     """Generate HTML map from filtered market data"""
@@ -351,6 +371,7 @@ def generate_html(lines):
         .legend-color { width: 24px; height: 3px; border-radius: 2px; margin-right: 12px; }
         hr { border: 0; border-top: 1px solid #334155; margin: 12px 0; }
     </style>
+    ANALYTICS_PLACEHOLDER
 </head>
 <body>
 
@@ -737,9 +758,13 @@ def generate_html(lines):
 </html>
 """
     
+    # Get analytics code
+    analytics_code = get_analytics_code(GA4_TRACKING_ID)
+    
     final_html = html_template.replace("JSON_LINES_PLACEHOLDER", json_lines)
     final_html = final_html.replace("LAST_UPDATE_PLACEHOLDER", current_time)
     final_html = final_html.replace("COUNTRY_FILTERS_PLACEHOLDER", country_checks)
+    final_html = final_html.replace("ANALYTICS_PLACEHOLDER", analytics_code)
     
     return final_html
 
