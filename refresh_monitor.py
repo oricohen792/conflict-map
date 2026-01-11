@@ -20,7 +20,7 @@ def log_refresh(refresh_type: str, duration_seconds: Optional[float] = None,
         error: Error message if failed
     """
     log_entry = {
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.utcnow().isoformat(),
         "type": refresh_type,
         "success": success,
         "duration_seconds": duration_seconds,

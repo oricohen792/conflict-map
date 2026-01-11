@@ -8,7 +8,8 @@ PRICE_REFRESH_INTERVAL = 300  # 5 minutes (in seconds)
 FETCH_INTERVAL = 3600  # 1 hour (in seconds)
 
 def log(message):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Use UTC for consistency
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] {message}")
 
 def run_script(script_name):

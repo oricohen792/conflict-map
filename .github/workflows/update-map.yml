@@ -187,7 +187,8 @@ jobs:
           
           # Create/update a timestamp file to ensure we always have something to commit
           # This tracks when the workflow ran, even if data didn't change
-          UPDATE_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          # Use UTC for consistency (GitHub Actions runs in UTC by default)
+          UPDATE_TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S')
           echo "$UPDATE_TIMESTAMP" > .last_update_timestamp
           
           # Stage all files that might have changed

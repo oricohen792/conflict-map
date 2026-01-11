@@ -54,8 +54,9 @@ def refresh_prices():
     # Track Changes
     price_changes = []
     updated_manifest = []
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_time_short = datetime.now().strftime("%H:%M")  # For change log
+    # Use UTC for all timestamps to ensure consistency across timezones
+    current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    current_time_short = datetime.utcnow().strftime("%H:%M")  # For change log
     
     for entry in manifest:
         m_id = entry.get("id")
