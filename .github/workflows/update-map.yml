@@ -81,9 +81,12 @@ except:
         if: steps.update_type.outputs.type == 'full' && github.event_name != 'push'
         run: |
           echo "Running full update..."
+          # Update timestamp BEFORE processing to prevent running twice
+          UPDATE_TIME=$(date -u '+%Y-%m-%d %H:%M:%S')
+          echo "$UPDATE_TIME" > .markets_verified_time
+          echo "Updated .markets_verified_time to: $UPDATE_TIME"
           python fetch_polymarket.py
           python cluster_markets.py
-          # cluster_markets.py updates .markets_verified_time automatically
       
       - name: Price refresh
         if: steps.update_type.outputs.type == 'price' && github.event_name != 'push'
