@@ -48,7 +48,7 @@ def log_refresh(refresh_type: str, duration_seconds: Optional[float] = None,
         json.dump(log_entries, f, indent=2)
     
     # Print summary
-    status = "✓" if success else "✗"
+    status = "[OK]" if success else "[FAIL]"
     duration_str = f" ({duration_seconds:.1f}s)" if duration_seconds else ""
     markets_str = f" - {markets_count} markets" if markets_count else ""
     error_str = f" - ERROR: {error}" if error else ""
@@ -117,7 +117,7 @@ if __name__ == "__main__":
             print(f"Avg price duration: {stats['avg_price_duration']:.1f}s")
         print("\n=== Recent Entries ===")
         for entry in stats['recent_entries']:
-            status = "✓" if entry.get('success') else "✗"
+            status = "[OK]" if entry.get('success') else "[FAIL]"
             print(f"{status} {entry['timestamp']} - {entry['type']} ({entry.get('duration_seconds', 'N/A')}s)")
     else:
         print("No refresh log found.")
