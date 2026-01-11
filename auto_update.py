@@ -74,19 +74,10 @@ def generate_and_push(skip_fetch=False):
     if not success:
         print("Failed to generate market report. Continuing...")
     
-    # Step 3: Generate market inventory
-    print("\n[3/4] Generating market inventory...")
-    success = run_command(
-        "python generate_market_inventory.py",
-        "Generating Market Inventory"
-    )
-    if not success:
-        print("Failed to generate market inventory. Continuing with commit check...")
-    
-    # Step 4: Check if there are changes (only HTML files)
-    print("\n[4/5] Checking for changes in HTML files...")
+    # Step 3: Check if there are changes (only HTML files)
+    print("\n[3/3] Checking for changes in HTML files...")
     result = subprocess.run(
-        "git status --porcelain market_report.html market_inventory.html",
+        "git status --porcelain market_report.html",
         shell=True,
         capture_output=True,
         text=True,
@@ -97,12 +88,12 @@ def generate_and_push(skip_fetch=False):
         print("No changes detected in HTML files. Skipping commit.")
         return True
     
-    # Step 5: Commit changes (only HTML files)
-    print("\n[5/5] Committing and pushing HTML changes...")
+    # Step 4: Commit changes (only HTML files)
+    print("\n[4/4] Committing and pushing HTML changes...")
     commit_message = f"Auto-update maps - {current_time} UTC"
     
     success = run_command(
-        "git add market_report.html market_inventory.html",
+        "git add market_report.html",
         "Staging HTML Changes"
     )
     if not success:
@@ -139,7 +130,7 @@ def main():
     print("Data will be fetched on every loop by default.")
     if skip_fetch:
         print("SKIP FETCH MODE: Will use existing data without fetching.")
-    print("Generates: Combined map with all types (Conflict, Sport, Finance, Elections, Technology, Political Leadership) and Market Inventory")
+    print("Generates: Combined map with all types (Conflict, Sport, Finance, Elections, Technology, Political Leadership)")
     print("Only HTML files will be committed.")
     print("Press Ctrl+C to stop.")
     print("="*60)
