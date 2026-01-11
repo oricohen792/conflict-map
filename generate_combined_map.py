@@ -455,10 +455,23 @@ def generate_combined_html():
             map.setMaxBounds(bounds);
             map.setMaxBoundsViscosity(1.0);
 
-            L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
+            // Add tile layer with error handling
+            const tileLayer = L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
                 maxZoom: 18,
-                noWrap: true
-            }}).addTo(map);
+                noWrap: true,
+                subdomains: 'abcd',
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }});
+            
+            tileLayer.addTo(map);
+            
+            // Force map to recalculate size after a short delay
+            setTimeout(() => {{
+                if (map) {{
+                    map.invalidateSize();
+                    console.log('Map size invalidated');
+                }}
+            }}, 200);
             
             // Prevent wrapping on move
             map.on('moveend', function() {{
@@ -468,8 +481,11 @@ def generate_combined_html():
                     map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
                 }}
             }});
+            
+            console.log('Map initialized successfully');
         }} catch (error) {{
             console.error('Error initializing map:', error);
+            alert('Failed to initialize map. Error: ' + error.message);
         }}
     }}
     

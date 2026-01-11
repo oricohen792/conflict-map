@@ -299,7 +299,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:59:31 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:59:47 UTC</span>
     </div>
     <div style="margin-bottom: 12px; padding: 8px; background: #1e293b; border-radius: 6px; border: 1px solid #475569;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -403,10 +403,23 @@
             map.setMaxBounds(bounds);
             map.setMaxBoundsViscosity(1.0);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            // Add tile layer with error handling
+            const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                 maxZoom: 18,
-                noWrap: true
-            }).addTo(map);
+                noWrap: true,
+                subdomains: 'abcd',
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            });
+            
+            tileLayer.addTo(map);
+            
+            // Force map to recalculate size after a short delay
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                    console.log('Map size invalidated');
+                }
+            }, 200);
             
             // Prevent wrapping on move
             map.on('moveend', function() {
@@ -416,8 +429,11 @@
                     map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
                 }
             });
+            
+            console.log('Map initialized successfully');
         } catch (error) {
             console.error('Error initializing map:', error);
+            alert('Failed to initialize map. Error: ' + error.message);
         }
     }
     
