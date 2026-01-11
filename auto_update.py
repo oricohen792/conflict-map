@@ -4,8 +4,12 @@ Automated script to generate conflict map report, commit, and push every 30 minu
 """
 import subprocess
 import sys
+import os
 import time
 from datetime import datetime, timezone
+
+# Get the directory where this script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def run_command(command, description):
     """Run a shell command and return success status"""
@@ -18,7 +22,7 @@ def run_command(command, description):
             shell=True,
             capture_output=True,
             text=True,
-            cwd="c:\\dev\\mempool"
+            cwd=SCRIPT_DIR
         )
         if result.returncode == 0:
             print(result.stdout)
@@ -54,7 +58,7 @@ def generate_and_push():
         shell=True,
         capture_output=True,
         text=True,
-        cwd="c:\\dev\\mempool"
+        cwd=SCRIPT_DIR
     )
     
     if not result.stdout.strip():
