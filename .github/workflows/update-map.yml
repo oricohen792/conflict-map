@@ -196,6 +196,10 @@ jobs:
           if [ -f ".last_full_update" ]; then
             git add .last_full_update
           fi
+          # Commit markets verified timestamp file if it exists
+          if [ -f ".markets_verified_time" ]; then
+            git add .markets_verified_time
+          fi
           # Commit refresh log if it exists
           if [ -f "refresh_log.json" ]; then
             git add refresh_log.json

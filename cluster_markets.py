@@ -217,10 +217,21 @@ def main():
 
 def generate_map_html(lines):
     # Get timestamp of active_markets.jsonl (Market Data Verified - Hourly scan)
+    # First check if we have a committed timestamp file (for price refresh runs)
     markets_verified_time = "Pending"
+    
+    # Check committed timestamp file first (persists across workflow runs)
+    if os.path.exists(".markets_verified_time"):
+        with open(".markets_verified_time", "r", encoding="utf-8") as f:
+            markets_verified_time = f.read().strip()
+    
+    # If active_markets.jsonl exists (during full update), update the timestamp
     if os.path.exists("active_markets.jsonl"):
         mtime = os.path.getmtime("active_markets.jsonl")
         markets_verified_time = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
+        # Save to committed file so it persists for price refresh runs
+        with open(".markets_verified_time", "w", encoding="utf-8") as f:
+            f.write(markets_verified_time)
         
     json_lines = json.dumps(lines)
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
