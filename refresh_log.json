@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-01-11T11:44:22.244076",
+    "type": "price",
+    "success": true,
+    "duration_seconds": 0.9086129665374756,
+    "markets_count": 131,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-11T11:44:37.051731",
+    "type": "price",
+    "success": true,
+    "duration_seconds": 0.5626220703125,
+    "markets_count": 131,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-11T11:44:53.506200",
+    "type": "test",
+    "success": true,
+    "duration_seconds": 1.5,
+    "markets_count": null,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-11T11:47:25.678766",
+    "type": "price",
+    "success": true,
+    "duration_seconds": 0.5539631843566895,
+    "markets_count": 131,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-11T11:50:26.794198",
+    "type": "full",
+    "success": true,
+    "duration_seconds": 1.0160930156707764,
+    "markets_count": 130,
+    "error": null
+  }
+]
