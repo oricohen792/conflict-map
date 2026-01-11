@@ -164,6 +164,8 @@ class SportMapGenerator(MapGeneratorBase):
         .leaflet-popup-content { margin: 8px 12px; }
         .line-tooltip a { color: #38bdf8; text-decoration: none; font-weight: 500; }
         .line-tooltip a:hover { text-decoration: underline; color: #7dd3fc; }
+        .info-box a { transition: opacity 0.2s; }
+        .info-box a:hover { opacity: 0.8; }
         
         .snapshot-btn {
             background: #3b82f6;
@@ -257,6 +259,11 @@ class SportMapGenerator(MapGeneratorBase):
         <div style="margin-bottom: 6px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6;">
             <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px;">Last Updated</div>
             <div style="color: #3b82f6; font-weight: 700; font-size: 0.95rem;">LAST_UPDATE_PLACEHOLDER</div>
+        </div>
+        <div style="margin-top: 8px; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 3px solid #ef4444;">
+            <a href="market_report.html" style="color: #ef4444; text-decoration: none; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <span>⚔️</span> View Conflict Prediction Map →
+            </a>
         </div>
         Flags show sport event locations. Click flags for details.
     </div>
