@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history to ensure we can push
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -199,22 +202,32 @@ jobs:
             git add .markets_verified_time
           fi
           
-          # Check for staged changes (more reliable than git diff --quiet)
+          # Ensure timestamp file is always staged (it should always change)
+          git add -f .last_update_timestamp
+          
+          # Check if there are any staged changes
           if git diff --cached --quiet; then
-            echo "No changes to commit (all files are up to date)"
+            echo "⚠ WARNING: No changes detected after staging files"
+            echo "This might indicate the workflow ran but data didn't change"
+            # Still try to commit the timestamp (it should always be different)
+            git commit --allow-empty -m "Auto-update: $UPDATE_TIMESTAMP (workflow ran)"
           else
             echo "Changes detected, committing..."
             git commit -m "Auto-update: $UPDATE_TIMESTAMP"
-            echo "✓ Changes committed successfully"
           fi
+          echo "✓ Commit completed"
       
       - name: Push changes
         if: github.event_name != 'push'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-          force: false
+        run: |
+          # Check if there are commits to push
+          if git log origin/main..HEAD --oneline | grep -q .; then
+            echo "Pushing commits to main branch..."
+            git push origin main
+            echo "✓ Changes pushed successfully"
+          else
+            echo "No new commits to push (workflow may have run but no changes detected)"
+          fi
       
       - name: Skip processing for push events
         if: github.event_name == 'push'
