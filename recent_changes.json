@@ -1,5 +1,71 @@
 [
   {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Israel x Hamas Ceasefire Phase II by June 30?",
+    "change": "\u2191 4%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "US strikes Iran by March 31, 2026?",
+    "change": "\u2193 3%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "US strikes Iran by June 30, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Israel strikes Iran by January 31, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 10, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 11, 2026?",
+    "change": "\u2193 6%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Will Israel strike Gaza on January 11, 2026?",
+    "change": "\u2191 2%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Israel strikes Iran by January 16, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 12, 2026?",
+    "change": "\u2193 3%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 31, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "11:46",
+    "type": "CHG",
+    "q": "Russia strike on Kyiv municipality by January 17?",
+    "change": "\u2191 4%"
+  },
+  {
     "time": "11:33",
     "type": "CHG",
     "q": "Will China invade Taiwan by end of 2026?",
@@ -52,71 +118,5 @@
     "type": "CHG",
     "q": "Will China invade Taiwan by end of 2026?",
     "change": "\u2193 1%"
-  },
-  {
-    "time": "11:25",
-    "type": "CHG",
-    "q": "US strikes Iran by March 31, 2026?",
-    "change": "\u2193 2%"
-  },
-  {
-    "time": "11:25",
-    "type": "CHG",
-    "q": "US strikes Iran by June 30, 2026?",
-    "change": "\u2193 1%"
-  },
-  {
-    "time": "11:25",
-    "type": "CHG",
-    "q": "Israel strikes Iran by January 31, 2026?",
-    "change": "\u2191 1%"
-  },
-  {
-    "time": "11:25",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 10, 2026?",
-    "change": "\u2193 1%"
-  },
-  {
-    "time": "11:25",
-    "type": "CHG",
-    "q": "Will Israel strike Gaza on January 11, 2026?",
-    "change": "\u2193 7%"
-  },
-  {
-    "time": "11:25",
-    "type": "CHG",
-    "q": "Will US or Israel strike Iran by January 12, 2026?",
-    "change": "\u2191 3%"
-  },
-  {
-    "time": "11:25",
-    "type": "CHG",
-    "q": "Will US or Israel strike Iran by January 31, 2026?",
-    "change": "\u2191 1%"
-  },
-  {
-    "time": "11:17",
-    "type": "CHG",
-    "q": "Israel x Iran ceasefire broken by March 31, 2026?",
-    "change": "\u2191 2%"
-  },
-  {
-    "time": "11:17",
-    "type": "CHG",
-    "q": "US strikes Iran by June 30, 2026?",
-    "change": "\u2191 1%"
-  },
-  {
-    "time": "11:17",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 10, 2026?",
-    "change": "\u2191 2%"
-  },
-  {
-    "time": "11:17",
-    "type": "CHG",
-    "q": "Will Israel strike Gaza on January 11, 2026?",
-    "change": "\u2193 10%"
   }
 ]
