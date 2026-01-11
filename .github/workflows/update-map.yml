@@ -39,25 +39,15 @@ jobs:
         if: github.event_name != 'push'
         id: update_type
         run: |
-          MINUTE=$(date +%M)
-          HOUR=$(date +%H)
           CURRENT_TIME=$(date +%s)
-          
-          # Check when markets were last verified (full update timestamp)
           MARKETS_VERIFIED_FILE=".markets_verified_time"
-          LAST_UPDATE_FILE=".last_full_update"
-          
-          IS_FULL_UPDATE=false
-          TIME_SINCE_VERIFIED=0
           
           # Check if markets verified time file exists
           if [ -f "$MARKETS_VERIFIED_FILE" ]; then
-            # Read the timestamp (format: "YYYY-MM-DD HH:MM:SS")
             VERIFIED_TIMESTAMP=$(cat "$MARKETS_VERIFIED_FILE" | tr -d '\n\r')
             
-            # Convert to Unix timestamp using Python (more reliable across systems)
+            # Convert to Unix timestamp
             VERIFIED_UNIX=$(python3 -c "
-import sys
 from datetime import datetime, timezone
 try:
     dt = datetime.strptime('$VERIFIED_TIMESTAMP', '%Y-%m-%d %H:%M:%S')
@@ -65,61 +55,41 @@ try:
     print(int(dt.timestamp()))
 except:
     print('0')
-" 2>/dev/null || echo "0")
+")
             
-            if [ "$VERIFIED_UNIX" != "0" ] && [ "$VERIFIED_UNIX" != "" ] && [ "$VERIFIED_UNIX" -gt 0 ]; then
+            if [ "$VERIFIED_UNIX" -gt 0 ]; then
               TIME_SINCE_VERIFIED=$((CURRENT_TIME - VERIFIED_UNIX))
-              MINUTES_SINCE=$((TIME_SINCE_VERIFIED / 60))
               
-              echo "Last market verification: $VERIFIED_TIMESTAMP"
-              echo "Time since last verification: $MINUTES_SINCE minutes ($TIME_SINCE_VERIFIED seconds)"
-              
-              # If 60 minutes (3600 seconds) have passed, do full update
-              if [ "$TIME_SINCE_VERIFIED" -ge 3600 ]; then
-                IS_FULL_UPDATE=true
-                echo "Full update needed: 60+ minutes since last market verification"
+              # If < 60 minutes: price refresh, else: full update
+              if [ "$TIME_SINCE_VERIFIED" -lt 3600 ]; then
+                echo "type=price" >> $GITHUB_OUTPUT
+                echo "Price refresh: $((TIME_SINCE_VERIFIED / 60)) minutes since last verification"
               else
-                echo "Price refresh only: Only $MINUTES_SINCE minutes since last verification (need 60+)"
+                echo "type=full" >> $GITHUB_OUTPUT
+                echo "Full update: $((TIME_SINCE_VERIFIED / 60)) minutes since last verification"
               fi
             else
-              echo "Warning: Could not parse markets verified timestamp '$VERIFIED_TIMESTAMP', assuming full update needed"
-              IS_FULL_UPDATE=true
+              echo "type=full" >> $GITHUB_OUTPUT
+              echo "Full update: Could not parse timestamp"
             fi
           else
-            # No markets verified file exists - this is first run or file missing
-            echo "No .markets_verified_time file found - performing full update"
-            IS_FULL_UPDATE=true
-          fi
-          
-          if [ "$IS_FULL_UPDATE" = true ]; then
             echo "type=full" >> $GITHUB_OUTPUT
-            echo "Full market fetch will be performed (MINUTE=$MINUTE, HOUR=$HOUR)"
-            # Update the last full update timestamp (Unix time)
-            echo "$CURRENT_TIME" > "$LAST_UPDATE_FILE"
-          else
-            echo "type=price" >> $GITHUB_OUTPUT
-            echo "Price refresh only (MINUTE=$MINUTE)"
+            echo "Full update: No .markets_verified_time file found"
           fi
       
-      - name: Full market fetch (when 60+ minutes since last verification)
+      - name: Full market fetch
         if: steps.update_type.outputs.type == 'full' && github.event_name != 'push'
         run: |
-          echo "Fetching all markets..."
+          echo "Running full update..."
           python fetch_polymarket.py
           python cluster_markets.py
+          # cluster_markets.py updates .markets_verified_time automatically
       
-      - name: Price refresh (every 5 minutes)
+      - name: Price refresh
         if: steps.update_type.outputs.type == 'price' && github.event_name != 'push'
         run: |
-          echo "Refreshing prices..."
-          # Check if manifest exists, if not do a full update instead
-          if [ ! -f "conflict_manifest.json" ]; then
-            echo "⚠ WARNING: conflict_manifest.json not found, doing full update instead..."
-            python fetch_polymarket.py
-            python cluster_markets.py
-          else
-            python refresh_prices.py
-          fi
+          echo "Running price refresh..."
+          python refresh_prices.py
       
       - name: Verify HTML update
         if: github.event_name != 'push'
