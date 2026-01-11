@@ -69,6 +69,10 @@ def refresh_prices():
     with open("market_report.html", "w", encoding="utf-8") as f:
         f.write(html_content)
     
+    # Always update the last_update_timestamp file to ensure git detects changes
+    with open(".last_update_timestamp", "w", encoding="utf-8") as f:
+        f.write(current_time)
+    
     if success:
         print("Done! Refreshed prices and updated market_report.html")
     else:
