@@ -124,26 +124,25 @@ def generate_combined_html():
     <title>Combined Map Generator - Polymarket</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        html, body {{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }}
         #map {{ 
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 100% !important;
             height: 100vh !important;
-            z-index: 1;
-            background: #0f172a;
-        }}
-        #globe-container {{ 
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100vh !important;
-            z-index: 1;
+            z-index: 1 !important;
+            background: #0f172a !important;
+            display: block !important;
+            visibility: visible !important;
         }}
         .leaflet-container {{
             background: #0f172a !important;
@@ -152,10 +151,17 @@ def generate_combined_html():
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
+            z-index: 1 !important;
         }}
         .leaflet-map-pane {{
             width: 100% !important;
             height: 100% !important;
+        }}
+        .leaflet-tile-pane {{
+            z-index: 2 !important;
+        }}
+        .leaflet-overlay-pane {{
+            z-index: 3 !important;
         }}
         .tooltip-overlay {{
             position: fixed;
@@ -228,10 +234,22 @@ def generate_combined_html():
             totals = category_totals.get(cat, {"events": 0, "volume": 0})
             category_checks += f'<div class="filter-item"><input type="checkbox" id="{map_type}_{safe_id}" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="{map_type}_{safe_id}">{cat} <span style="color: #94a3b8; font-size: 0.85rem;">({totals["events"]} events, {format_vol(totals["volume"])})</span></label></div>'
         
+        # All categories start hidden, JavaScript will show the selected one
         category_filters_html += f'<div id="category-filters-{map_type}" class="category-filters" style="display: none;">\n{category_checks}\n</div>\n'
     
     # CSS
     combined_css = """
+        #map {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100vh !important;
+            z-index: 1 !important;
+            background: #0f172a !important;
+            display: block !important;
+            visibility: visible !important;
+        }
         .filter-box h1 {
             font-size: 0.85rem !important;
         }
@@ -313,11 +331,28 @@ def generate_combined_html():
         }
         .tooltip-tab-content {
             display: none;
-            max-height: 400px;
+            min-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
         }
         .tooltip-tab-content.active {
             display: block;
+        }
+        .line-popup {
+            width: 600px !important;
+            max-width: 600px !important;
+            min-width: 600px !important;
+        }
+        .line-popup .leaflet-popup-content {
+            width: 600px !important;
+            max-width: 600px !important;
+            min-width: 600px !important;
+            min-height: 450px !important;
+            max-height: 500px !important;
+        }
+        .line-popup .line-tooltip {
+            width: 100% !important;
+            min-height: 450px !important;
         }
         #zone-filters { max-height: 200px; overflow-y: auto; }
         .selected-zone-icon {
@@ -376,7 +411,6 @@ def generate_combined_html():
 <body>
 
 <div id="map"></div>
-<div id="globe-container" style="display: none;"></div>
 <button id="mobile-filter-btn" style="display:none;" onclick="document.querySelector('.filter-box').classList.toggle('active')">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
     Filters
@@ -388,15 +422,6 @@ def generate_combined_html():
         <span style="color: #94a3b8;">Last Updated:</span>
         <span style="color: #3b82f6; font-weight: 700;">{current_time} UTC</span>
     </div>
-    <div style="margin-bottom: 12px; padding: 8px; background: #1e293b; border-radius: 6px; border: 1px solid #475569;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <span style="font-size: 0.75rem; color: #94a3b8;">View:</span>
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" id="globe-mode-toggle" onchange="toggleViewMode()" style="cursor: pointer;">
-                <span style="font-size: 0.75rem; color: #e2e8f0;">🌍 Globe</span>
-            </label>
-        </div>
-    </div>
     <h1>Map Type</h1>
     {map_selector}
     
@@ -405,7 +430,7 @@ def generate_combined_html():
     {category_filters_html}
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Zones <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
+    <h1 style="margin-bottom: 8px;">Zones</h1>
     <div id="zone-filters" style="max-height: 200px; overflow-y: auto;">
         ZONE_FILTERS_PLACEHOLDER
     </div>
@@ -424,21 +449,23 @@ def generate_combined_html():
 <script>
     const allMapData = ALL_MAP_DATA_PLACEHOLDER;
     let currentMapType = 'conflict';
-    let isGlobeMode = false;
     let map = null;
-    let scene = null;
-    let camera = null;
-    let renderer = null;
-    let controls = null;
-    let markerGroup = null;
-    let globe = null;
     
     // Initialize Leaflet Map
-    function initMapMode() {{
+    function initMap() {{
         if (map) {{
             // Map already exists, just make sure it's visible
             const mapContainer = document.getElementById('map');
-            if (mapContainer) mapContainer.style.display = 'block';
+            if (mapContainer) {{
+                mapContainer.style.display = 'block';
+                mapContainer.style.visibility = 'visible';
+                mapContainer.style.opacity = '1';
+            }}
+            if (map) {{
+                setTimeout(() => {{
+                    map.invalidateSize();
+                }}, 100);
+            }}
             return;
         }}
         
@@ -447,321 +474,113 @@ def generate_combined_html():
             console.error('Map container not found');
             return;
         }}
+        
+        // Ensure container is visible and has dimensions
         mapContainer.style.display = 'block';
+        mapContainer.style.visibility = 'visible';
+        mapContainer.style.opacity = '1';
+        mapContainer.style.position = 'fixed';
+        mapContainer.style.top = '0';
+        mapContainer.style.left = '0';
+        mapContainer.style.width = '100%';
+        mapContainer.style.height = '100vh';
+        mapContainer.style.zIndex = '1';
+        mapContainer.style.background = '#0f172a';
         
-        try {{
-            map = L.map('map', {{
-                zoomControl: false,
-                attributionControl: false,
-                minZoom: 2,
-                maxZoom: 18,
-                worldCopyJump: false
-            }}).setView([20, 0], 2);
+        // Wait a moment to ensure container is rendered
+        setTimeout(() => {{
+            try {{
+                map = L.map('map', {{
+                    zoomControl: true,
+                    attributionControl: false,
+                    minZoom: 2,
+                    maxZoom: 18,
+                    worldCopyJump: false,
+                    dragging: true,
+                    touchZoom: true,
+                    doubleClickZoom: true,
+                    scrollWheelZoom: true,
+                    boxZoom: true,
+                    keyboard: true
+                }}).setView([20, 0], 2);
 
-            // Set strict bounds to prevent wrapping
-            const southWest = L.latLng(-85, -180);
-            const northEast = L.latLng(85, 180);
-            const bounds = L.latLngBounds(southWest, northEast);
-            map.setMaxBounds(bounds);
-            map.setMaxBoundsViscosity(1.0);
-
-            // Add tile layer with error handling
-            const tileLayer = L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
-                maxZoom: 18,
-                noWrap: true,
-                subdomains: 'abcd',
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }});
-            
-            tileLayer.addTo(map);
-            
-            // Force map to recalculate size after a short delay
-            setTimeout(() => {{
-                if (map) {{
-                    map.invalidateSize();
-                    console.log('Map size invalidated');
-                }}
-            }}, 200);
-            
-            // Prevent wrapping on move
-            map.on('moveend', function() {{
-                const center = map.getCenter();
-                const zoom = map.getZoom();
-                if (center.lng < -180 || center.lng > 180) {{
-                    map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
-                }}
-            }});
-            
-            console.log('Map initialized successfully');
-        }} catch (error) {{
-            console.error('Error initializing map:', error);
-            alert('Failed to initialize map. Error: ' + error.message);
-        }}
-    }}
-    
-    // Initialize Three.js Globe
-    function initGlobeMode() {{
-        if (renderer) return; // Already initialized
-        
-        const globeContainer = document.getElementById('globe-container');
-        globeContainer.style.display = 'block';
-        globeContainer.style.position = 'absolute';
-        globeContainer.style.top = '0';
-        globeContainer.style.left = '0';
-        globeContainer.style.width = '100%';
-        globeContainer.style.height = '100%';
-        
-        // Three.js Globe Setup
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0f172a);
-        
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 2.5;
-        
-        renderer = new THREE.WebGLRenderer({{ antialias: true }});
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        globeContainer.appendChild(renderer.domElement);
-    
-        // Orbit controls for rotation
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.minDistance = 1.5;
-        controls.maxDistance = 5;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.5;
-    
-    // Create globe sphere with dark theme
-    const globeGeometry = new THREE.SphereGeometry(1, 64, 64);
-    const textureLoader = new THREE.TextureLoader();
-    
-    // Try to load earth texture, fallback to dark material
-    const globeMaterial = new THREE.MeshPhongMaterial({{
-        color: 0x1e293b,
-        shininess: 0,
-        transparent: false
-    }});
-    
-    // Try loading earth texture
-    textureLoader.load(
-        'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-        function(texture) {{
-            globeMaterial.map = texture;
-            globeMaterial.needsUpdate = true;
-        }},
-        undefined,
-        function(err) {{
-            console.log('Texture load failed, using dark globe');
-        }}
-    );
-    
-        globe = new THREE.Mesh(globeGeometry, globeMaterial);
-        scene.add(globe);
-        
-        // Add ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-        
-        // Add directional light
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(5, 3, 5);
-        scene.add(directionalLight);
-        
-        markerGroup = new THREE.Group();
-        scene.add(markerGroup);
-        
-        // Animation loop
-        function animate() {{
-            requestAnimationFrame(animate);
-            if (controls) controls.update();
-            if (renderer && scene && camera) renderer.render(scene, camera);
-        }}
-        animate();
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {{
-            if (camera && renderer) {{
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                // Add tile layer with error handling
+                const tileLayer = L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
+                    maxZoom: 18,
+                    noWrap: true,
+                    subdomains: 'abcd',
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }});
+                
+                tileLayer.addTo(map);
+                
+                // Force map to recalculate size after a short delay
+                setTimeout(() => {{
+                    if (map) {{
+                        map.invalidateSize();
+                        console.log('Map size invalidated');
+                    }}
+                }}, 200);
+                
+                // Allow free map movement - no restrictions
+                
+                console.log('Map initialized successfully');
+            }} catch (error) {{
+                console.error('Error initializing map:', error);
+                alert('Failed to initialize map. Error: ' + error.message);
             }}
-        }});
-    }}
-    
-    // Helper function to convert lat/lng to 3D position on sphere
-    function latLngToVector3(lat, lng, radius = 1) {{
-        const phi = (90 - lat) * (Math.PI / 180);
-        const theta = (lng + 180) * (Math.PI / 180);
-        const x = -(radius * Math.sin(phi) * Math.cos(theta));
-        const z = radius * Math.sin(phi) * Math.sin(theta);
-        const y = radius * Math.cos(phi);
-        return new THREE.Vector3(x, y, z);
+        }}, 50);
     }}
     
     const markers = [];
     
-    // Raycaster for click detection
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    let tooltipOverlay = null;
-    
-    // Create tooltip overlay element
-    function createTooltipOverlay() {{
-        if (!tooltipOverlay) {{
-            tooltipOverlay = document.createElement('div');
-            tooltipOverlay.className = 'tooltip-overlay line-tooltip';
-            tooltipOverlay.id = 'globe-tooltip';
-            tooltipOverlay.style.cssText = 'position: fixed; background: rgba(15, 23, 42, 0.98); border: 1px solid #475569; color: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; max-width: 800px; min-width: 600px; z-index: 10000; pointer-events: auto; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
-            document.body.appendChild(tooltipOverlay);
-        }}
-        return tooltipOverlay;
-    }}
-    
-    // Handle mouse clicks on markers
-    function onMouseClick(event) {{
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(markerGroup.children);
-        
-        if (intersects.length > 0) {{
-            const marker = intersects[0].object;
-            const zone = marker.zoneName;
-            const safe_id = zone.replace(/ /g, '_').replace(/\\./g, '');
-            const radio = document.getElementById(`zone_${{safe_id}}`);
-            if (radio) {{
-                radio.checked = true;
-                updateVisibility();
-                if (marker.tooltipHtml) {{
-                    showTooltip(event.clientX, event.clientY, marker.tooltipHtml);
-                }}
-            }}
-        }}
-    }}
-    
-    // Handle mouse move for hover
-    function onMouseMove(event) {{
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(markerGroup.children);
-        
-        if (intersects.length > 0) {{
-            const marker = intersects[0].object;
-            if (marker.tooltipHtml) {{
-                showTooltip(event.clientX, event.clientY, marker.tooltipHtml);
-            }}
-        }} else {{
-            hideTooltip();
-        }}
-    }}
-    
-    function showTooltip(x, y, html) {{
-        const tooltip = createTooltipOverlay();
-        tooltip.innerHTML = html;
-        tooltip.style.display = 'block';
-        // Position tooltip, but keep it on screen
-        const tooltipWidth = 800;
-        const tooltipHeight = 400;
-        let leftPos = x + 10;
-        let topPos = y + 10;
-        
-        // Adjust if tooltip would go off screen
-        if (leftPos + tooltipWidth > window.innerWidth) {{
-            leftPos = x - tooltipWidth - 10;
-        }}
-        if (topPos + tooltipHeight > window.innerHeight) {{
-            topPos = window.innerHeight - tooltipHeight - 10;
-        }}
-        if (leftPos < 0) leftPos = 10;
-        if (topPos < 0) topPos = 10;
-        
-        tooltip.style.left = leftPos + 'px';
-        tooltip.style.top = topPos + 'px';
-    }}
-    
-    function hideTooltip() {{
-        if (tooltipOverlay) {{
-            tooltipOverlay.style.display = 'none';
-        }}
-    }}
-    
-    // Toggle between globe and map mode
-    function toggleViewMode() {{
-        const toggle = document.getElementById('globe-mode-toggle');
-        isGlobeMode = toggle.checked;
-        const mapContainer = document.getElementById('map');
-        const globeContainer = document.getElementById('globe-container');
-        
-        if (isGlobeMode) {{
-            mapContainer.style.display = 'none';
-            globeContainer.style.display = 'block';
-            initGlobeMode();
-            // Re-attach event listeners if renderer exists
-            setTimeout(() => {{
-                if (renderer && renderer.domElement) {{
-                    renderer.domElement.addEventListener('click', onMouseClick);
-                    renderer.domElement.addEventListener('mousemove', onMouseMove);
-                }}
-            }}, 100);
-        }} else {{
-            globeContainer.style.display = 'none';
-            mapContainer.style.display = 'block';
-            initMapMode();
-            if (renderer && renderer.domElement) {{
-                renderer.domElement.removeEventListener('click', onMouseClick);
-                renderer.domElement.removeEventListener('mousemove', onMouseMove);
-            }}
-        }}
-        
-        // Update visibility to show markers in current mode
-        setTimeout(() => {{
-            updateVisibility();
-        }}, 200);
-    }}
-    
-    // Initialize with map mode by default
+    // Initialize map on page load
     window.addEventListener('load', function() {{
         const mapContainer = document.getElementById('map');
-        const globeContainer = document.getElementById('globe-container');
-        if (mapContainer) mapContainer.style.display = 'block';
-        if (globeContainer) globeContainer.style.display = 'none';
         
-        // Ensure globe toggle is unchecked (map mode)
-        const toggle = document.getElementById('globe-mode-toggle');
-        if (toggle) toggle.checked = false;
-        isGlobeMode = false;
+        // Ensure container is properly styled
+        if (mapContainer) {{
+            mapContainer.style.display = 'block';
+            mapContainer.style.visibility = 'visible';
+            mapContainer.style.opacity = '1';
+            mapContainer.style.position = 'fixed';
+            mapContainer.style.top = '0';
+            mapContainer.style.left = '0';
+            mapContainer.style.width = '100%';
+            mapContainer.style.height = '100vh';
+            mapContainer.style.zIndex = '1';
+            mapContainer.style.background = '#0f172a';
+        }}
         
-        // Initialize map
-        initMapMode();
-        
-        // Initialize map type and show markers after map is ready
+        // Initialize map after a short delay to ensure DOM is ready
         setTimeout(() => {{
-            if (map) {{
-                // Force map to recalculate size
-                map.invalidateSize();
-                // Try again after a short delay
-                setTimeout(() => {{
+            initMap();
+            
+            // Initialize map type and show markers after map is ready
+            setTimeout(() => {{
+                if (map) {{
+                    // Force map to recalculate size
                     map.invalidateSize();
-                    switchMapType('conflict');
-                    updateZoneCounts();
-                }}, 200);
-            }} else {{
-                console.error('Map not initialized');
-                // Retry initialization
-                setTimeout(() => {{
-                    initMapMode();
-                    if (map) {{
+                    // Try again after a short delay
+                    setTimeout(() => {{
                         map.invalidateSize();
                         switchMapType('conflict');
                         updateZoneCounts();
-                    }}
-                }}, 500);
-            }}
-        }}, 500);
+                    }}, 200);
+                }} else {{
+                    console.error('Map not initialized');
+                    // Retry initialization
+                    setTimeout(() => {{
+                        initMap();
+                        if (map) {{
+                            map.invalidateSize();
+                            switchMapType('conflict');
+                            updateZoneCounts();
+                        }}
+                    }}, 500);
+                }}
+            }}, 300);
+        }}, 100);
     }});
 
     function getProbColor(p) {{
@@ -777,13 +596,32 @@ def generate_combined_html():
         currentMapType = mapType;
         const mapInfo = allMapData[mapType];
         if (!mapInfo) return;
-        
+
         const config = mapInfo.config;
 
-        // Update zone filters
+        // Clear any selected zone from previous map type
+        document.querySelectorAll('.zone-radio').forEach(radio => {{
+            radio.checked = false;
+        }});
+
+        // Show/hide category filters for current map type - hide all first
+        document.querySelectorAll('.category-filters').forEach(div => {{
+            div.style.display = 'none';
+            div.style.visibility = 'hidden';
+        }});
+        // Show only the current map type's categories
+        const currentCategoryFilters = document.getElementById(`category-filters-${{mapType}}`);
+        if (currentCategoryFilters) {{
+            currentCategoryFilters.style.display = 'block';
+            currentCategoryFilters.style.visibility = 'visible';
+        }} else {{
+            console.warn('Category filters not found for:', mapType);
+        }}
+
+        // Update zone filters (this will regenerate zone list for new map type)
         updateZoneFilters(mapType);
         
-        // Update visibility - this will show markers
+        // Update visibility - this will show markers for all zones (no zone selected)
         updateVisibility();
     }}
     
@@ -818,55 +656,40 @@ def generate_combined_html():
             const volume = zone_volumes[z] || 0;
             const radio = document.createElement('div');
             radio.className = 'filter-item';
-            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${{safe_id}}" data-zone="${{z}}" ${{checked}} onchange="onZoneChange('${{z}}')"> <label for="zone_${{safe_id}}">${{z}} <span style="color: #94a3b8; font-size: 0.85rem;">(${{count}} events, ${{formatVol(volume)}})</span></label>`;
+            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${{safe_id}}" data-zone="${{z}}" ${{checked}} onchange="onZoneChange('${{z}}')" onclick="onZoneChange('${{z}}')"> <label for="zone_${{safe_id}}" onclick="document.getElementById('zone_${{safe_id}}').click();">${{z}} <span style="color: #94a3b8; font-size: 0.85rem;">(${{count}} events, ${{formatVol(volume)}})</span></label>`;
             zoneFiltersDiv.appendChild(radio);
         }});
     }}
     
     function onZoneChange(zoneName) {{
-        const coords = ZONE_COORDS[zoneName];
-        if (coords) {{
-            const [lat, lng] = coords;
-            if (isGlobeMode && camera) {{
-                const targetPos = latLngToVector3(lat, lng, 1.0);
-                // Animate camera to look at selected zone
-                const startPos = camera.position.clone();
-                const endPos = new THREE.Vector3(targetPos.x * 2.2, targetPos.y * 2.2, targetPos.z * 2.2);
-                let progress = 0;
-                const animateCamera = () => {{
-                    progress += 0.03;
-                    if (progress < 1) {{
-                        camera.position.lerpVectors(startPos, endPos, progress);
-                        camera.lookAt(targetPos);
-                        requestAnimationFrame(animateCamera);
-                    }} else {{
-                        camera.lookAt(targetPos);
-                    }}
-                }};
-                animateCamera();
-            }} else if (map) {{
-                map.setView([lat, lng], 5, {{ animate: true, duration: 0.5 }});
-            }}
+        // Ensure radio button is checked
+        const safe_id = zoneName.replace(/ /g, '_').replace(/\\./g, '');
+        const radio = document.getElementById(`zone_${{safe_id}}`);
+        if (radio && !radio.checked) {{
+            radio.checked = true;
         }}
+        
+        // Don't move the map - just update visibility and show tooltip
         updateVisibility();
         
         // After visibility updates, show tooltip for selected zone marker
-        setTimeout(() => {{
+        // Try multiple times with increasing delays to ensure marker is ready
+        function tryOpenTooltip(attempt = 0) {{
             const selectedMarker = markers.find(m => m.zoneName === zoneName);
             if (selectedMarker && selectedMarker.tooltipHtml) {{
-                if (isGlobeMode) {{
-                    const tooltip = createTooltipOverlay();
-                    tooltip.innerHTML = selectedMarker.tooltipHtml;
-                    tooltip.style.display = 'block';
-                    tooltip.style.left = (window.innerWidth / 2) + 'px';
-                    tooltip.style.top = (window.innerHeight / 2) + 'px';
-                    tooltip.style.transform = 'translate(-50%, -50%)';
-                }} else if (selectedMarker.openPopup) {{
-                    selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
-                    selectedMarker.openPopup(selectedMarker.getLatLng());
-                }}
+                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                selectedMarker.openPopup(selectedMarker.getLatLng());
+                console.log('Tooltip opened for zone:', zoneName);
+            }} else if (attempt < 5) {{
+                // Retry up to 5 times
+                setTimeout(() => tryOpenTooltip(attempt + 1), 200);
+            }} else {{
+                console.warn('Could not find marker for zone:', zoneName);
             }}
-        }}, isGlobeMode ? 500 : 150);
+        }}
+        
+        // Start trying to open tooltip after a short delay
+        setTimeout(() => tryOpenTooltip(), 200);
     }}
 
     function updateZoneCounts() {{
@@ -921,9 +744,7 @@ def generate_combined_html():
         const selectedZone = selectedRadio ? selectedRadio.getAttribute('data-zone') : null;
 
         // Remove all markers
-        if (isGlobeMode && markerGroup) {{
-            markers.forEach(marker => markerGroup.remove(marker));
-        }} else if (map) {{
+        if (map) {{
             markers.forEach(marker => map.removeLayer(marker));
         }}
         markers.length = 0;
@@ -948,7 +769,7 @@ def generate_combined_html():
         Object.values(zoneEvents).forEach(zoneEventList => {{
             totalCount += zoneEventList.length;
         }});
-        document.getElementById('total-events-count').innerText = `(${{totalCount}} events)`;
+        // Removed total events count display
 
         // Always show all markers for selected categories (simplified - no zone selection required)
         if (!selectedZone) {{
@@ -993,18 +814,47 @@ def generate_combined_html():
                 const sortedCats = Object.keys(eventsByCat).sort();
                 const tooltipId = `tooltip-${{zone.replace(/[^a-zA-Z0-9]/g, '-')}}-${{Date.now()}}`;
                 
+                // Collect all events for Top Volume tab
+                const allEvents = [];
+                Object.values(eventsByCat).forEach(catEvents => {{
+                    allEvents.push(...catEvents);
+                }});
+                const topVolumeEvents = [...allEvents].sort((a, b) => (b.vol || 0) - (a.vol || 0)).slice(0, 50); // Top 50 by volume
+                
                 tooltipHtml += `<div class="tooltip-tabs" id="${{tooltipId}}-tabs">`;
+                // Add Top Volume tab first
+                tooltipHtml += `<div class="tooltip-tab active" onclick="switchTooltipTab('${{tooltipId}}', -1)" id="${{tooltipId}}-tab-topvol">💰 Top Volume</div>`;
                 sortedCats.forEach((cat, idx) => {{
                     const tabId = `${{tooltipId}}-tab-${{idx}}`;
-                    const activeClass = idx === 0 ? 'active' : '';
-                    tooltipHtml += `<div class="tooltip-tab ${{activeClass}}" onclick="switchTooltipTab('${{tooltipId}}', ${{idx}})" id="${{tabId}}">${{cat}}</div>`;
+                    tooltipHtml += `<div class="tooltip-tab" onclick="switchTooltipTab('${{tooltipId}}', ${{idx}})" id="${{tabId}}">${{cat}}</div>`;
+                }});
+                tooltipHtml += `</div>`;
+                
+                // Top Volume tab content (first, active by default)
+                tooltipHtml += `<div class="tooltip-tab-content active" id="${{tooltipId}}-content-topvol">`;
+                topVolumeEvents.forEach(event => {{
+                    const eventColor = getProbColor(event.price);
+                    let volStr;
+                    if (event.vol >= 1000000) {{
+                        volStr = (event.vol / 1000000).toFixed(1) + 'M';
+                    }} else if (event.vol >= 1000) {{
+                        volStr = (event.vol / 1000).toFixed(1) + 'k';
+                    }} else {{
+                        volStr = Math.round(event.vol).toString();
+                    }}
+                    const polyLink = event.url || `https://polymarket.com/event/${{event.slug}}`;
+                    tooltipHtml += `<div style="margin-bottom:4px; font-size: 0.8rem; padding: 4px; border-left: 2px solid ${{eventColor}};">
+                        <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${{volStr}}</strong>]</span> 
+                        <span style="color:#64748b; font-size:0.75rem;">[${{event.cat}}]</span>
+                        <a href="${{polyLink}}" target="_blank" style="margin-left:5px; margin-right:5px; display:block; margin-top:2px;">${{event.q}}</a>
+                        <span style="color:${{eventColor}}; font-weight:800;">${{Math.round(event.price * 100)}}%</span>
+                    </div>`;
                 }});
                 tooltipHtml += `</div>`;
                 
                 sortedCats.forEach((cat, idx) => {{
                     const contentId = `${{tooltipId}}-content-${{idx}}`;
-                    const activeClass = idx === 0 ? 'active' : '';
-                    tooltipHtml += `<div class="tooltip-tab-content ${{activeClass}}" id="${{contentId}}">`;
+                    tooltipHtml += `<div class="tooltip-tab-content" id="${{contentId}}">`;
                     
                     const topics = {{}};
                     eventsByCat[cat].forEach(event => {{
@@ -1040,19 +890,7 @@ def generate_combined_html():
                 tooltipHtml += `</div>`;
                 
                 // Now create marker with tooltip
-                if (isGlobeMode && markerGroup) {{
-                    // Create 3D marker on globe
-                    const position = latLngToVector3(lat, lng, 1.02);
-                    const markerGeometry = new THREE.SphereGeometry(0.02, 16, 16);
-                    const markerMaterial = new THREE.MeshBasicMaterial({{ color: color, opacity: 0.8, transparent: true }});
-                    marker = new THREE.Mesh(markerGeometry, markerMaterial);
-                    marker.position.copy(position);
-                    marker.zoneName = zone;
-                    marker.tooltipHtml = tooltipHtml;
-                    marker.lat = lat;
-                    marker.lng = lng;
-                    markerGroup.add(marker);
-                }} else if (map) {{
+                if (map) {{
                     // Create Leaflet marker
                     const iconSize = 20;
                     const icon = L.divIcon({{
@@ -1072,37 +910,80 @@ def generate_combined_html():
                         closeButton: false,
                         autoClose: false,
                         className: 'line-popup',
-                        minWidth: 400,
-                        maxWidth: 2000,
+                        minWidth: 600,
+                        maxWidth: 600,
                         offset: [0, -10]
                     }});
                     
                     let popupTimeout;
+                    let isPopupHovered = false;
+                    
                     marker.on('mouseover', function(e) {{
                         clearTimeout(popupTimeout);
-                        this.setPopupContent(tooltipHtml);
+                        isPopupHovered = false;
+                        this.setPopupContent(this.tooltipHtml);
                         this.openPopup(e.latlng);
+                        
+                        // Add event listeners to popup element to keep it open when hovering
+                        setTimeout(() => {{
+                            const popup = this.getPopup();
+                            if (popup && popup.getElement()) {{
+                                const popupElement = popup.getElement();
+                                popupElement.addEventListener('mouseenter', function() {{
+                                    clearTimeout(popupTimeout);
+                                    isPopupHovered = true;
+                                }});
+                                popupElement.addEventListener('mouseleave', function() {{
+                                    isPopupHovered = false;
+                                    popupTimeout = setTimeout(() => {{
+                                        if (!isPopupHovered) {{
+                                            marker.closePopup();
+                                        }}
+                                    }}, 300);
+                                }});
+                            }}
+                        }}, 100);
                     }});
                     
                     marker.on('mouseout', function(e) {{
+                        // Only close if not hovering over popup
                         popupTimeout = setTimeout(() => {{
-                            this.closePopup();
-                        }}, 400);
+                            if (!isPopupHovered) {{
+                                this.closePopup();
+                            }}
+                        }}, 500);
                     }});
                     
                     marker.on('click', function(e) {{
+                        // Open tooltip immediately before updating visibility
+                        if (this.tooltipHtml) {{
+                            this.setPopupContent(this.tooltipHtml);
+                            this.openPopup(e.latlng);
+                        }}
+                        
                         const safe_id = zone.replace(/ /g, '_').replace(/\\./g, '');
                         const radio = document.getElementById(`zone_${{safe_id}}`);
                         if (radio) {{
                             radio.checked = true;
                             updateVisibility();
+                            
+                            // After visibility updates, ensure tooltip is still open
                             setTimeout(() => {{
-                                const selectedMarker = markers.find(m => m.zoneName === zone);
+                                let selectedMarker = markers.find(m => m.zoneName === zone);
                                 if (selectedMarker && selectedMarker.tooltipHtml) {{
                                     selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
                                     selectedMarker.openPopup(selectedMarker.getLatLng());
+                                }} else {{
+                                    // Retry if marker not found yet
+                                    setTimeout(() => {{
+                                        selectedMarker = markers.find(m => m.zoneName === zone);
+                                        if (selectedMarker && selectedMarker.tooltipHtml) {{
+                                            selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                            selectedMarker.openPopup(selectedMarker.getLatLng());
+                                        }}
+                                    }}, 200);
                                 }}
-                            }}, 150);
+                            }}, 200);
                         }}
                     }});
                 }}
@@ -1114,31 +995,7 @@ def generate_combined_html():
             return;
         }}
 
-        // Center camera/map on selected zone
-        const selectedCoords = ZONE_COORDS[selectedZone];
-        if (selectedCoords) {{
-            const [lat, lng] = selectedCoords;
-            if (isGlobeMode && camera) {{
-                const targetPos = latLngToVector3(lat, lng, 1.0);
-                // Animate camera to look at selected zone
-                const startPos = camera.position.clone();
-                const endPos = new THREE.Vector3(targetPos.x * 2.2, targetPos.y * 2.2, targetPos.z * 2.2);
-                let progress = 0;
-                const animateCamera = () => {{
-                    progress += 0.03;
-                    if (progress < 1) {{
-                        camera.position.lerpVectors(startPos, endPos, progress);
-                        camera.lookAt(targetPos);
-                        requestAnimationFrame(animateCamera);
-                    }} else {{
-                        camera.lookAt(targetPos);
-                    }}
-                }};
-                animateCamera();
-            }} else if (map) {{
-                map.setView([lat, lng], 5, {{ animate: true, duration: 0.5 }});
-            }}
-        }}
+        // Don't move the map - keep it static
 
         let visibleCount = 0;
         
@@ -1161,87 +1018,8 @@ def generate_combined_html():
             // Highlight selected zone with larger marker (if zone is selected)
             const isSelected = selectedZone && zone === selectedZone;
             const [lat, lng] = coords;
-            let marker;
             
-            if (isGlobeMode && markerGroup) {{
-                const position = latLngToVector3(lat, lng, isSelected ? 1.05 : 1.02);
-                const markerSize = isSelected ? 0.04 : 0.02;
-                const markerGeometry = new THREE.SphereGeometry(markerSize, 16, 16);
-                const markerMaterial = new THREE.MeshBasicMaterial({{
-                    color: color,
-                    opacity: isSelected ? 1.0 : 0.6,
-                    transparent: true
-                }});
-                marker = new THREE.Mesh(markerGeometry, markerMaterial);
-                marker.position.copy(position);
-                marker.zoneName = zone;
-                markerGroup.add(marker);
-            }} else if (map) {{
-                const iconSize = isSelected ? 36 : 28;
-                const iconAnchor = isSelected ? 18 : 14;
-                const iconStyle = isSelected 
-                    ? `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; filter: drop-shadow(0 0 8px ${{color}}) drop-shadow(0 0 12px rgba(255,255,255,0.3));`
-                    : `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; opacity: 0.6;`;
-                const icon = L.divIcon({{
-                    className: isSelected ? 'map-icon selected-zone-icon' : 'map-icon',
-                    html: `<span style="${{iconStyle}}">${{config.icon}}</span>`,
-                    iconSize: [iconSize, iconSize],
-                    iconAnchor: [iconAnchor, iconSize]
-                }});
-                marker = L.marker([lat, lng], {{ icon: icon }}).addTo(map);
-                marker.zoneName = zone;
-                
-                // Add Leaflet popup handlers
-                marker.bindPopup("", {{
-                    closeButton: false,
-                    autoClose: false,
-                    className: 'line-popup',
-                    minWidth: 400,
-                    maxWidth: 2000,
-                    offset: [0, -10]
-                }});
-                
-                let popupTimeout;
-                marker.on('mouseover', function(e) {{
-                    clearTimeout(popupTimeout);
-                    this.setPopupContent(tooltipHtml);
-                    this.openPopup(e.latlng);
-                }});
-                
-                marker.on('mouseout', function(e) {{
-                    popupTimeout = setTimeout(() => {{
-                        this.closePopup();
-                    }}, 400);
-                }});
-                
-                marker.on('click', function(e) {{
-                    const safe_id = zone.replace(/ /g, '_').replace(/\\./g, '');
-                    const radio = document.getElementById(`zone_${{safe_id}}`);
-                    if (radio) {{
-                        radio.checked = true;
-                        updateVisibility();
-                        setTimeout(() => {{
-                            const selectedMarker = markers.find(m => m.zoneName === zone);
-                            if (selectedMarker && selectedMarker.tooltipHtml) {{
-                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
-                                selectedMarker.openPopup(selectedMarker.getLatLng());
-                            }}
-                        }}, 150);
-                    }}
-                }});
-            }}
-            
-            if (isSelected) {{
-                selectedZoneCount += events.length;
-            }}
-            visibleCount += events.length;
-            
-            // Make marker interactive
-            marker.userData = {{ zone: zone, events: events }};
-            
-            // Build tooltip HTML for all zones
-            let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${{zone}}</div>`;
-            
+            // Build tooltip HTML BEFORE creating marker
             function getBaseTopic(slug, q) {{
                 if (!slug) return q;
                 let base = slug.replace(/-\\d+$/, '');
@@ -1256,25 +1034,56 @@ def generate_combined_html():
                 return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
             }}
             
+            let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${{zone}}</div>`;
+            
             tooltipHtml += `<button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
             
             const sortedCats = Object.keys(eventsByCat).sort();
             const tooltipId = `tooltip-${{zone.replace(/[^a-zA-Z0-9]/g, '-')}}-${{Date.now()}}`;
             
+            // Collect all events for Top Volume tab
+            const allEvents = [];
+            Object.values(eventsByCat).forEach(catEvents => {{
+                allEvents.push(...catEvents);
+            }});
+            const topVolumeEvents = [...allEvents].sort((a, b) => (b.vol || 0) - (a.vol || 0)).slice(0, 50); // Top 50 by volume
+            
             // Create tabs
             tooltipHtml += `<div class="tooltip-tabs" id="${{tooltipId}}-tabs">`;
+            // Add Top Volume tab first
+            tooltipHtml += `<div class="tooltip-tab active" onclick="switchTooltipTab('${{tooltipId}}', -1)" id="${{tooltipId}}-tab-topvol">💰 Top Volume</div>`;
             sortedCats.forEach((cat, idx) => {{
                 const tabId = `${{tooltipId}}-tab-${{idx}}`;
-                const activeClass = idx === 0 ? 'active' : '';
-                tooltipHtml += `<div class="tooltip-tab ${{activeClass}}" onclick="switchTooltipTab('${{tooltipId}}', ${{idx}})" id="${{tabId}}">${{cat}}</div>`;
+                tooltipHtml += `<div class="tooltip-tab" onclick="switchTooltipTab('${{tooltipId}}', ${{idx}})" id="${{tabId}}">${{cat}}</div>`;
+            }});
+            tooltipHtml += `</div>`;
+            
+            // Top Volume tab content (first, active by default)
+            tooltipHtml += `<div class="tooltip-tab-content active" id="${{tooltipId}}-content-topvol">`;
+            topVolumeEvents.forEach(event => {{
+                const eventColor = getProbColor(event.price);
+                let volStr;
+                if (event.vol >= 1000000) {{
+                    volStr = (event.vol / 1000000).toFixed(1) + 'M';
+                }} else if (event.vol >= 1000) {{
+                    volStr = (event.vol / 1000).toFixed(1) + 'k';
+                }} else {{
+                    volStr = Math.round(event.vol).toString();
+                }}
+                const polyLink = event.url || `https://polymarket.com/event/${{event.slug}}`;
+                tooltipHtml += `<div style="margin-bottom:4px; font-size: 0.8rem; padding: 4px; border-left: 2px solid ${{eventColor}};">
+                    <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${{volStr}}</strong>]</span> 
+                    <span style="color:#64748b; font-size:0.75rem;">[${{event.cat}}]</span>
+                    <a href="${{polyLink}}" target="_blank" style="margin-left:5px; margin-right:5px; display:block; margin-top:2px;">${{event.q}}</a>
+                    <span style="color:${{eventColor}}; font-weight:800;">${{Math.round(event.price * 100)}}%</span>
+                </div>`;
             }});
             tooltipHtml += `</div>`;
             
             // Create tab contents
             sortedCats.forEach((cat, idx) => {{
                 const contentId = `${{tooltipId}}-content-${{idx}}`;
-                const activeClass = idx === 0 ? 'active' : '';
-                tooltipHtml += `<div class="tooltip-tab-content ${{activeClass}}" id="${{contentId}}">`;
+                tooltipHtml += `<div class="tooltip-tab-content" id="${{contentId}}">`;
                 
                 const topics = {{}};
                 eventsByCat[cat].forEach(event => {{
@@ -1309,46 +1118,229 @@ def generate_combined_html():
             
             tooltipHtml += `</div>`;
             
-            // Store zone name and tooltip HTML on marker
-            marker.tooltipHtml = tooltipHtml;
-            marker.lat = lat;
-            marker.lng = lng;
-            markers.push(marker);
+            let marker;
+            if (map) {{
+                const iconSize = isSelected ? 36 : 28;
+                const iconAnchor = isSelected ? 18 : 14;
+                const iconStyle = isSelected 
+                    ? `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; filter: drop-shadow(0 0 8px ${{color}}) drop-shadow(0 0 12px rgba(255,255,255,0.3));`
+                    : `color: ${{color}}; font-size: ${{iconSize}}px; font-weight: bold; opacity: 0.6;`;
+                const icon = L.divIcon({{
+                    className: isSelected ? 'map-icon selected-zone-icon' : 'map-icon',
+                    html: `<span style="${{iconStyle}}">${{config.icon}}</span>`,
+                    iconSize: [iconSize, iconSize],
+                    iconAnchor: [iconAnchor, iconSize]
+                }});
+                marker = L.marker([lat, lng], {{ icon: icon }}).addTo(map);
+                marker.zoneName = zone;
+                marker.tooltipHtml = tooltipHtml;
+                marker.lat = lat;
+                marker.lng = lng;
+                
+                // Add Leaflet popup handlers
+                marker.bindPopup("", {{
+                    closeButton: false,
+                    autoClose: false,
+                    className: 'line-popup',
+                    minWidth: 400,
+                    maxWidth: 2000,
+                    offset: [0, -10]
+                }});
+                
+                let popupTimeout;
+                let isPopupHovered = false;
+                
+                marker.on('mouseover', function(e) {{
+                    clearTimeout(popupTimeout);
+                    isPopupHovered = false;
+                    this.setPopupContent(this.tooltipHtml);
+                    this.openPopup(e.latlng);
+                    
+                    // Store timeout and hover state on marker for access from tab switching
+                    marker._popupTimeout = popupTimeout;
+                    marker._isPopupHovered = isPopupHovered;
+                    
+                    // Add event listeners to popup element to keep it open when hovering
+                    setTimeout(() => {{
+                        const popup = this.getPopup();
+                        if (popup && popup.getElement()) {{
+                            const popupElement = popup.getElement();
+                            popupElement.addEventListener('mouseenter', function() {{
+                                clearTimeout(marker._popupTimeout);
+                                marker._isPopupHovered = true;
+                            }});
+                            popupElement.addEventListener('mouseleave', function() {{
+                                marker._isPopupHovered = false;
+                                marker._popupTimeout = setTimeout(() => {{
+                                    if (!marker._isPopupHovered) {{
+                                        marker.closePopup();
+                                    }}
+                                }}, 500);
+                            }});
+                            
+                            // Prevent closing when clicking on tabs
+                            const tabs = popupElement.querySelectorAll('.tooltip-tab');
+                            tabs.forEach(tab => {{
+                                tab.addEventListener('click', function(e) {{
+                                    clearTimeout(marker._popupTimeout);
+                                    marker._isPopupHovered = true;
+                                    e.stopPropagation();
+                                }});
+                                tab.addEventListener('mouseenter', function() {{
+                                    clearTimeout(marker._popupTimeout);
+                                    marker._isPopupHovered = true;
+                                }});
+                            }});
+                        }}
+                    }}, 100);
+                }});
+                
+                marker.on('mouseout', function(e) {{
+                    // Only close if not hovering over popup
+                    this._popupTimeout = setTimeout(() => {{
+                        if (!this._isPopupHovered) {{
+                            this.closePopup();
+                        }}
+                    }}, 500);
+                }});
+                
+                marker.on('click', function(e) {{
+                    // Open tooltip immediately before updating visibility
+                    if (this.tooltipHtml) {{
+                        this.setPopupContent(this.tooltipHtml);
+                        this.openPopup(e.latlng);
+                    }}
+                    
+                    const safe_id = zone.replace(/ /g, '_').replace(/\\./g, '');
+                    const radio = document.getElementById(`zone_${{safe_id}}`);
+                    if (radio) {{
+                        radio.checked = true;
+                        updateVisibility();
+                        
+                        // After visibility updates, ensure tooltip is still open
+                        setTimeout(() => {{
+                            let selectedMarker = markers.find(m => m.zoneName === zone);
+                            if (selectedMarker && selectedMarker.tooltipHtml) {{
+                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                selectedMarker.openPopup(selectedMarker.getLatLng());
+                            }} else {{
+                                // Retry if marker not found yet
+                                setTimeout(() => {{
+                                    selectedMarker = markers.find(m => m.zoneName === zone);
+                                    if (selectedMarker && selectedMarker.tooltipHtml) {{
+                                        selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                        selectedMarker.openPopup(selectedMarker.getLatLng());
+                                    }}
+                                }}, 200);
+                            }}
+                        }}, 200);
+                    }}
+                }});
+            }}
+            
+            if (isSelected) {{
+                selectedZoneCount += events.length;
+            }}
             visibleCount += events.length;
+            
+            // Make marker interactive
+            if (marker) {{
+                marker.userData = {{ zone: zone, events: events }};
+                markers.push(marker);
+            }}
         }}
         
-        document.getElementById('total-events-count').innerText = `(${{visibleCount}} events)`;
+        // Removed total events count display
     }}
     
     function switchTooltipTab(tooltipId, tabIndex) {{
         const tabsContainer = document.getElementById(`${{tooltipId}}-tabs`);
         if (!tabsContainer) return;
+
+        // Find the marker that owns this tooltip and prevent it from closing
+        const marker = markers.find(m => {{
+            if (!m.tooltipHtml) return false;
+            return m.tooltipHtml.includes(tooltipId);
+        }});
         
+        // Clear any pending close timeouts
+        if (marker && marker._popupTimeout) {{
+            clearTimeout(marker._popupTimeout);
+            marker._popupTimeout = null;
+        }}
+        if (marker) {{
+            marker._isPopupHovered = true;
+        }}
+
         const tabs = tabsContainer.querySelectorAll('.tooltip-tab');
-        const allContents = [];
-        let idx = 0;
-        while (true) {{
-            const content = document.getElementById(`${{tooltipId}}-content-${{idx}}`);
-            if (!content) break;
-            allContents.push(content);
-            idx++;
+        
+        // Handle Top Volume tab (tabIndex === -1)
+        if (tabIndex === -1) {{
+            tabs.forEach((tab, idx) => {{
+                if (idx === 0) {{ // Top Volume is first tab
+                    tab.classList.add('active');
+                }} else {{
+                    tab.classList.remove('active');
+                }}
+            }});
+            
+            // Show Top Volume content
+            const topVolContent = document.getElementById(`${{tooltipId}}-content-topvol`);
+            const allContents = [];
+            let idx = 0;
+            while (true) {{
+                const content = document.getElementById(`${{tooltipId}}-content-${{idx}}`);
+                if (!content) break;
+                allContents.push(content);
+                idx++;
+            }}
+            
+            if (topVolContent) {{
+                topVolContent.classList.add('active');
+            }}
+            allContents.forEach(content => {{
+                content.classList.remove('active');
+            }});
+        }} else {{
+            // Handle category tabs
+            tabs.forEach((tab, idx) => {{
+                if (idx === tabIndex + 1) {{ // +1 because Top Volume is at index 0
+                    tab.classList.add('active');
+                }} else {{
+                    tab.classList.remove('active');
+                }}
+            }});
+            
+            const allContents = [];
+            const topVolContent = document.getElementById(`${{tooltipId}}-content-topvol`);
+            if (topVolContent) {{
+                topVolContent.classList.remove('active');
+            }}
+            let idx = 0;
+            while (true) {{
+                const content = document.getElementById(`${{tooltipId}}-content-${{idx}}`);
+                if (!content) break;
+                allContents.push(content);
+                idx++;
+            }}
+
+            allContents.forEach((content, idx) => {{
+                if (idx === tabIndex) {{
+                    content.classList.add('active');
+                }} else {{
+                    content.classList.remove('active');
+                }}
+            }});
         }}
         
-        tabs.forEach((tab, idx) => {{
-            if (idx === tabIndex) {{
-                tab.classList.add('active');
-            }} else {{
-                tab.classList.remove('active');
-            }}
-        }});
-        
-        allContents.forEach((content, idx) => {{
-            if (idx === tabIndex) {{
-                content.classList.add('active');
-            }} else {{
-                content.classList.remove('active');
-            }}
-        }});
+        // Reset hover state after a short delay to allow normal mouseout behavior
+        if (marker) {{
+            setTimeout(() => {{
+                if (marker) {{
+                    marker._isPopupHovered = false;
+                }}
+            }}, 100);
+        }}
     }}
     
     function captureTooltipSnapshot(button) {{
