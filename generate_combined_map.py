@@ -408,6 +408,14 @@ def generate_combined_html():
             map.setView(coords, 5, {{ animate: true, duration: 0.5 }});
         }}
         updateVisibility();
+        
+        // After visibility updates, open tooltip for selected zone marker
+        setTimeout(() => {{
+            const selectedMarker = markers.find(m => m.zoneName === zoneName);
+            if (selectedMarker) {{
+                selectedMarker.openPopup();
+            }}
+        }}, 100);
     }}
 
     function updateZoneCounts() {{
@@ -609,13 +617,19 @@ def generate_combined_html():
             // Store zone name on marker for click handler
             marker.zoneName = zone;
             
-            // Click handler to select zone
+            // Click handler to select zone and open tooltip
             marker.on('click', function(e) {{
                 const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
                 const radio = document.getElementById(`zone_${{safe_id}}`);
                 if (radio) {{
                     radio.checked = true;
-                    onZoneChange(zone);
+                    // Update visibility first
+                    updateVisibility();
+                    // Then open tooltip for this marker
+                    setTimeout(() => {{
+                        this.setPopupContent(tooltipHtml);
+                        this.openPopup(e.latlng);
+                    }}, 100);
                 }}
             }});
             

@@ -294,7 +294,7 @@
     <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div style="padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 8px;">
             <span style="color: #94a3b8;">Last Updated:</span>
-            <span style="color: #3b82f6; font-weight: 700;">2026-01-11 20:53:10</span>
+            <span style="color: #3b82f6; font-weight: 700;">2026-01-11 20:54:19</span>
         </div>
         <span style="color: #94a3b8;">•</span>
         <span id="map-description" style="color: #94a3b8;">Loading...</span>
@@ -427,6 +427,14 @@
             map.setView(coords, 5, { animate: true, duration: 0.5 });
         }
         updateVisibility();
+        
+        // After visibility updates, open tooltip for selected zone marker
+        setTimeout(() => {
+            const selectedMarker = markers.find(m => m.zoneName === zoneName);
+            if (selectedMarker) {
+                selectedMarker.openPopup();
+            }
+        }, 100);
     }
 
     function updateZoneCounts() {
@@ -628,13 +636,19 @@
             // Store zone name on marker for click handler
             marker.zoneName = zone;
             
-            // Click handler to select zone
+            // Click handler to select zone and open tooltip
             marker.on('click', function(e) {
                 const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
                 const radio = document.getElementById(`zone_${safe_id}`);
                 if (radio) {
                     radio.checked = true;
-                    onZoneChange(zone);
+                    // Update visibility first
+                    updateVisibility();
+                    // Then open tooltip for this marker
+                    setTimeout(() => {
+                        this.setPopupContent(tooltipHtml);
+                        this.openPopup(e.latlng);
+                    }, 100);
                 }
             });
             
