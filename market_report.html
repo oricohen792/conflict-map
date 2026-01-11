@@ -325,7 +325,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:14:03 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:16:52 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -610,12 +610,19 @@
             const volume = zone_volumes[z] || 0;
             const radio = document.createElement('div');
             radio.className = 'filter-item';
-            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${safe_id}" data-zone="${z}" ${checked} onchange="onZoneChange('${z}')"> <label for="zone_${safe_id}">${z} <span style="color: #94a3b8; font-size: 0.85rem;">(${count} events, ${formatVol(volume)})</span></label>`;
+            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${safe_id}" data-zone="${z}" ${checked} onchange="onZoneChange('${z}')" onclick="onZoneChange('${z}')"> <label for="zone_${safe_id}" onclick="document.getElementById('zone_${safe_id}').click();">${z} <span style="color: #94a3b8; font-size: 0.85rem;">(${count} events, ${formatVol(volume)})</span></label>`;
             zoneFiltersDiv.appendChild(radio);
         });
     }
     
     function onZoneChange(zoneName) {
+        // Ensure radio button is checked
+        const safe_id = zoneName.replace(/ /g, '_').replace(/\./g, '');
+        const radio = document.getElementById(`zone_${safe_id}`);
+        if (radio && !radio.checked) {
+            radio.checked = true;
+        }
+        
         const coords = ZONE_COORDS[zoneName];
         if (coords && map) {
             const [lat, lng] = coords;
@@ -637,10 +644,19 @@
                     if (selectedMarker && selectedMarker.tooltipHtml) {
                         selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
                         selectedMarker.openPopup(selectedMarker.getLatLng());
+                    } else {
+                        // One more retry
+                        setTimeout(() => {
+                            selectedMarker = markers.find(m => m.zoneName === zoneName);
+                            if (selectedMarker && selectedMarker.tooltipHtml) {
+                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                selectedMarker.openPopup(selectedMarker.getLatLng());
+                            }
+                        }, 300);
                     }
-                }, 200);
+                }, 300);
             }
-        }, 200);
+        }, 300);
     }
 
     function updateZoneCounts() {
@@ -838,16 +854,42 @@
                     });
                     
                     let popupTimeout;
+                    let isPopupHovered = false;
+                    
                     marker.on('mouseover', function(e) {
                         clearTimeout(popupTimeout);
+                        isPopupHovered = false;
                         this.setPopupContent(this.tooltipHtml);
                         this.openPopup(e.latlng);
+                        
+                        // Add event listeners to popup element to keep it open when hovering
+                        setTimeout(() => {
+                            const popup = this.getPopup();
+                            if (popup && popup.getElement()) {
+                                const popupElement = popup.getElement();
+                                popupElement.addEventListener('mouseenter', function() {
+                                    clearTimeout(popupTimeout);
+                                    isPopupHovered = true;
+                                });
+                                popupElement.addEventListener('mouseleave', function() {
+                                    isPopupHovered = false;
+                                    popupTimeout = setTimeout(() => {
+                                        if (!isPopupHovered) {
+                                            marker.closePopup();
+                                        }
+                                    }, 300);
+                                });
+                            }
+                        }, 100);
                     });
                     
                     marker.on('mouseout', function(e) {
+                        // Only close if not hovering over popup
                         popupTimeout = setTimeout(() => {
-                            this.closePopup();
-                        }, 400);
+                            if (!isPopupHovered) {
+                                this.closePopup();
+                            }
+                        }, 500);
                     });
                     
                     marker.on('click', function(e) {
@@ -1022,16 +1064,42 @@
                 });
                 
                 let popupTimeout;
+                let isPopupHovered = false;
+                
                 marker.on('mouseover', function(e) {
                     clearTimeout(popupTimeout);
+                    isPopupHovered = false;
                     this.setPopupContent(this.tooltipHtml);
                     this.openPopup(e.latlng);
+                    
+                    // Add event listeners to popup element to keep it open when hovering
+                    setTimeout(() => {
+                        const popup = this.getPopup();
+                        if (popup && popup.getElement()) {
+                            const popupElement = popup.getElement();
+                            popupElement.addEventListener('mouseenter', function() {
+                                clearTimeout(popupTimeout);
+                                isPopupHovered = true;
+                            });
+                            popupElement.addEventListener('mouseleave', function() {
+                                isPopupHovered = false;
+                                popupTimeout = setTimeout(() => {
+                                    if (!isPopupHovered) {
+                                        marker.closePopup();
+                                    }
+                                }, 300);
+                            });
+                        }
+                    }, 100);
                 });
                 
                 marker.on('mouseout', function(e) {
+                    // Only close if not hovering over popup
                     popupTimeout = setTimeout(() => {
-                        this.closePopup();
-                    }, 400);
+                        if (!isPopupHovered) {
+                            this.closePopup();
+                        }
+                    }, 500);
                 });
                 
                 marker.on('click', function(e) {
