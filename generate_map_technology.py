@@ -1,51 +1,49 @@
 #!/usr/bin/env python3
 """
-Generate sport map from saved Polymarket data - uses base class
-Shows sport events as flags at their locations
+Generate technology map from saved Polymarket data - uses base class
+Shows technology events like product launches, AI developments, company announcements, etc.
 """
 import json
 from datetime import datetime, timezone
 from map_base import MapGeneratorBase, ZONE_COORD_MAP
 
-# Category Keywords for sports
-SPORT_KEYWORDS = {
-    "Football": ["football", "nfl", "super bowl", "ncaa", "college football", "nfl game", "touchdown", "quarterback"],
-    "Basketball": ["basketball", "nba", "ncaa basketball", "march madness", "nba game", "basketball game"],
-    "Baseball": ["baseball", "mlb", "world series", "baseball game", "mlb game"],
-    "Soccer": ["soccer", "football match", "premier league", "champions league", "world cup", "fifa", "euro", "copa"],
-    "Tennis": ["tennis", "wimbledon", "us open", "french open", "australian open", "atp", "wta"],
-    "Hockey": ["hockey", "nhl", "stanley cup", "hockey game"],
-    "Other Sports": ["golf", "boxing", "mma", "ufc", "olympics", "racing", "formula", "nascar", "cricket", "rugby"]
+# Category Keywords for technology events
+TECH_KEYWORDS = {
+    "Product Launches": ["product launch", "announcement", "release", "unveil", "launch"],
+    "Companies": ["apple", "google", "microsoft", "tesla", "meta", "amazon", "nvidia", "openai"],
+    "AI/ML": ["ai", "artificial intelligence", "chatgpt", "gpt", "machine learning", "llm", "large language model"],
+    "Conferences": ["ces", "wwdc", "google i/o", "developer conference", "tech conference"]
 }
 
 # Combined list for initial check
-all_sport_keywords = []
-for k in SPORT_KEYWORDS.values():
-    all_sport_keywords.extend(k)
+all_tech_keywords = []
+for k in TECH_KEYWORDS.values():
+    all_tech_keywords.extend(k)
 
-# Exclusion keywords - markets containing these should NOT be considered sports
+# Exclusion keywords - markets containing these should NOT be considered technology
 EXCLUSION_KEYWORDS = [
+    "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
+    "football", "basketball", "baseball", "soccer", "tennis", "hockey", "sport", "game",
+    "election", "president", "senate", "congress", "vote", "polling", "candidate",
     "inflation", "cpi", "consumer price index", "economic", "economy", "gdp", "unemployment",
     "interest rate", "fed rate", "federal reserve", "central bank", "monetary policy",
     "stock market", "dow", "nasdaq", "s&p", "sp500", "market crash", "recession",
-    "election", "president", "senate", "congress", "vote", "polling", "candidate",
-    "war", "conflict", "military", "attack", "invasion", "sanctions", "trade war",
     "crypto", "bitcoin", "ethereum", "cryptocurrency", "blockchain", "nft"
 ]
 
 
-class SportMapGenerator(MapGeneratorBase):
-    """Sport map generator - shows sport events as flags at locations"""
+class TechnologyMapGenerator(MapGeneratorBase):
+    """Technology map generator - shows technology events as markers at locations"""
     
     def __init__(self):
-        super().__init__("Sport Events Map Generator", "sport_report.html")
+        super().__init__("Technology Events Map Generator", "technology_report.html")
     
     def filter_markets(self):
-        """Filter and categorize sport markets"""
+        """Filter and categorize technology markets"""
         event_data = []
         current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         
-        print("Filtering and categorizing sport events...")
+        print("Filtering and categorizing technology events...")
         
         for m in self.markets:
             q = m.get("question", "")
@@ -54,29 +52,33 @@ class SportMapGenerator(MapGeneratorBase):
             price = float(m.get("lastTradePrice", 0) or 0)
             end_date = m.get("endDate", "")[:10]
             
-            # First check for exclusion keywords - skip non-sport markets
+            # First check for exclusion keywords - skip non-technology markets
             if any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
                 continue
             
-            assigned_cat = "Other Sports"
-            for cat, keywords in SPORT_KEYWORDS.items():
+            assigned_cat = "Other Technology"
+            for cat, keywords in TECH_KEYWORDS.items():
                 if any(k in q_lower for k in keywords):
                     assigned_cat = cat
                     break
             
-            if assigned_cat == "Other Sports" and not any(k in q_lower for k in all_sport_keywords):
+            if assigned_cat == "Other Technology" and not any(k in q_lower for k in all_tech_keywords):
                 continue
                 
             # Find location(s) mentioned in the question
             found_zones = self.find_zones_in_text(q)
             
-            # Use first zone found, or default to a central location if none found
+            # Use first zone found, or default to US for major tech companies if none found
             if found_zones:
                 zone_name = list(found_zones.keys())[0]
                 coords = ZONE_COORD_MAP[zone_name]
             else:
-                # Try to find any location mention, if none use default
-                continue  # Skip if no location found
+                # For major US tech companies, default to US
+                if any(k in q_lower for k in ["apple", "google", "microsoft", "meta", "amazon", "nvidia", "tesla", "openai"]):
+                    zone_name = "United States"
+                    coords = ZONE_COORD_MAP[zone_name]
+                else:
+                    continue  # Skip if no location found
             
             parent_slug = m.get("slug", "")
             events = m.get("events", [])
@@ -85,7 +87,7 @@ class SportMapGenerator(MapGeneratorBase):
             
             event_data.append({
                 "id": m.get("id", ""),
-                "unique_id": f"E{len(event_data)}", 
+                "unique_id": f"T{len(event_data)}", 
                 "q": q,
                 "price": price,
                 "date": end_date,
@@ -100,11 +102,11 @@ class SportMapGenerator(MapGeneratorBase):
                 "clobTokenIds": m.get("clobTokenIds", "")
             })
 
-        print(f"Found {len(event_data)} sport events.")
+        print(f"Found {len(event_data)} technology events.")
         return event_data
     
     def generate_html(self, events):
-        """Generate HTML map from filtered sport event data"""
+        """Generate HTML map from filtered technology event data"""
         current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         json_events = json.dumps(events)
         
@@ -113,7 +115,7 @@ class SportMapGenerator(MapGeneratorBase):
         
         # Generate category filters
         category_checks = ""
-        for cat in SPORT_KEYWORDS.keys():
+        for cat in TECH_KEYWORDS.keys():
             safe_id = cat.replace(" ", "_").replace("&", "")
             category_checks += f"<div class='filter-item'><input type='checkbox' id='{safe_id}' checked onchange='updateZoneCounts(); updateVisibility()'> <label for='{safe_id}'>{cat}</label></div>"
         
@@ -136,9 +138,9 @@ class SportMapGenerator(MapGeneratorBase):
         analytics_code = self.get_analytics_code()
         zone_coords_js = self.get_zone_coords_js()
         
-        # Add sport-specific CSS (insert before closing </style> tag)
-        sport_css = """
-        .flag-icon {
+        # Add technology-specific CSS (insert before closing </style> tag)
+        tech_css = """
+        .tech-icon {
             font-size: 24px;
             cursor: pointer;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
@@ -167,8 +169,6 @@ class SportMapGenerator(MapGeneratorBase):
         .leaflet-popup-content { margin: 8px 12px; }
         .line-tooltip a { color: #38bdf8; text-decoration: none; font-weight: 500; }
         .line-tooltip a:hover { text-decoration: underline; color: #7dd3fc; }
-        .info-box a { transition: opacity 0.2s; }
-        .info-box a:hover { opacity: 0.8; }
         
         .snapshot-btn {
             background: #3b82f6;
@@ -215,7 +215,7 @@ class SportMapGenerator(MapGeneratorBase):
         }
         .tooltip-tab.active {
             background: #0f172a;
-            color: #fbbf24;
+            color: #06b6d4;
             border-color: #475569;
             border-bottom-color: #0f172a;
         }
@@ -286,10 +286,10 @@ class SportMapGenerator(MapGeneratorBase):
         }
         """
         
-        # Insert sport_css before the closing </style> tag
-        css_with_sport = css.replace("    </style>", sport_css + "    </style>")
+        # Insert tech_css before the closing </style> tag
+        css_with_tech = css.replace("    </style>", tech_css + "    </style>")
         
-        html_template = html_head + css_with_sport + analytics_code + """
+        html_template = html_head + css_with_tech + analytics_code + """
 </head>
 <body>
 
@@ -301,7 +301,7 @@ class SportMapGenerator(MapGeneratorBase):
 
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
-    <h1>Select Sports</h1>
+    <h1>Select Technology Categories</h1>
     CATEGORY_FILTERS_PLACEHOLDER
     
     <hr style="margin: 10px 0;">
@@ -312,7 +312,7 @@ class SportMapGenerator(MapGeneratorBase):
 </div>
 
 <div class="info-box">
-    <h1 style="font-size: 1.2rem;">Sport Events Map</h1>
+    <h1 style="font-size: 1.2rem;">Technology Events Map</h1>
     <p id="stats-text">Loading...</p>
     <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div style="padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 8px;">
@@ -330,7 +330,7 @@ class SportMapGenerator(MapGeneratorBase):
             <span style="color: #94a3b8;">Unmapped: <strong>STATS_UNMAPPED</strong></span>
         </div>
         <span style="color: #94a3b8;">•</span>
-        <span style="color: #94a3b8;">Flags show sport event locations. Click flags for details.</span>
+        <span style="color: #94a3b8;">Icons show technology event locations. Click icons for details.</span>
     </div>
 </div>
 
@@ -343,9 +343,9 @@ class SportMapGenerator(MapGeneratorBase):
     <hr style="margin: 12px 0; border-color: #334155;">
     <div class="nav-links">
         <a href="market_report.html" class="nav-link">⚔️ Conflict</a>
+        <a href="sport_report.html" class="nav-link">⚽ Sport</a>
         <a href="finance_report.html" class="nav-link">💰 Finance</a>
         <a href="elections_report.html" class="nav-link">🗳️ Elections</a>
-        <a href="technology_report.html" class="nav-link">💻 Technology</a>
     </div>
 </div>
 
@@ -456,10 +456,10 @@ class SportMapGenerator(MapGeneratorBase):
             const maxProb = Math.max(...events.map(e => e.price));
             const color = getProbColor(maxProb);
             
-            // Create flag icon
+            // Create technology icon (laptop/computer emoji)
             const icon = L.divIcon({
-                className: 'flag-icon',
-                html: `<span style="color: ${color}; font-size: 28px;">🚩</span>`,
+                className: 'tech-icon',
+                html: `<span style="color: ${color}; font-size: 28px; font-weight: bold;">💻</span>`,
                 iconSize: [28, 28],
                 iconAnchor: [14, 28]
             });
@@ -568,7 +568,7 @@ class SportMapGenerator(MapGeneratorBase):
             visibleCount += events.length;
         }
         
-        document.getElementById('stats-text').innerText = `Visualizing ${visibleCount} sport events.`;
+        document.getElementById('stats-text').innerText = `Visualizing ${visibleCount} technology events.`;
     }
     
     // Initialize visibility
@@ -679,7 +679,7 @@ class SportMapGenerator(MapGeneratorBase):
 
 
 def main():
-    generator = SportMapGenerator()
+    generator = TechnologyMapGenerator()
     generator.run()
 
 

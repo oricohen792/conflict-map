@@ -247,11 +247,13 @@ class MapGeneratorBase:
         from generate_map_sport import SPORT_KEYWORDS, all_sport_keywords, EXCLUSION_KEYWORDS
         from generate_map_finance import FINANCE_KEYWORDS, all_finance_keywords
         from generate_map_elections import ELECTION_KEYWORDS, all_election_keywords
+        from generate_map_technology import TECH_KEYWORDS, all_tech_keywords
         
         conflict_ids = set()
         sport_ids = set()
         finance_ids = set()
         election_ids = set()
+        tech_ids = set()
         markets_with_zones = 0
         
         for m in self.markets:
@@ -313,8 +315,19 @@ class MapGeneratorBase:
                 if assigned_election_cat != "Voting" or any(k in q_lower for k in all_election_keywords):
                     if len(found_zones) >= 1 or any(k in q_lower for k in ["president", "presidential", "senate", "congress", "supreme court"]):
                         election_ids.add(m_id)
+            
+            # Check technology
+            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+                assigned_tech_cat = "Other Technology"
+                for cat, keywords in TECH_KEYWORDS.items():
+                    if any(k in q_lower for k in keywords):
+                        assigned_tech_cat = cat
+                        break
+                if assigned_tech_cat != "Other Technology" or any(k in q_lower for k in all_tech_keywords):
+                    if len(found_zones) >= 1 or any(k in q_lower for k in ["apple", "google", "microsoft", "meta", "amazon", "nvidia", "tesla", "openai"]):
+                        tech_ids.add(m_id)
         
-        mapped_count = len(conflict_ids) + len(sport_ids) + len(finance_ids) + len(election_ids)
+        mapped_count = len(conflict_ids) + len(sport_ids) + len(finance_ids) + len(election_ids) + len(tech_ids)
         unmapped_count = markets_with_zones - mapped_count
         
         return {
@@ -323,6 +336,7 @@ class MapGeneratorBase:
             "sports": len(sport_ids),
             "finance": len(finance_ids),
             "elections": len(election_ids),
+            "technology": len(tech_ids),
             "unmapped": unmapped_count
         }
     

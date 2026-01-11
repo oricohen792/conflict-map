@@ -326,6 +326,7 @@ class FinanceMapGenerator(MapGeneratorBase):
             <span style="color: #22c55e;">⚽ <strong>STATS_SPORTS</strong></span>
             <span style="color: #fbbf24;">💰 <strong>STATS_FINANCE</strong></span>
             <span style="color: #a855f7;">🗳️ <strong>STATS_ELECTIONS</strong></span>
+            <span style="color: #06b6d4;">💻 <strong>STATS_TECHNOLOGY</strong></span>
             <span style="color: #94a3b8;">Unmapped: <strong>STATS_UNMAPPED</strong></span>
         </div>
         <span style="color: #94a3b8;">•</span>
@@ -344,6 +345,7 @@ class FinanceMapGenerator(MapGeneratorBase):
         <a href="market_report.html" class="nav-link">⚔️ Conflict</a>
         <a href="sport_report.html" class="nav-link">⚽ Sport</a>
         <a href="elections_report.html" class="nav-link">🗳️ Elections</a>
+        <a href="technology_report.html" class="nav-link">💻 Technology</a>
     </div>
 </div>
 
@@ -670,6 +672,7 @@ class FinanceMapGenerator(MapGeneratorBase):
         final_html = final_html.replace("STATS_SPORTS", str(stats["sports"]))
         final_html = final_html.replace("STATS_FINANCE", str(stats["finance"]))
         final_html = final_html.replace("STATS_ELECTIONS", str(stats["elections"]))
+        final_html = final_html.replace("STATS_TECHNOLOGY", str(stats["technology"]))
         final_html = final_html.replace("STATS_UNMAPPED", str(stats["unmapped"]))
         
         return final_html
