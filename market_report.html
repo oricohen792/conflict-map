@@ -260,7 +260,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:24:08 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:24:48 UTC</span>
     </div>
     <h1>Select Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -489,15 +489,183 @@
         markers.forEach(marker => map.removeLayer(marker));
         markers.length = 0;
 
-        if (!selectedZone) {
-            // Count total events for selected categories when no zone is selected
-            let totalCount = 0;
-            events.forEach(event => {
-                if (selectedCats.includes(event.cat)) {
-                    totalCount++;
+        // Group events by zone - show ALL zones that match selected categories
+        const zoneEvents = {};
+        events.forEach(event => {
+            const eventCat = event.cat;
+            const eventZone = event.zone;
+            
+            // Show all zones that match selected categories
+            if (selectedCats.includes(eventCat)) {
+                if (!zoneEvents[eventZone]) {
+                    zoneEvents[eventZone] = [];
                 }
+                zoneEvents[eventZone].push(event);
+            }
+        });
+
+        // Count total events for selected categories
+        let totalCount = 0;
+        Object.values(zoneEvents).forEach(zoneEventList => {
+            totalCount += zoneEventList.length;
+        });
+        document.getElementById('total-events-count').innerText = `(${totalCount} events)`;
+
+        // If no zone selected, show all markers but don't center
+        if (!selectedZone) {
+            // Show all markers for all zones matching selected categories
+            Object.keys(zoneEvents).forEach(zone => {
+                const events = zoneEvents[zone];
+                if (events.length === 0) return;
+                
+                const coords = ZONE_COORDS[zone];
+                if (!coords) return;
+                
+                // Get color from config
+                const color = config.color || '#3b82f6';
+                const iconSize = 20;
+                
+                // Create icon
+                const icon = L.divIcon({
+                    className: 'map-icon',
+                    html: `<span style="color: ${color}; font-size: ${iconSize}px; font-weight: bold; opacity: 0.6;">${config.icon}</span>`,
+                    iconSize: [iconSize, iconSize],
+                    iconAnchor: [iconSize/2, iconSize/2]
+                });
+                
+                const marker = L.marker(coords, { icon: icon }).addTo(map);
+                marker.zoneName = zone;
+                
+                // Build tooltip
+                const eventsByCat = {};
+                events.forEach(e => {
+                    if (!eventsByCat[e.cat]) eventsByCat[e.cat] = [];
+                    eventsByCat[e.cat].push(e);
+                });
+                
+                let tooltipHtml = `<div class="line-tooltip"><div style="font-weight:700; color:white; margin-bottom:6px; border-bottom:1px solid #475569; padding-bottom:4px;">${zone}</div>`;
+                
+                function getBaseTopic(slug, q) {
+                    if (!slug) return q;
+                    let base = slug.replace(/-\d+$/, '');
+                    const preps = "on|by|before|in|at|during|through|after";
+                    const months = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|may|june|july|august|september|october|november|december";
+                    base = base.replace(new RegExp(`-(${preps})-(${months}|\\d{1,2}|\\d{4})(-(\\d{1,2}|\\d{4}))?(-.*)?$`, "i"), '');
+                    base = base.replace(new RegExp(`-(${months})(-(\\d{1,2}|\\d{4}))?(-(\\d{4}))?$`, "i"), '');
+                    base = base.replace(new RegExp(`-(\\d{1,2})-(${months})(-.*)?$`, "i"), '');
+                    base = base.replace(/-(2024|2025|2026|2027|2028)$/, '');
+                    base = base.replace(/^will-/, '').replace(/-?any-?$/, '').replace(/-?daily-?$/, '').replace(/-?weekly-?$/, '');
+                    return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                }
+                
+                tooltipHtml += `<button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
+                
+                const sortedCats = Object.keys(eventsByCat).sort();
+                const tooltipId = `tooltip-${zone.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}`;
+                
+                tooltipHtml += `<div class="tooltip-tabs" id="${tooltipId}-tabs">`;
+                sortedCats.forEach((cat, idx) => {
+                    const tabId = `${tooltipId}-tab-${idx}`;
+                    const activeClass = idx === 0 ? 'active' : '';
+                    tooltipHtml += `<div class="tooltip-tab ${activeClass}" onclick="switchTooltipTab('${tooltipId}', ${idx})" id="${tabId}">${cat}</div>`;
+                });
+                tooltipHtml += `</div>`;
+                
+                sortedCats.forEach((cat, idx) => {
+                    const contentId = `${tooltipId}-content-${idx}`;
+                    const activeClass = idx === 0 ? 'active' : '';
+                    tooltipHtml += `<div class="tooltip-tab-content ${activeClass}" id="${contentId}">`;
+                    
+                    const topics = {};
+                    eventsByCat[cat].forEach(event => {
+                        const topic = getBaseTopic(event.slug, event.q);
+                        if (!topics[topic]) topics[topic] = [];
+                        topics[topic].push(event);
+                    });
+                    
+                    Object.keys(topics).forEach(topic => {
+                        tooltipHtml += `<div style="font-weight:700; color:#cbd5e1; margin-top:4px; margin-bottom:2px;">${topic}</div>`;
+                        topics[topic].forEach(event => {
+                            const eventColor = getProbColor(event.price);
+                            let volStr;
+                            if (event.vol >= 1000000) {
+                                volStr = (event.vol / 1000000).toFixed(1) + 'M';
+                            } else if (event.vol >= 1000) {
+                                volStr = (event.vol / 1000).toFixed(1) + 'k';
+                            } else {
+                                volStr = Math.round(event.vol).toString();
+                            }
+                            const polyLink = event.url || `https://polymarket.com/event/${event.slug}`;
+                            tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
+                                <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${volStr}</strong>]</span> 
+                                <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${event.q}</a>
+                                <span style="color:${eventColor}; font-weight:800;">${Math.round(event.price * 100)}%</span>
+                            </div>`;
+                        });
+                    });
+                    
+                    tooltipHtml += `</div>`;
+                });
+                
+                tooltipHtml += `</div>`;
+                
+                marker.bindPopup("", {
+                    closeButton: false,
+                    autoClose: false,
+                    className: 'line-popup',
+                    minWidth: 400,
+                    maxWidth: 2000,
+                    offset: [0, -10]
+                });
+                
+                marker.zoneName = zone;
+                marker.tooltipHtml = tooltipHtml;
+                
+                // Hover handlers
+                let popupTimeout;
+                marker.on('mouseover', function(e) {
+                    clearTimeout(popupTimeout);
+                    this.setPopupContent(tooltipHtml);
+                    this.openPopup(e.latlng);
+                });
+                
+                marker.on('mouseout', function(e) {
+                    popupTimeout = setTimeout(() => {
+                        this.closePopup();
+                    }, 400);
+                });
+                
+                marker.on('popupopen', function(e) {
+                    const popupEl = e.popup.getElement();
+                    if (popupEl) {
+                        popupEl.addEventListener('mouseenter', () => clearTimeout(popupTimeout));
+                        popupEl.addEventListener('mouseleave', () => {
+                            popupTimeout = setTimeout(() => {
+                                this.closePopup();
+                            }, 400);
+                        });
+                    }
+                });
+                
+                // Click handler to select zone and open tooltip
+                marker.on('click', function(e) {
+                    const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+                    const radio = document.getElementById(`zone_${safe_id}`);
+                    if (radio) {
+                        radio.checked = true;
+                        updateVisibility();
+                        setTimeout(() => {
+                            const selectedMarker = markers.find(m => m.zoneName === zone);
+                            if (selectedMarker) {
+                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                                selectedMarker.openPopup(selectedMarker.getLatLng());
+                            }
+                        }, 150);
+                    }
+                });
+                
+                markers.push(marker);
             });
-            document.getElementById('total-events-count').innerText = `(${totalCount} events)`;
             return;
         }
 
@@ -506,21 +674,6 @@
         if (selectedCoords) {
             map.setView(selectedCoords, 5, { animate: true, duration: 0.5 });
         }
-
-        // Group events by zone - show ALL zones that match selected categories
-        const zoneEvents = {};
-        events.forEach(event => {
-            const eventCat = event.cat;
-            const eventZone = event.zone;
-            
-            // Show all zones that match selected categories (not just selected zone)
-            if (selectedCats.includes(eventCat)) {
-                if (!zoneEvents[eventZone]) {
-                    zoneEvents[eventZone] = [];
-                }
-                zoneEvents[eventZone].push(event);
-            }
-        });
 
         let visibleCount = 0;
         let selectedZoneCount = 0;
