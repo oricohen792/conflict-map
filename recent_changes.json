@@ -1,5 +1,59 @@
 [
   {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "Russia x Ukraine ceasefire by end of 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "Israel x Iran ceasefire broken by March 31, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "US strikes Iran by March 31, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "Israel strikes Iran by January 31, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 10, 2026?",
+    "change": "\u2193 2%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 11, 2026?",
+    "change": "\u2191 3%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "U.S. x Iran Military Engagement by June 30, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 11, 2026?",
+    "change": "\u2191 5%"
+  },
+  {
+    "time": "06:47",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 31, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
     "time": "06:32",
     "type": "CHG",
     "q": "Will Israel strike Gaza on January 11, 2026?",
@@ -64,59 +118,5 @@
     "type": "NEW",
     "q": "Will the U.S. invade Venezuela by March 31, 2026?",
     "change": "8%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Israel x Hamas ceasefire cancelled by March 31, 2026?",
-    "change": "22%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Ukraine signs peace deal with Russia by March 31?",
-    "change": "24%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Ukraine signs peace deal with Russia before 2027?",
-    "change": "47%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Will the U.S. invade Iran before 2027?",
-    "change": "12%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Israel and Lebanon normalize relations before 2027?",
-    "change": "20%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Will North Korea invade South Korea before 2027?",
-    "change": "5%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Will Trump establish a Gaza \u201cBoard of Peace\u201d by March 31?",
-    "change": "89%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "Israel x Iran ceasefire broken by March 31, 2026?",
-    "change": "56%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "U.S. agrees to a new trade deal with \"European Union\" before 2027?",
-    "change": "12%"
   }
 ]
