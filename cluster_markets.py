@@ -234,6 +234,7 @@ def generate_map_html(lines):
     <title>Global Conflict Map - Polymarket</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { margin: 0; padding: 0; background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', -apple-system, sans-serif; }
         #map { height: 100vh; width: 100%; background: #0f172a; cursor: crosshair; }
@@ -357,6 +358,26 @@ def generate_map_html(lines):
         .leaflet-popup-content { margin: 8px 12px; }
         .line-tooltip a { color: #38bdf8; text-decoration: none; font-weight: 500; }
         .line-tooltip a:hover { text-decoration: underline; color: #7dd3fc; }
+        
+        .snapshot-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .snapshot-btn:hover {
+            background: #2563eb;
+        }
+        .snapshot-btn:active {
+            background: #1d4ed8;
+        }
         .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 0.8rem; }
         .legend-color { width: 24px; height: 3px; border-radius: 2px; margin-right: 12px; }
         hr { border: 0; border-top: 1px solid #334155; margin: 12px 0; }
@@ -600,7 +621,8 @@ def generate_map_html(lines):
                     <div style="display:flex; justify-content:space-between;"><span>Page Updated:</span> <span style="color:#3b82f6; font-weight:600;">${pageUpdateTime || "N/A"}</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${lastUpdate || "N/A"}</span></div>
                     <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime || "N/A"}</span></div>
-                </div>`;
+                </div>
+                <button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
 
                 Object.keys(groups).sort().forEach((cat, idx) => {
                     if (idx > 0) tooltipHtml += `<div style="color:#475569; margin: 6px 0;">----------------------------------------------------------------------------------------------------</div>`;
@@ -749,6 +771,65 @@ def generate_map_html(lines):
         updateCountryCounts();
         updateVisibility();
     } catch (err) { console.error(err); }
+    
+    // Function to capture tooltip as image
+    function captureTooltipSnapshot(button) {
+        // Find the tooltip container (parent of the button)
+        const tooltipElement = button.closest('.line-tooltip');
+        if (!tooltipElement) {
+            console.error('Tooltip element not found');
+            return;
+        }
+        
+        // Temporarily hide the button to avoid capturing it
+        const originalDisplay = button.style.display;
+        button.style.display = 'none';
+        
+        // Get the country pair name for filename
+        const headerText = tooltipElement.querySelector('div').textContent || 'tooltip';
+        const filename = headerText.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + '_' + new Date().toISOString().slice(0, 10) + '.png';
+        
+        // Use html2canvas to capture the tooltip
+        if (typeof html2canvas !== 'undefined') {
+            html2canvas(tooltipElement, {
+                backgroundColor: '#0f172a',
+                scale: 2, // Higher quality
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                // Convert canvas to blob and trigger download
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    // Restore button visibility
+                    button.style.display = originalDisplay;
+                    
+                    // Show brief feedback
+                    const originalText = button.textContent;
+                    button.textContent = '✓ Saved!';
+                    button.style.background = '#22c55e';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '';
+                    }, 1500);
+                }, 'image/png');
+            }).catch(err => {
+                console.error('Error capturing tooltip:', err);
+                button.style.display = originalDisplay;
+                alert('Failed to capture tooltip. Please try again.');
+            });
+        } else {
+            button.style.display = originalDisplay;
+            alert('html2canvas library not loaded. Please refresh the page.');
+        }
+    }
 </script>
 </body>
 </html>
