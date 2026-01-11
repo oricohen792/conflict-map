@@ -362,26 +362,23 @@ def generate_combined_html():
         <span style="color: #3b82f6; font-weight: 700;">{current_time} UTC</span>
     </div>
     <div style="margin-bottom: 12px; padding: 8px; background: #1e293b; border-radius: 6px; border: 1px solid #475569;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <span style="font-size: 0.75rem; color: #94a3b8;">View Mode:</span>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.75rem; color: #94a3b8;">View:</span>
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                 <input type="checkbox" id="globe-mode-toggle" onchange="toggleViewMode()" style="cursor: pointer;">
                 <span style="font-size: 0.75rem; color: #e2e8f0;">🌍 Globe</span>
             </label>
         </div>
-        <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">
-            <span id="view-mode-label">🗺️ Map</span>
-        </div>
     </div>
-    <h1>Select Map Type</h1>
+    <h1>Map Type</h1>
     {map_selector}
     
     <hr style="margin: 10px 0;">
-    <h1>Select Categories</h1>
+    <h1>Categories <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
     {category_filters_html}
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Choose Zone <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
+    <h1 style="margin-bottom: 8px;">Zones</h1>
     <div id="zone-filters" style="max-height: 200px; overflow-y: auto;">
         ZONE_FILTERS_PLACEHOLDER
     </div>
@@ -411,39 +408,52 @@ def generate_combined_html():
     
     // Initialize Leaflet Map
     function initMapMode() {{
-        if (map) return; // Already initialized
+        if (map) {{
+            // Map already exists, just make sure it's visible
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) mapContainer.style.display = 'block';
+            return;
+        }}
         
         const mapContainer = document.getElementById('map');
+        if (!mapContainer) {{
+            console.error('Map container not found');
+            return;
+        }}
         mapContainer.style.display = 'block';
         
-        map = L.map('map', {{
-            zoomControl: false,
-            attributionControl: false,
-            minZoom: 2,
-            maxZoom: 18,
-            worldCopyJump: false
-        }}).setView([20, 0], 2);
+        try {{
+            map = L.map('map', {{
+                zoomControl: false,
+                attributionControl: false,
+                minZoom: 2,
+                maxZoom: 18,
+                worldCopyJump: false
+            }}).setView([20, 0], 2);
 
-        // Set strict bounds to prevent wrapping
-        const southWest = L.latLng(-85, -180);
-        const northEast = L.latLng(85, 180);
-        const bounds = L.latLngBounds(southWest, northEast);
-        map.setMaxBounds(bounds);
-        map.setMaxBoundsViscosity(1.0);
+            // Set strict bounds to prevent wrapping
+            const southWest = L.latLng(-85, -180);
+            const northEast = L.latLng(85, 180);
+            const bounds = L.latLngBounds(southWest, northEast);
+            map.setMaxBounds(bounds);
+            map.setMaxBoundsViscosity(1.0);
 
-        L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
-            maxZoom: 18,
-            noWrap: true
-        }}).addTo(map);
-        
-        // Prevent wrapping on move
-        map.on('moveend', function() {{
-            const center = map.getCenter();
-            const zoom = map.getZoom();
-            if (center.lng < -180 || center.lng > 180) {{
-                map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
-            }}
-        }});
+            L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
+                maxZoom: 18,
+                noWrap: true
+            }}).addTo(map);
+            
+            // Prevent wrapping on move
+            map.on('moveend', function() {{
+                const center = map.getCenter();
+                const zoom = map.getZoom();
+                if (center.lng < -180 || center.lng > 180) {{
+                    map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
+                }}
+            }});
+        }} catch (error) {{
+            console.error('Error initializing map:', error);
+        }}
     }}
     
     // Initialize Three.js Globe
@@ -642,12 +652,10 @@ def generate_combined_html():
         isGlobeMode = toggle.checked;
         const mapContainer = document.getElementById('map');
         const globeContainer = document.getElementById('globe-container');
-        const viewModeLabel = document.getElementById('view-mode-label');
         
         if (isGlobeMode) {{
             mapContainer.style.display = 'none';
             globeContainer.style.display = 'block';
-            viewModeLabel.textContent = '🌍 Globe';
             initGlobeMode();
             // Re-attach event listeners if renderer exists
             setTimeout(() => {{
@@ -659,7 +667,6 @@ def generate_combined_html():
         }} else {{
             globeContainer.style.display = 'none';
             mapContainer.style.display = 'block';
-            viewModeLabel.textContent = '🗺️ Map';
             initMapMode();
             if (renderer && renderer.domElement) {{
                 renderer.domElement.removeEventListener('click', onMouseClick);
@@ -672,7 +679,17 @@ def generate_combined_html():
     }}
     
     // Initialize with map mode by default
+    const mapContainer = document.getElementById('map');
+    const globeContainer = document.getElementById('globe-container');
+    mapContainer.style.display = 'block';
+    globeContainer.style.display = 'none';
     initMapMode();
+    
+    // Initialize map type and show markers
+    setTimeout(() => {{
+        switchMapType('conflict');
+        updateZoneCounts();
+    }}, 100);
 
     function getProbColor(p) {{
         if (p >= 0.70) return '#22c55e';
@@ -690,14 +707,10 @@ def generate_combined_html():
         
         const config = mapInfo.config;
 
-        // Show/hide category filters
-        document.querySelectorAll('.category-filters').forEach(el => el.style.display = 'none');
-        document.getElementById(`category-filters-${{mapType}}`).style.display = 'block';
-        
         // Update zone filters
         updateZoneFilters(mapType);
         
-        // Update visibility
+        // Update visibility - this will show markers
         updateVisibility();
     }}
     
@@ -864,7 +877,7 @@ def generate_combined_html():
         }});
         document.getElementById('total-events-count').innerText = `(${{totalCount}} events)`;
 
-        // If no zone selected, show all markers but don't center
+        // Always show all markers for selected categories (simplified - no zone selection required)
         if (!selectedZone) {{
             // Show all markers for all zones matching selected categories
             Object.keys(zoneEvents).forEach(zone => {{
@@ -1055,9 +1068,8 @@ def generate_combined_html():
         }}
 
         let visibleCount = 0;
-        let selectedZoneCount = 0;
         
-        // Create markers grouped by zone
+        // Create markers grouped by zone - show all zones
         for (const zone in zoneEvents) {{
             const events = zoneEvents[zone];
             const coords = ZONE_COORDS[zone] || [events[0].lat, events[0].lng];
@@ -1073,8 +1085,8 @@ def generate_combined_html():
             const maxProb = Math.max(...events.map(e => e.price));
             const color = getProbColor(maxProb);
             
-            // Highlight selected zone with larger marker
-            const isSelected = zone === selectedZone;
+            // Highlight selected zone with larger marker (if zone is selected)
+            const isSelected = selectedZone && zone === selectedZone;
             const [lat, lng] = coords;
             let marker;
             
@@ -1317,9 +1329,7 @@ def generate_combined_html():
         }}
     }}
     
-    // Initialize
-    switchMapType('conflict');
-    updateZoneCounts();
+    // Already initialized above
 </script>
 </body>
 </html>
