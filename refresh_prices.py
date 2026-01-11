@@ -2,7 +2,7 @@ import json
 import requests
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Optional monitoring - don't fail if module not available
 try:
@@ -55,8 +55,8 @@ def refresh_prices():
     price_changes = []
     updated_manifest = []
     # Use UTC for all timestamps to ensure consistency across timezones
-    current_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    current_time_short = datetime.utcnow().strftime("%H:%M")  # For change log
+    current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    current_time_short = datetime.now(timezone.utc).strftime("%H:%M")  # For change log
     
     for entry in manifest:
         m_id = entry.get("id")

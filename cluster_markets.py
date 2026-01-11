@@ -3,7 +3,7 @@ import os
 import requests
 import numpy as np
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Optional monitoring - don't fail if module not available
 try:
@@ -165,7 +165,7 @@ def main():
                 "tgt_lat": tgt_coords[0],
                 "tgt_lng": tgt_coords[1],
                 "cat": assigned_cat,
-                "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"), 
+                "updated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"), 
                 "countries": sorted([src_name, tgt_name]),
                 "slug": m.get("slug", ""),
                 "url": f"https://polymarket.com/event/{parent_slug}",
@@ -185,7 +185,7 @@ def main():
     for l in line_data:
         if l["id"] not in old_ids:
             new_changes.append({
-                "time": datetime.utcnow().strftime("%H:%M"),  # Keep short format for change log
+                "time": datetime.now(timezone.utc).strftime("%H:%M"),  # Keep short format for change log
                 "type": "NEW",
                 "q": l["q"],
                 "change": f"{int(l['price']*100)}%"
@@ -225,7 +225,7 @@ def generate_map_html(lines):
     if os.path.exists("active_markets.jsonl"):
         mtime = os.path.getmtime("active_markets.jsonl")
         # Use UTC for consistency (file mtime is system time, convert to UTC)
-        markets_verified_time = datetime.utcfromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
+        markets_verified_time = datetime.fromtimestamp(mtime, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         # Save to committed file so it persists for price refresh runs
         with open(".markets_verified_time", "w", encoding="utf-8") as f:
             f.write(markets_verified_time)
@@ -237,7 +237,7 @@ def generate_map_html(lines):
         else:
             # First run - use current time (page first date) instead of "Pending"
             # Use UTC for consistency
-            markets_verified_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            markets_verified_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         
     json_lines = json.dumps(lines)
     
@@ -249,7 +249,7 @@ def generate_map_html(lines):
     else:
         # Fallback to current time if file doesn't exist
         # Use UTC for consistency
-        last_update_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        last_update_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     
     html_template = """
 <!DOCTYPE html>
@@ -873,7 +873,7 @@ def generate_map_html(lines):
     final_html = final_html.replace("COUNTRY_FILTERS_PLACEHOLDER", country_checks)
     # Ensure markets_verified_time is never None or empty
     if not markets_verified_time:
-        markets_verified_time = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        markets_verified_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     final_html = final_html.replace("MARKET_VERIFY_PLACEHOLDER", markets_verified_time)
     
     return final_html

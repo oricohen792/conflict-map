@@ -1,7 +1,7 @@
 import time
 import subprocess
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Configuration
 PRICE_REFRESH_INTERVAL = 300  # 5 minutes (in seconds)
@@ -9,7 +9,7 @@ FETCH_INTERVAL = 3600  # 1 hour (in seconds)
 
 def log(message):
     # Use UTC for consistency
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] {message}")
 
 def run_script(script_name):

@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 REFRESH_LOG_FILE = "refresh_log.json"
@@ -20,7 +20,7 @@ def log_refresh(refresh_type: str, duration_seconds: Optional[float] = None,
         error: Error message if failed
     """
     log_entry = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "type": refresh_type,
         "success": success,
         "duration_seconds": duration_seconds,
