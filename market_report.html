@@ -251,11 +251,28 @@
         }
         .tooltip-tab-content {
             display: none;
-            max-height: 400px;
+            min-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
         }
         .tooltip-tab-content.active {
             display: block;
+        }
+        .line-popup {
+            width: 600px !important;
+            max-width: 600px !important;
+            min-width: 600px !important;
+        }
+        .line-popup .leaflet-popup-content {
+            width: 600px !important;
+            max-width: 600px !important;
+            min-width: 600px !important;
+            min-height: 450px !important;
+            max-height: 500px !important;
+        }
+        .line-popup .line-tooltip {
+            width: 100% !important;
+            min-height: 450px !important;
         }
         #zone-filters { max-height: 200px; overflow-y: auto; }
         .selected-zone-icon {
@@ -325,7 +342,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:32:22 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:37:52 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -420,18 +437,12 @@
         // Wait a moment to ensure container is rendered
         setTimeout(() => {
             try {
-                // Set strict bounds to prevent wrapping
-                const southWest = L.latLng(-85, -180);
-                const northEast = L.latLng(85, 180);
-                const bounds = L.latLngBounds(southWest, northEast);
-                
                 map = L.map('map', {
                     zoomControl: true,
                     attributionControl: false,
                     minZoom: 2,
                     maxZoom: 18,
                     worldCopyJump: false,
-                    maxBounds: bounds,
                     dragging: true,
                     touchZoom: true,
                     doubleClickZoom: true,
@@ -439,11 +450,6 @@
                     boxZoom: true,
                     keyboard: true
                 }).setView([20, 0], 2);
-                
-                // Set maxBoundsViscosity if available (Leaflet 1.4.0+)
-                if (map.setMaxBoundsViscosity) {
-                    map.setMaxBoundsViscosity(1.0);
-                }
 
                 // Add tile layer with error handling
                 const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -463,14 +469,7 @@
                     }
                 }, 200);
                 
-                // Prevent wrapping on move
-                map.on('moveend', function() {
-                    const center = map.getCenter();
-                    const zoom = map.getZoom();
-                    if (center.lng < -180 || center.lng > 180) {
-                        map.setView([center.lat, Math.max(-180, Math.min(180, center.lng))], zoom);
-                    }
-                });
+                // Allow free map movement - no restrictions
                 
                 console.log('Map initialized successfully');
             } catch (error) {
@@ -860,8 +859,8 @@
                         closeButton: false,
                         autoClose: false,
                         className: 'line-popup',
-                        minWidth: 400,
-                        maxWidth: 2000,
+                        minWidth: 600,
+                        maxWidth: 600,
                         offset: [0, -10]
                     });
                     
@@ -1077,22 +1076,40 @@
                     this.setPopupContent(this.tooltipHtml);
                     this.openPopup(e.latlng);
                     
+                    // Store timeout and hover state on marker for access from tab switching
+                    marker._popupTimeout = popupTimeout;
+                    marker._isPopupHovered = isPopupHovered;
+                    
                     // Add event listeners to popup element to keep it open when hovering
                     setTimeout(() => {
                         const popup = this.getPopup();
                         if (popup && popup.getElement()) {
                             const popupElement = popup.getElement();
                             popupElement.addEventListener('mouseenter', function() {
-                                clearTimeout(popupTimeout);
-                                isPopupHovered = true;
+                                clearTimeout(marker._popupTimeout);
+                                marker._isPopupHovered = true;
                             });
                             popupElement.addEventListener('mouseleave', function() {
-                                isPopupHovered = false;
-                                popupTimeout = setTimeout(() => {
-                                    if (!isPopupHovered) {
+                                marker._isPopupHovered = false;
+                                marker._popupTimeout = setTimeout(() => {
+                                    if (!marker._isPopupHovered) {
                                         marker.closePopup();
                                     }
-                                }, 300);
+                                }, 500);
+                            });
+                            
+                            // Prevent closing when clicking on tabs
+                            const tabs = popupElement.querySelectorAll('.tooltip-tab');
+                            tabs.forEach(tab => {
+                                tab.addEventListener('click', function(e) {
+                                    clearTimeout(marker._popupTimeout);
+                                    marker._isPopupHovered = true;
+                                    e.stopPropagation();
+                                });
+                                tab.addEventListener('mouseenter', function() {
+                                    clearTimeout(marker._popupTimeout);
+                                    marker._isPopupHovered = true;
+                                });
                             });
                         }
                     }, 100);
@@ -1100,8 +1117,8 @@
                 
                 marker.on('mouseout', function(e) {
                     // Only close if not hovering over popup
-                    popupTimeout = setTimeout(() => {
-                        if (!isPopupHovered) {
+                    this._popupTimeout = setTimeout(() => {
+                        if (!this._isPopupHovered) {
                             this.closePopup();
                         }
                     }, 500);
@@ -1159,7 +1176,22 @@
     function switchTooltipTab(tooltipId, tabIndex) {
         const tabsContainer = document.getElementById(`${tooltipId}-tabs`);
         if (!tabsContainer) return;
+
+        // Find the marker that owns this tooltip and prevent it from closing
+        const marker = markers.find(m => {
+            if (!m.tooltipHtml) return false;
+            return m.tooltipHtml.includes(tooltipId);
+        });
         
+        // Clear any pending close timeouts
+        if (marker && marker._popupTimeout) {
+            clearTimeout(marker._popupTimeout);
+            marker._popupTimeout = null;
+        }
+        if (marker) {
+            marker._isPopupHovered = true;
+        }
+
         const tabs = tabsContainer.querySelectorAll('.tooltip-tab');
         const allContents = [];
         let idx = 0;
@@ -1169,7 +1201,7 @@
             allContents.push(content);
             idx++;
         }
-        
+
         tabs.forEach((tab, idx) => {
             if (idx === tabIndex) {
                 tab.classList.add('active');
@@ -1177,7 +1209,7 @@
                 tab.classList.remove('active');
             }
         });
-        
+
         allContents.forEach((content, idx) => {
             if (idx === tabIndex) {
                 content.classList.add('active');
@@ -1185,6 +1217,15 @@
                 content.classList.remove('active');
             }
         });
+        
+        // Reset hover state after a short delay to allow normal mouseout behavior
+        if (marker) {
+            setTimeout(() => {
+                if (marker) {
+                    marker._isPopupHovered = false;
+                }
+            }, 100);
+        }
     }
     
     function captureTooltipSnapshot(button) {
