@@ -342,7 +342,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:48:32 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:51:08 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -821,10 +821,10 @@
                         volStr = Math.round(event.vol).toString();
                     }
                     const polyLink = event.url || `https://polymarket.com/event/${event.slug}`;
-                    tooltipHtml += `<div style="margin-bottom:4px; font-size: 0.8rem; padding: 4px; border-left: 2px solid ${eventColor};">
+                    tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
                         <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${volStr}</strong>]</span> 
                         <span style="color:#64748b; font-size:0.75rem;">[${event.cat}]</span>
-                        <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px; display:block; margin-top:2px;">${event.q}</a>
+                        <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${event.q}</a>
                         <span style="color:${eventColor}; font-weight:800;">${Math.round(event.price * 100)}%</span>
                     </div>`;
                 });
@@ -1049,10 +1049,10 @@
                     volStr = Math.round(event.vol).toString();
                 }
                 const polyLink = event.url || `https://polymarket.com/event/${event.slug}`;
-                tooltipHtml += `<div style="margin-bottom:4px; font-size: 0.8rem; padding: 4px; border-left: 2px solid ${eventColor};">
+                tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
                     <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${volStr}</strong>]</span> 
                     <span style="color:#64748b; font-size:0.75rem;">[${event.cat}]</span>
-                    <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px; display:block; margin-top:2px;">${event.q}</a>
+                    <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${event.q}</a>
                     <span style="color:${eventColor}; font-weight:800;">${Math.round(event.price * 100)}%</span>
                 </div>`;
             });
