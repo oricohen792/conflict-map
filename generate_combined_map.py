@@ -412,10 +412,11 @@ def generate_combined_html():
         // After visibility updates, open tooltip for selected zone marker
         setTimeout(() => {{
             const selectedMarker = markers.find(m => m.zoneName === zoneName);
-            if (selectedMarker) {{
-                selectedMarker.openPopup();
+            if (selectedMarker && selectedMarker.tooltipHtml) {{
+                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                selectedMarker.openPopup(selectedMarker.getLatLng());
             }}
-        }}, 100);
+        }}, 150);
     }}
 
     function updateZoneCounts() {{
@@ -614,8 +615,9 @@ def generate_combined_html():
                 offset: [0, -10]
             }});
             
-            // Store zone name on marker for click handler
+            // Store zone name and tooltip HTML on marker
             marker.zoneName = zone;
+            marker.tooltipHtml = tooltipHtml;
             
             // Click handler to select zone and open tooltip
             marker.on('click', function(e) {{
@@ -623,13 +625,15 @@ def generate_combined_html():
                 const radio = document.getElementById(`zone_${{safe_id}}`);
                 if (radio) {{
                     radio.checked = true;
-                    // Update visibility first
+                    // Update visibility first, then open tooltip
                     updateVisibility();
-                    // Then open tooltip for this marker
                     setTimeout(() => {{
-                        this.setPopupContent(tooltipHtml);
-                        this.openPopup(e.latlng);
-                    }}, 100);
+                        const selectedMarker = markers.find(m => m.zoneName === zone);
+                        if (selectedMarker) {{
+                            selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
+                            selectedMarker.openPopup(selectedMarker.getLatLng());
+                        }}
+                    }}, 150);
                 }}
             }});
             
