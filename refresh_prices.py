@@ -3,7 +3,15 @@ import requests
 import os
 import time
 from datetime import datetime
-from refresh_monitor import log_refresh
+
+# Optional monitoring - don't fail if module not available
+try:
+    from refresh_monitor import log_refresh
+    MONITORING_AVAILABLE = True
+except ImportError:
+    MONITORING_AVAILABLE = False
+    def log_refresh(*args, **kwargs):
+        pass  # No-op if monitoring not available
 
 def refresh_prices():
     manifest_file = "conflict_manifest.json"
