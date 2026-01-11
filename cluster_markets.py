@@ -616,8 +616,9 @@ def generate_map_html(lines):
                     if (match) pageUpdateTime = match[1];
                 }
                 
-                // Get most recent price update time from all visible markets (sort to get latest)
-                const allUpdateTimes = visibleMarkets.map(m => m.updated || "").filter(t => t);
+                // Get most recent price update time from ALL markets (not just visible ones)
+                // This ensures "Prices Updated" shows the actual latest price update regardless of filters
+                const allUpdateTimes = linesData.map(m => m.updated || "").filter(t => t);
                 let pricesUpdateTime = "";
                 if (allUpdateTimes.length > 0) {
                     // Sort by date-time descending to get most recent
