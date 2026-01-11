@@ -1,7 +1,9 @@
 import json
 import requests
 import os
+import time
 from datetime import datetime
+from refresh_monitor import log_refresh
 
 def refresh_prices():
     manifest_file = "conflict_manifest.json"
@@ -20,6 +22,7 @@ def refresh_prices():
     market_ids = [m["id"] for m in manifest if m["id"]]
     
     print(f"Refreshing prices for {len(market_ids)} markets...")
+    start_time = time.time()
 
     # Fetch updated data from API using IDs
     chunk_size = 50
@@ -35,11 +38,16 @@ def refresh_prices():
                 updated_data[m["id"]] = m
         except Exception as e:
             print(f"Error fetching batch: {e}")
+            success = False
+            error_msg = str(e)
 
     # Track Changes
     price_changes = []
     updated_manifest = []
     current_time = datetime.now().strftime("%H:%M")
+    
+    success = True
+    error_msg = None
     
     for entry in manifest:
         m_id = entry.get("id")
@@ -85,7 +93,13 @@ def refresh_prices():
     with open("market_report.html", "w", encoding="utf-8") as f:
         f.write(html_content)
     
-    print("Done! Refreshed prices and updated market_report.html")
+    duration = time.time() - start_time
+    log_refresh("price", duration_seconds=duration, markets_count=len(updated_manifest), success=success, error=error_msg)
+    
+    if success:
+        print("Done! Refreshed prices and updated market_report.html")
+    else:
+        print(f"Done with errors! Refreshed prices and updated market_report.html (Error: {error_msg})")
 
 if __name__ == "__main__":
     refresh_prices()

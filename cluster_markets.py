@@ -2,7 +2,9 @@ import json
 import os
 import requests
 import numpy as np
+import time
 from datetime import datetime
+from refresh_monitor import log_refresh
 
 def fetch_and_load_markets():
     markets_file = "active_markets.jsonl"
@@ -20,9 +22,11 @@ def fetch_and_load_markets():
     return markets
 
 def main():
+    start_time = time.time()
     print("Loading markets...")
     markets = fetch_and_load_markets()
     if not markets:
+        log_refresh("full", duration_seconds=time.time() - start_time, success=False, error="No markets loaded")
         return
     
     print(f"Loaded {len(markets)} markets.")
@@ -197,6 +201,9 @@ def main():
     html_content = generate_map_html(line_data)
     with open("market_report.html", "w", encoding="utf-8") as f:
         f.write(html_content)
+    
+    duration = time.time() - start_time
+    log_refresh("full", duration_seconds=duration, markets_count=len(line_data), success=True)
     
     print("Done! Saved to market_report.html")
 

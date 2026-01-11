@@ -35,3 +35,4 @@ Thumbs.db
 # conflict_manifest.json - keep
 # market_report.html - keep
 # recent_changes.json - keep
+# refresh_log.json - keep (monitoring data)

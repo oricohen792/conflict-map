@@ -95,6 +95,82 @@ jobs:
           echo "Refreshing prices..."
           python refresh_prices.py
       
+      - name: Verify HTML update
+        run: |
+          echo "=== Verifying HTML Update ==="
+          
+          # Check if HTML file exists
+          if [ ! -f "market_report.html" ]; then
+            echo "❌ ERROR: market_report.html not found!"
+            exit 1
+          fi
+          
+          # Check file size (should be > 0)
+          HTML_SIZE=$(stat -f%z market_report.html 2>/dev/null || stat -c%s market_report.html 2>/dev/null || echo "0")
+          if [ "$HTML_SIZE" -eq 0 ]; then
+            echo "❌ ERROR: market_report.html is empty!"
+            exit 1
+          fi
+          echo "✓ HTML file size: $HTML_SIZE bytes"
+          
+          # Check if HTML contains expected content
+          if ! grep -q "Global Conflict Map" market_report.html; then
+            echo "❌ ERROR: HTML missing expected title!"
+            exit 1
+          fi
+          echo "✓ HTML contains expected title"
+          
+          # Check if HTML contains market data
+          if ! grep -q "linesData" market_report.html; then
+            echo "❌ ERROR: HTML missing market data (linesData)!"
+            exit 1
+          fi
+          echo "✓ HTML contains market data"
+          
+          # Check if HTML contains Leaflet map
+          if ! grep -q "leaflet" market_report.html; then
+            echo "❌ ERROR: HTML missing Leaflet map library!"
+            exit 1
+          fi
+          echo "✓ HTML contains Leaflet map"
+          
+          # Get file modification time
+          HTML_MTIME=$(stat -f%m market_report.html 2>/dev/null || stat -c%Y market_report.html 2>/dev/null || echo "0")
+          HTML_DATE=$(date -r "$HTML_MTIME" 2>/dev/null || date -d "@$HTML_MTIME" 2>/dev/null || echo "Unknown")
+          echo "✓ HTML last modified: $HTML_DATE"
+          
+          # Check manifest file
+          if [ -f "conflict_manifest.json" ]; then
+            MANIFEST_SIZE=$(stat -f%z conflict_manifest.json 2>/dev/null || stat -c%s conflict_manifest.json 2>/dev/null || echo "0")
+            echo "✓ Manifest file size: $MANIFEST_SIZE bytes"
+            
+            # Count markets in manifest
+            MARKET_COUNT=$(python3 -c "import json; f=open('conflict_manifest.json'); data=json.load(f); print(len(data))" 2>/dev/null || echo "0")
+            echo "✓ Markets in manifest: $MARKET_COUNT"
+          else
+            echo "⚠ WARNING: conflict_manifest.json not found"
+          fi
+          
+          # Check refresh log if it exists
+          if [ -f "refresh_log.json" ]; then
+            echo "✓ Refresh log exists"
+            python3 -c "
+import json
+try:
+    with open('refresh_log.json') as f:
+        log = json.load(f)
+    if log:
+        last = log[-1]
+        print(f\"  Last refresh: {last.get('type', 'unknown')} at {last.get('timestamp', 'unknown')}\")
+        print(f\"  Duration: {last.get('duration_seconds', 'N/A')}s\")
+        print(f\"  Success: {last.get('success', False)}\")
+except:
+    pass
+" || echo "  Could not read refresh log"
+          fi
+          
+          echo "=== HTML Verification Complete ==="
+      
       - name: Commit changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -103,6 +179,10 @@ jobs:
           # Also commit the last full update timestamp file if it exists
           if [ -f ".last_full_update" ]; then
             git add .last_full_update
+          fi
+          # Commit refresh log if it exists
+          if [ -f "refresh_log.json" ]; then
+            git add refresh_log.json
           fi
           git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: $(date '+%Y-%m-%d %H:%M:%S')"
       
