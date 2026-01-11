@@ -102,5 +102,13 @@
     "duration_seconds": 0.9124922752380371,
     "markets_count": 130,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-11T10:54:18.977847",
+    "type": "price",
+    "success": true,
+    "duration_seconds": 0.8598024845123291,
+    "markets_count": 130,
+    "error": null
   }
 ]
