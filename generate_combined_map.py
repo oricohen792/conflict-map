@@ -600,7 +600,6 @@ def generate_combined_html():
                         }}
                         const polyLink = event.url || `https://polymarket.com/event/${{event.slug}}`;
                         tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
-                            <span style="font-weight:700; color:#94a3b8;">[${{event.date}}]</span> 
                             <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${{volStr}}</strong>]</span> 
                             <a href="${{polyLink}}" target="_blank" style="margin-left:5px; margin-right:5px;">${{event.q}}</a>
                             <span style="color:${{eventColor}}; font-weight:800;">${{Math.round(event.price * 100)}}%</span>

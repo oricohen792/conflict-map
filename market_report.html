@@ -294,7 +294,7 @@
     <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div style="padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 8px;">
             <span style="color: #94a3b8;">Last Updated:</span>
-            <span style="color: #3b82f6; font-weight: 700;">2026-01-11 20:59:38</span>
+            <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:01:26</span>
         </div>
         <span style="color: #94a3b8;">•</span>
         <span id="map-description" style="color: #94a3b8;">Loading...</span>
@@ -619,7 +619,6 @@
                         }
                         const polyLink = event.url || `https://polymarket.com/event/${event.slug}`;
                         tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
-                            <span style="font-weight:700; color:#94a3b8;">[${event.date}]</span> 
                             <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${volStr}</strong>]</span> 
                             <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px;">${event.q}</a>
                             <span style="color:${eventColor}; font-weight:800;">${Math.round(event.price * 100)}%</span>
