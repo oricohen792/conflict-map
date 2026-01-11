@@ -3,9 +3,10 @@ name: Update Conflict Map
 
 on:
   schedule:
-    # Every 1 minute for price updates (GitHub Actions minimum is 5 minutes, but this ensures maximum frequency)
+    # Every 5 minutes for price updates (GitHub Actions minimum interval)
+    # Runs at :00, :05, :10, :15, :20, :25, :30, :35, :40, :45, :50, :55 of each hour
     # Full market data refresh happens at :00 minutes of each hour
-    - cron: '*/1 * * * *'
+    - cron: '*/5 * * * *'
   # Allow manual trigger
   workflow_dispatch:
   # Run on push to main
