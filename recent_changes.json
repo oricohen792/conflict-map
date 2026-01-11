@@ -1,5 +1,17 @@
 [
   {
+    "time": "06:31",
+    "type": "CHG",
+    "q": "Will Israel strike Gaza on January 11, 2026?",
+    "change": "\u2193 7%"
+  },
+  {
+    "time": "06:31",
+    "type": "CHG",
+    "q": "Russia strike on Kyiv municipality by January 17?",
+    "change": "\u2193 15%"
+  },
+  {
     "time": "08:30",
     "type": "NEW",
     "q": "Russia-Ukraine Ceasefire before GTA VI?",
@@ -106,17 +118,5 @@
     "type": "NEW",
     "q": "U.S. agrees to a new trade deal with \"Canada\" before 2027?",
     "change": "23%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "U.S. agrees to a new trade deal with \"Brazil\" before 2027?",
-    "change": "25%"
-  },
-  {
-    "time": "08:30",
-    "type": "NEW",
-    "q": "U.S. agrees to a new trade deal with \"Japan\" before 2027?",
-    "change": "11%"
   }
 ]
