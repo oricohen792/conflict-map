@@ -35,6 +35,8 @@ def refresh_prices():
     # Fetch updated data from API using IDs
     chunk_size = 50
     updated_data = {}
+    success = True
+    error_msg = None
     
     for i in range(0, len(market_ids), chunk_size):
         chunk = market_ids[i:i + chunk_size]
@@ -53,9 +55,6 @@ def refresh_prices():
     price_changes = []
     updated_manifest = []
     current_time = datetime.now().strftime("%H:%M")
-    
-    success = True
-    error_msg = None
     
     for entry in manifest:
         m_id = entry.get("id")
