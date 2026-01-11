@@ -205,11 +205,22 @@ jobs:
           # Check if there are commits to push
           if git log origin/main..HEAD --oneline | grep -q .; then
             echo "Local commits found, attempting to push..."
+            
             # Try to rebase our commits on top of remote changes
             if git rebase origin/main; then
               echo "Rebase successful, pushing commits..."
-              git push origin main
-              echo "✓ Changes pushed successfully"
+              
+              # Use force-with-lease for safer concurrent push handling
+              # This will fail if remote was updated by another process
+              if git push --force-with-lease origin main; then
+                echo "✓ Changes pushed successfully"
+              else
+                echo "⚠ Push failed (remote was updated by another run)"
+                echo "This is expected when multiple runs execute concurrently"
+                echo "Resetting to remote state..."
+                git reset --hard origin/main
+                echo "Skipping push (remote already has updates from another run)"
+              fi
             else
               echo "⚠ Rebase failed (likely due to concurrent updates)"
               echo "Resetting to remote state (another run may have already updated)"
