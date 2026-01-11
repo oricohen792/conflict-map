@@ -208,3 +208,14 @@ except:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
           force: false
+      
+      - name: Workflow complete
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "✓ Workflow triggered by push event - changes processed but not committed (to avoid circular pushes)"
+            echo "✓ HTML file has been updated locally in this run"
+            echo "✓ Scheduled runs will commit and push changes automatically"
+          else
+            echo "✓ Workflow completed successfully"
+            echo "✓ Changes have been committed and pushed"
+          fi
