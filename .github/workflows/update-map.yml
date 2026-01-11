@@ -47,15 +47,8 @@ jobs:
             VERIFIED_TIMESTAMP=$(cat "$MARKETS_VERIFIED_FILE" | tr -d '\n\r')
             
             # Convert to Unix timestamp
-            VERIFIED_UNIX=$(python3 -c "
-from datetime import datetime, timezone
-try:
-    dt = datetime.strptime('$VERIFIED_TIMESTAMP', '%Y-%m-%d %H:%M:%S')
-    dt = dt.replace(tzinfo=timezone.utc)
-    print(int(dt.timestamp()))
-except:
-    print('0')
-")
+            printf 'from datetime import datetime, timezone\nimport sys\ntry:\n    timestamp = sys.argv[1] if len(sys.argv) > 1 else ""\n    dt = datetime.strptime(timestamp, "%%Y-%%m-%%d %%H:%%M:%%S")\n    dt = dt.replace(tzinfo=timezone.utc)\n    print(int(dt.timestamp()))\nexcept:\n    print("0")\n' > /tmp/parse_timestamp.py
+            VERIFIED_UNIX=$(python3 /tmp/parse_timestamp.py "$VERIFIED_TIMESTAMP")
             
             if [ "$VERIFIED_UNIX" -gt 0 ]; then
               TIME_SINCE_VERIFIED=$((CURRENT_TIME - VERIFIED_UNIX))
