@@ -121,16 +121,19 @@ def generate_and_push(skip_fetch=False):
 def main():
     """Main loop - run every 30 minutes"""
     # Check for command line arguments
-    skip_fetch = "--skip-fetch" in sys.argv or "-s" in sys.argv
+    skip_fetch = "--skip-fetch" in sys.argv or "-s" in sys.argv or "--no-fetch" in sys.argv or "-n" in sys.argv
     
     print("="*60)
     print("Polymarket Maps Auto-Updater")
     print("="*60)
     print("This script will generate maps, commit, and push every 30 minutes.")
     print("Data will be fetched on every loop by default.")
+    print("\nOptions:")
+    print("  --no-fetch, -n    : Skip fetching data (use existing polymarket_data.json)")
+    print("  --skip-fetch, -s  : Same as --no-fetch")
     if skip_fetch:
-        print("SKIP FETCH MODE: Will use existing data without fetching.")
-    print("Generates: Combined map with all types (Conflict, Sport, Finance, Elections, Technology, Political Leadership)")
+        print("\n✓ NO FETCH MODE: Will use existing data without fetching.")
+    print("\nGenerates: Combined map with all types (Conflict, Sport, Finance, Elections, Technology, Political Leadership)")
     print("Only HTML files will be committed.")
     print("Press Ctrl+C to stop.")
     print("="*60)
