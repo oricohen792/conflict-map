@@ -900,7 +900,7 @@ def generate_map_html(lines):
         });
         
         const marketsSummary = marketTexts.length > 0 ? marketTexts.join(' | ') : '';
-        const shareText = `${headerText} - Conflict Prediction Markets\n\n${marketsSummary}\n\nView full map: ${pageUrl}`;
+        const shareText = `${headerText} - Conflict Prediction Markets\\n\\n${marketsSummary}\\n\\nView full map: ${pageUrl}`;
         
         return encodeURIComponent(shareText);
     }
@@ -923,7 +923,7 @@ def generate_map_html(lines):
     function shareToInstagram(button) {
         // Instagram doesn't support direct URL sharing, so we'll copy to clipboard and show message
         const text = getTooltipShareText(button);
-        const fullText = decodeURIComponent(text) + '\n\n' + window.location.href;
+        const fullText = decodeURIComponent(text) + String.fromCharCode(10, 10) + window.location.href;
         
         if (navigator.clipboard) {
             navigator.clipboard.writeText(fullText).then(() => {
@@ -934,7 +934,7 @@ def generate_map_html(lines):
                 }, 1500);
                 alert('Text copied! Paste it in your Instagram post/story.');
             }).catch(() => {
-                alert('Please copy manually:\n\n' + fullText);
+                alert('Please copy manually:' + String.fromCharCode(10, 10) + fullText);
             });
         } else {
             // Fallback for older browsers
@@ -951,7 +951,7 @@ def generate_map_html(lines):
                 }, 1500);
                 alert('Text copied! Paste it in your Instagram post/story.');
             } catch (err) {
-                alert('Please copy manually:\n\n' + fullText);
+                alert('Please copy manually:' + String.fromCharCode(10, 10) + fullText);
             }
             document.body.removeChild(textarea);
         }
