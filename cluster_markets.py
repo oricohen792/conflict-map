@@ -217,13 +217,9 @@ def main():
 
 def generate_map_html(lines):
     # Get timestamp of active_markets.jsonl (Market Data Verified - Hourly scan)
-    # First check if we have a committed timestamp file (for price refresh runs)
-    markets_verified_time = "Pending"
-    
-    # Check committed timestamp file first (persists across workflow runs)
-    if os.path.exists(".markets_verified_time"):
-        with open(".markets_verified_time", "r", encoding="utf-8") as f:
-            markets_verified_time = f.read().strip()
+    # Markets Verified is updated every 1 hour during full update
+    # Never show "Pending" - use current time if file doesn't exist (first run)
+    markets_verified_time = None
     
     # If active_markets.jsonl exists (during full update), update the timestamp
     if os.path.exists("active_markets.jsonl"):
@@ -232,9 +228,25 @@ def generate_map_html(lines):
         # Save to committed file so it persists for price refresh runs
         with open(".markets_verified_time", "w", encoding="utf-8") as f:
             f.write(markets_verified_time)
+    else:
+        # Check committed timestamp file (for price refresh runs)
+        if os.path.exists(".markets_verified_time"):
+            with open(".markets_verified_time", "r", encoding="utf-8") as f:
+                markets_verified_time = f.read().strip()
+        else:
+            # First run - use current time (page first date) instead of "Pending"
+            markets_verified_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
     json_lines = json.dumps(lines)
-    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Get "Last Updated" timestamp from committed file (when HTML was last committed)
+    # This shows when the page was last updated/committed, not when HTML was generated
+    if os.path.exists(".last_update_timestamp"):
+        with open(".last_update_timestamp", "r", encoding="utf-8") as f:
+            last_update_str = f.read().strip()
+    else:
+        # Fallback to current time if file doesn't exist
+        last_update_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     html_template = """
 <!DOCTYPE html>
@@ -606,20 +618,11 @@ def generate_map_html(lines):
                     return base.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
                 }
 
-                // Get overall page update time from info box (this is when HTML was generated)
-                const pageUpdateElement = document.querySelector('.info-box');
-                let pageUpdateTime = "";
-                if (pageUpdateElement) {
-                    // Match date-time pattern: YYYY-MM-DD HH:MM:SS
-                    const dateTimeRegex = /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/;
-                    const match = pageUpdateElement.textContent.match(dateTimeRegex);
-                    if (match) pageUpdateTime = match[1];
-                }
-                
                 // Get most recent price update time from ALL markets (not just visible ones)
                 // This ensures "Prices Updated" shows the actual latest price update regardless of filters
+                // Prices are updated every 5 minutes via refresh_prices.py
                 const allUpdateTimes = linesData.map(m => m.updated || "").filter(t => t);
-                let pricesUpdateTime = "";
+                let pricesUpdateTime = "N/A";
                 if (allUpdateTimes.length > 0) {
                     // Sort by date-time descending to get most recent
                     allUpdateTimes.sort((a, b) => {
@@ -627,19 +630,15 @@ def generate_map_html(lines):
                         return b.localeCompare(a);
                     });
                     pricesUpdateTime = allUpdateTimes[0];
-                } else {
-                    // If no market update times available, use page update time
-                    pricesUpdateTime = pageUpdateTime;
                 }
                 
-                // Ensure page update time is always current (use page update time if available, otherwise use prices time)
-                const displayPageTime = pageUpdateTime || pricesUpdateTime || "N/A";
-                const displayPricesTime = pricesUpdateTime || "N/A";
+                // Markets Verified is updated every 1 hour during full update
+                // Should never be "Pending" - always show a timestamp or "N/A" if truly unavailable
+                const displayMarketsVerified = (marketVerifyTime && marketVerifyTime !== "Pending" && marketVerifyTime.trim() !== "") ? marketVerifyTime : "N/A";
                 
                 tooltipHtml += `<div style="font-size:0.75rem; color:#94a3b8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px;">    
-                    <div style="display:flex; justify-content:space-between;"><span>Page Updated:</span> <span style="color:#3b82f6; font-weight:600;">${displayPageTime}</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${displayPricesTime}</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${marketVerifyTime || "N/A"}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Prices Updated:</span> <span style="color:#e2e8f0; font-weight:600;">${pricesUpdateTime}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Markets Verified:</span> <span style="color:#e2e8f0; font-weight:600;">${displayMarketsVerified}</span></div>
                 </div>
                 <button class="snapshot-btn" onclick="captureTooltipSnapshot(this)" title="Save tooltip as image">📷 Save as Image</button>`;
 
@@ -867,8 +866,11 @@ def generate_map_html(lines):
         country_checks += f"<div class='filter-item'><input type='radio' name='country' class='country-radio' id='{safe_id}' data-country='{c}' {checked} onchange='onCountryChange(\"{c}\")'> <label for='{safe_id}'>{c} ({count})</label></div>"
 
     final_html = html_template.replace("JSON_LINES_PLACEHOLDER", json_lines)
-    final_html = final_html.replace("LAST_UPDATE_PLACEHOLDER", now_str)
+    final_html = final_html.replace("LAST_UPDATE_PLACEHOLDER", last_update_str)
     final_html = final_html.replace("COUNTRY_FILTERS_PLACEHOLDER", country_checks)
+    # Ensure markets_verified_time is never None or empty
+    if not markets_verified_time:
+        markets_verified_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     final_html = final_html.replace("MARKET_VERIFY_PLACEHOLDER", markets_verified_time)
     
     return final_html
