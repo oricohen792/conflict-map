@@ -243,11 +243,41 @@ class MapGeneratorBase:
     
     def calculate_market_stats(self):
         """Calculate statistics about all markets with zones"""
-        from generate_map_conflict import CAT_KEYWORDS, all_keywords
-        from generate_map_sport import SPORT_KEYWORDS, all_sport_keywords, EXCLUSION_KEYWORDS
-        from generate_map_finance import FINANCE_KEYWORDS, all_finance_keywords
-        from generate_map_elections import ELECTION_KEYWORDS, all_election_keywords
-        from generate_map_technology import TECH_KEYWORDS, all_tech_keywords
+        import json
+        import os
+        
+        # Load config from JSON
+        config_path = os.path.join(os.path.dirname(__file__), "map_configs.json")
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        # Extract keywords from config
+        conflict_config = config_data["maps"]["conflict"]
+        conflict_keywords = []
+        for k in conflict_config["keywords"].values():
+            conflict_keywords.extend(k)
+        
+        sport_config = config_data["maps"]["sport"]
+        sport_keywords = []
+        for k in sport_config["keywords"].values():
+            sport_keywords.extend(k)
+        sport_exclusions = sport_config["exclusion_keywords"]
+        
+        finance_config = config_data["maps"]["finance"]
+        finance_keywords = []
+        for k in finance_config["keywords"].values():
+            finance_keywords.extend(k)
+        
+        elections_config = config_data["maps"]["elections"]
+        election_keywords = []
+        for k in elections_config["keywords"].values():
+            election_keywords.extend(k)
+        election_exclusions = elections_config["exclusion_keywords"]
+        
+        tech_config = config_data["maps"]["technology"]
+        tech_keywords = []
+        for k in tech_config["keywords"].values():
+            tech_keywords.extend(k)
         
         conflict_ids = set()
         sport_ids = set()
@@ -275,56 +305,56 @@ class MapGeneratorBase:
             
             # Check conflict
             assigned_cat = "Other"
-            for cat, keywords in CAT_KEYWORDS.items():
+            for cat, keywords in conflict_config["keywords"].items():
                 if any(k in q_lower for k in keywords):
                     assigned_cat = cat
                     break
-            if assigned_cat != "Other" or any(k in q_lower for k in all_keywords):
-                if len(found_zones) >= 2:
+            if assigned_cat != "Other" or any(k in q_lower for k in conflict_keywords):
+                if len(found_zones) >= conflict_config["min_zones"]:
                     conflict_ids.add(m_id)
             
             # Check sport
-            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+            if not any(excl in q_lower for excl in sport_exclusions):
                 assigned_sport_cat = "Other Sports"
-                for cat, keywords in SPORT_KEYWORDS.items():
+                for cat, keywords in sport_config["keywords"].items():
                     if any(k in q_lower for k in keywords):
                         assigned_sport_cat = cat
                         break
-                if assigned_sport_cat != "Other Sports" or any(k in q_lower for k in all_sport_keywords):
-                    if len(found_zones) >= 1:
+                if assigned_sport_cat != "Other Sports" or any(k in q_lower for k in sport_keywords):
+                    if len(found_zones) >= sport_config["min_zones"]:
                         sport_ids.add(m_id)
             
             # Check finance
-            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+            if not any(excl in q_lower for excl in sport_exclusions):
                 assigned_finance_cat = "Other Financial"
-                for cat, keywords in FINANCE_KEYWORDS.items():
+                for cat, keywords in finance_config["keywords"].items():
                     if any(k in q_lower for k in keywords):
                         assigned_finance_cat = cat
                         break
-                if assigned_finance_cat != "Other Financial" or any(k in q_lower for k in all_finance_keywords):
-                    if len(found_zones) >= 1 or any(k in q_lower for k in ["fed", "federal reserve", "fomc", "jerome powell"]):
+                if assigned_finance_cat != "Other Financial" or any(k in q_lower for k in finance_keywords):
+                    if len(found_zones) >= finance_config["min_zones"] or any(k in q_lower for k in finance_config["default_zone_keywords"]):
                         finance_ids.add(m_id)
             
             # Check elections
-            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+            if not any(excl in q_lower for excl in election_exclusions):
                 assigned_election_cat = "Voting"
-                for cat, keywords in ELECTION_KEYWORDS.items():
+                for cat, keywords in elections_config["keywords"].items():
                     if any(k in q_lower for k in keywords):
                         assigned_election_cat = cat
                         break
-                if assigned_election_cat != "Voting" or any(k in q_lower for k in all_election_keywords):
-                    if len(found_zones) >= 1 or any(k in q_lower for k in ["president", "presidential", "senate", "congress", "supreme court"]):
+                if assigned_election_cat != "Voting" or any(k in q_lower for k in election_keywords):
+                    if len(found_zones) >= elections_config["min_zones"] or any(k in q_lower for k in elections_config["default_zone_keywords"]):
                         election_ids.add(m_id)
             
             # Check technology
-            if not any(excl in q_lower for excl in EXCLUSION_KEYWORDS):
+            if not any(excl in q_lower for excl in sport_exclusions):
                 assigned_tech_cat = "Other Technology"
-                for cat, keywords in TECH_KEYWORDS.items():
+                for cat, keywords in tech_config["keywords"].items():
                     if any(k in q_lower for k in keywords):
                         assigned_tech_cat = cat
                         break
-                if assigned_tech_cat != "Other Technology" or any(k in q_lower for k in all_tech_keywords):
-                    if len(found_zones) >= 1 or any(k in q_lower for k in ["apple", "google", "microsoft", "meta", "amazon", "nvidia", "tesla", "openai"]):
+                if assigned_tech_cat != "Other Technology" or any(k in q_lower for k in tech_keywords):
+                    if len(found_zones) >= tech_config["min_zones"] or any(k in q_lower for k in tech_config["default_zone_keywords"]):
                         tech_ids.add(m_id)
         
         mapped_count = len(conflict_ids) + len(sport_ids) + len(finance_ids) + len(election_ids) + len(tech_ids)
