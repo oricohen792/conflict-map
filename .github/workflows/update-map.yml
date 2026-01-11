@@ -32,13 +32,54 @@ jobs:
         id: update_type
         run: |
           MINUTE=$(date +%M)
-          # Full update every hour (at :00)
+          HOUR=$(date +%H)
+          CURRENT_TIME=$(date +%s)
+          
+          # Track last full update time in a file
+          LAST_UPDATE_FILE=".last_full_update"
+          
+          # Check if this is a scheduled :00 run (or delayed :00 run)
+          # Cron runs at :00, :05, :10, :15, :20, :25, :30, :35, :40, :45, :50, :55
+          # Full update should happen at :00 of each hour
+          
+          IS_FULL_UPDATE=false
+          
+          # Case 1: Exactly :00 - definitely a full update
           if [ "$MINUTE" = "00" ]; then
+            IS_FULL_UPDATE=true
+            echo "Scheduled :00 run detected"
+          
+          # Case 2: :01 or :02 - could be delayed :00 run, check if last update was >50 minutes ago
+          elif [ "$MINUTE" = "01" ] || [ "$MINUTE" = "02" ]; then
+            if [ -f "$LAST_UPDATE_FILE" ]; then
+              LAST_UPDATE=$(cat "$LAST_UPDATE_FILE")
+              TIME_SINCE_UPDATE=$((CURRENT_TIME - LAST_UPDATE))
+              # If last full update was more than 50 minutes ago, this is likely a delayed :00
+              if [ "$TIME_SINCE_UPDATE" -gt 3000 ]; then  # 50 minutes = 3000 seconds
+                IS_FULL_UPDATE=true
+                echo "Delayed :00 run detected (last update was $((TIME_SINCE_UPDATE / 60)) minutes ago)"
+              else
+                echo "Not a delayed :00 (last update was $((TIME_SINCE_UPDATE / 60)) minutes ago)"
+              fi
+            else
+              # No previous update file - assume this is the first run (delayed :00)
+              IS_FULL_UPDATE=true
+              echo "First run detected (no previous update file)"
+            fi
+          
+          # Case 3: Any other minute - price refresh only
+          else
+            echo "Price refresh run (MINUTE=$MINUTE)"
+          fi
+          
+          if [ "$IS_FULL_UPDATE" = true ]; then
             echo "type=full" >> $GITHUB_OUTPUT
-            echo "Full market fetch will be performed"
+            echo "Full market fetch will be performed (MINUTE=$MINUTE, HOUR=$HOUR)"
+            # Update the last full update timestamp
+            echo "$CURRENT_TIME" > "$LAST_UPDATE_FILE"
           else
             echo "type=price" >> $GITHUB_OUTPUT
-            echo "Price refresh only"
+            echo "Price refresh only (MINUTE=$MINUTE)"
           fi
       
       - name: Full market fetch (every hour)
@@ -59,6 +100,10 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add market_report.html conflict_manifest.json recent_changes.json
+          # Also commit the last full update timestamp file if it exists
+          if [ -f ".last_full_update" ]; then
+            git add .last_full_update
+          fi
           git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: $(date '+%Y-%m-%d %H:%M:%S')"
       
       - name: Push changes
