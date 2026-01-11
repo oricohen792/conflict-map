@@ -11,7 +11,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -32,7 +32,7 @@
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "China",
       "Taiwan"
@@ -47,13 +47,13 @@
     "q": "Russia x Ukraine ceasefire by March 31, 2026?",
     "price": 0.15,
     "date": "2026-03-31",
-    "vol": 8020264.964144,
+    "vol": 8024332.793598,
     "src_lat": 55.7558,
     "src_lng": 37.6173,
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -66,15 +66,15 @@
     "id": "567621",
     "unique_id": "L3",
     "q": "Will China invade Taiwan by end of 2026?",
-    "price": 0.13,
+    "price": 0.14,
     "date": "2026-12-31",
-    "vol": 5699031.212299,
+    "vol": 5699063.642508,
     "src_lat": 39.9042,
     "src_lng": 116.4074,
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "China",
       "Taiwan"
@@ -89,13 +89,13 @@
     "q": "Russia x Ukraine ceasefire by end of 2026?",
     "price": 0.45,
     "date": "2026-12-31",
-    "vol": 6065963.289685,
+    "vol": 6067066.067461,
     "src_lat": 55.7558,
     "src_lng": 37.6173,
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -116,7 +116,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "United States"
@@ -137,7 +137,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "United States",
       "Venezuela"
@@ -158,7 +158,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Palestine"
@@ -171,15 +171,15 @@
     "id": "665223",
     "unique_id": "L8",
     "q": "Ukraine signs peace deal with Russia by March 31?",
-    "price": 0.24,
+    "price": 0.2,
     "date": "2026-03-31",
-    "vol": 142989.787543,
+    "vol": 142993.947543,
     "src_lat": 55.7558,
     "src_lng": 37.6173,
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -200,7 +200,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -221,7 +221,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "United States"
@@ -242,7 +242,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Trade",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -263,7 +263,7 @@
     "tgt_lat": 37.5665,
     "tgt_lng": 126.978,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "North Korea",
       "South Korea"
@@ -284,7 +284,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Palestine",
       "United States"
@@ -305,7 +305,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "Israel"
@@ -326,7 +326,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "EU",
       "United States"
@@ -347,7 +347,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "India",
       "United States"
@@ -368,7 +368,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Canada",
       "United States"
@@ -389,7 +389,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Brazil",
       "United States"
@@ -410,7 +410,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Trade",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Japan",
       "United States"
@@ -1061,7 +1061,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -1082,7 +1082,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -1103,7 +1103,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "United States",
       "Venezuela"
@@ -1124,7 +1124,7 @@
     "tgt_lat": 25.033,
     "tgt_lng": 121.5654,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "China",
       "Taiwan"
@@ -1137,15 +1137,15 @@
     "id": "957644",
     "unique_id": "L54",
     "q": "Israel x Hamas Ceasefire Phase II by January 31?",
-    "price": 0.28,
+    "price": 0.27,
     "date": "2026-03-31",
-    "vol": 141118.955619,
+    "vol": 141175.025619,
     "src_lat": 31.7683,
     "src_lng": 35.2137,
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Palestine"
@@ -1166,7 +1166,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Palestine"
@@ -1187,7 +1187,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Diplomatic",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "Israel"
@@ -1200,15 +1200,15 @@
     "id": "984441",
     "unique_id": "L57",
     "q": "US strikes Iran by March 31, 2026?",
-    "price": 0.59,
+    "price": 0.6,
     "date": "2026-06-30",
-    "vol": 678508.087562,
+    "vol": 678524.754227,
     "src_lat": 35.6892,
     "src_lng": 51.389,
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "United States"
@@ -1229,7 +1229,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "United States"
@@ -1244,13 +1244,13 @@
     "q": "Israel strikes Iran by January 31, 2026?",
     "price": 0.36,
     "date": "2026-01-31",
-    "vol": 6154964.499608,
+    "vol": 6155965.074045,
     "src_lat": 35.6892,
     "src_lng": 51.389,
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "Israel"
@@ -1263,15 +1263,15 @@
     "id": "1065900",
     "unique_id": "L60",
     "q": "Will Israel strike Lebanon on January 10, 2026?",
-    "price": 0.082,
+    "price": 0.078,
     "date": "2026-01-31",
-    "vol": 204377.053192,
+    "vol": 204845.51037,
     "src_lat": 31.7683,
     "src_lng": 35.2137,
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1286,13 +1286,13 @@
     "q": "Will Israel strike Lebanon on January 11, 2026?",
     "price": 0.66,
     "date": "2026-01-31",
-    "vol": 41819.95749,
+    "vol": 42161.795075,
     "src_lat": 31.7683,
     "src_lng": 35.2137,
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1313,7 +1313,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1334,7 +1334,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1355,7 +1355,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1376,7 +1376,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1397,7 +1397,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1418,7 +1418,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -1439,7 +1439,7 @@
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Palestine"
@@ -1452,15 +1452,15 @@
     "id": "1065972",
     "unique_id": "L69",
     "q": "Will Israel strike Gaza on January 11, 2026?",
-    "price": 0.48,
+    "price": 0.54,
     "date": "2026-01-31",
-    "vol": 18562.46557,
+    "vol": 18873.33999,
     "src_lat": 31.7683,
     "src_lng": 35.2137,
     "tgt_lat": 31.9522,
     "tgt_lng": 35.2332,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Palestine"
@@ -2111,7 +2111,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "United States"
@@ -2132,7 +2132,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "United States"
@@ -2147,13 +2147,13 @@
     "q": "Israel strikes Iran by January 16, 2026?",
     "price": 0.16,
     "date": "2026-01-16",
-    "vol": 768911.541189,
+    "vol": 769273.541189,
     "src_lat": 35.6892,
     "src_lng": 51.389,
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "Israel"
@@ -2174,7 +2174,7 @@
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iraq",
       "Israel"
@@ -2195,7 +2195,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "United States",
       "Venezuela"
@@ -2216,7 +2216,7 @@
     "tgt_lat": 10.4806,
     "tgt_lng": -66.9036,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "United States",
       "Venezuela"
@@ -2237,7 +2237,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "United States"
@@ -2258,7 +2258,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "United States"
@@ -2279,7 +2279,7 @@
     "tgt_lat": 33.8938,
     "tgt_lng": 35.5018,
     "cat": "Trade",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "Lebanon"
@@ -2294,13 +2294,13 @@
     "q": "Israel nuclear weapon use against Iran by January 31?",
     "price": 0.008,
     "date": "2026-01-31",
-    "vol": 650280.157154,
+    "vol": 650284.638522,
     "src_lat": 35.6892,
     "src_lng": 51.389,
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "Israel"
@@ -2313,15 +2313,15 @@
     "id": "1139590",
     "unique_id": "L110",
     "q": "US strikes Iran by January 11, 2026?",
-    "price": 0.033,
+    "price": 0.026,
     "date": "2026-01-31",
-    "vol": 1682903.77607,
+    "vol": 1686594.208191,
     "src_lat": 35.6892,
     "src_lng": 51.389,
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "United States"
@@ -2336,13 +2336,13 @@
     "q": "Will US or Israel strike Iran by January 11, 2026?",
     "price": 0.045,
     "date": "2026-01-12",
-    "vol": 187548.395469,
+    "vol": 188220.456828,
     "src_lat": 31.7683,
     "src_lng": 35.2137,
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "United States"
@@ -2357,13 +2357,13 @@
     "q": "Will US or Israel strike Iran by January 12, 2026?",
     "price": 0.14,
     "date": "2026-01-12",
-    "vol": 161210.519538,
+    "vol": 161449.675373,
     "src_lat": 31.7683,
     "src_lng": 35.2137,
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "United States"
@@ -2378,13 +2378,13 @@
     "q": "Will US or Israel strike Iran by January 31, 2026?",
     "price": 0.54,
     "date": "2026-01-12",
-    "vol": 269821.586148,
+    "vol": 270051.586145,
     "src_lat": 31.7683,
     "src_lng": 35.2137,
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "United States"
@@ -2397,15 +2397,15 @@
     "id": "1144023",
     "unique_id": "L114",
     "q": "U.S. anti-cartel ground operation in Mexico by January 31?",
-    "price": 0.09,
+    "price": 0.08,
     "date": "2026-01-31",
-    "vol": 25844.286353,
+    "vol": 26114.286353,
     "src_lat": 19.4326,
     "src_lng": -99.1332,
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Drugs & Border",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Mexico",
       "United States"
@@ -2426,7 +2426,7 @@
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -2439,15 +2439,15 @@
     "id": "1144154",
     "unique_id": "L116",
     "q": "Russia strike on Kyiv municipality by January 17?",
-    "price": 0.68,
+    "price": 0.67,
     "date": "2026-01-17",
-    "vol": 1535.115767,
+    "vol": 1542.011288,
     "src_lat": 55.7558,
     "src_lng": 37.6173,
     "tgt_lat": 50.4501,
     "tgt_lng": 30.5234,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Russia",
       "Ukraine"
@@ -2460,15 +2460,15 @@
     "id": "1147106",
     "unique_id": "L117",
     "q": "Israel strikes Iran by January 11, 2026?",
-    "price": 0.012,
+    "price": 0.031,
     "date": "2026-01-11",
-    "vol": 5816.233966,
+    "vol": 5911.291706,
     "src_lat": 35.6892,
     "src_lng": 51.389,
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "Israel"
@@ -2481,15 +2481,15 @@
     "id": "1147107",
     "unique_id": "L118",
     "q": "Israel strikes Iran by January 13, 2026?",
-    "price": 0.09,
+    "price": 0.07,
     "date": "2026-01-13",
-    "vol": 4403.817457,
+    "vol": 4423.817457,
     "src_lat": 35.6892,
     "src_lng": 51.389,
     "tgt_lat": 31.7683,
     "tgt_lng": 35.2137,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Iran",
       "Israel"
@@ -2510,7 +2510,7 @@
     "tgt_lat": 38.9072,
     "tgt_lng": -77.0369,
     "cat": "Military",
-    "updated": "2026-01-11 11:25:54",
+    "updated": "2026-01-11 11:33:42",
     "countries": [
       "Israel",
       "United States"
