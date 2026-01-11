@@ -590,11 +590,18 @@ def generate_combined_html():
                     tooltipHtml += `<div style="font-weight:700; color:#cbd5e1; margin-top:4px; margin-bottom:2px;">${{topic}}</div>`;
                     topics[topic].forEach(event => {{
                         const eventColor = getProbColor(event.price);
-                        const volStr = event.vol >= 1000 ? (event.vol / 1000).toFixed(1) + 'k' : Math.round(event.vol);
+                        let volStr;
+                        if (event.vol >= 1000000) {{
+                            volStr = (event.vol / 1000000).toFixed(1) + 'M';
+                        }} else if (event.vol >= 1000) {{
+                            volStr = (event.vol / 1000).toFixed(1) + 'k';
+                        }} else {{
+                            volStr = Math.round(event.vol).toString();
+                        }}
                         const polyLink = event.url || `https://polymarket.com/event/${{event.slug}}`;
                         tooltipHtml += `<div style="margin-bottom:2px; font-size: 0.8rem; padding-left: 10px;">
                             <span style="font-weight:700; color:#94a3b8;">[${{event.date}}]</span> 
-                            <span style="font-weight:700; color:#94a3b8;">[Vol: $${{volStr}}]</span> 
+                            <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${{volStr}}</strong>]</span> 
                             <a href="${{polyLink}}" target="_blank" style="margin-left:5px; margin-right:5px;">${{event.q}}</a>
                             <span style="color:${{eventColor}}; font-weight:800;">${{Math.round(event.price * 100)}}%</span>
                         </div>`;
