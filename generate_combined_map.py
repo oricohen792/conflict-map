@@ -115,9 +115,6 @@ def generate_combined_html():
         }
         print(f"    Found {len(event_data)} events")
     
-    # Calculate statistics
-    stats = generator.calculate_market_stats()
-    
     # Get base HTML components
     html_head = generator.get_common_html_head()
     css = generator.get_common_css()
@@ -310,16 +307,6 @@ def generate_combined_html():
         <div style="padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 8px;">
             <span style="color: #94a3b8;">Last Updated:</span>
             <span style="color: #3b82f6; font-weight: 700;">{current_time}</span>
-        </div>
-        <span style="color: #94a3b8;">•</span>
-        <div style="padding: 8px; background: rgba(15, 23, 42, 0.8); border-radius: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <span style="color: #e2e8f0;">Total: <strong>{stats["total"]}</strong></span>
-            <span style="color: #ef4444;">⚔️ <strong>{stats["conflicts"]}</strong></span>
-            <span style="color: #22c55e;">⚽ <strong>{stats["sports"]}</strong></span>
-            <span style="color: #fbbf24;">💰 <strong>{stats["finance"]}</strong></span>
-            <span style="color: #a855f7;">🗳️ <strong>{stats["elections"]}</strong></span>
-            <span style="color: #06b6d4;">💻 <strong>{stats["technology"]}</strong></span>
-            <span style="color: #94a3b8;">Unmapped: <strong>{stats["unmapped"]}</strong></span>
         </div>
         <span style="color: #94a3b8;">•</span>
         <span id="map-description" style="color: #94a3b8;">Loading...</span>
