@@ -138,7 +138,8 @@ def generate_combined_html():
             padding: 10px;
             border-radius: 6px;
             font-size: 13px;
-            max-width: 400px;
+            max-width: 800px;
+            min-width: 600px;
             z-index: 10000;
             pointer-events: auto;
             display: none;
@@ -558,7 +559,7 @@ def generate_combined_html():
             tooltipOverlay = document.createElement('div');
             tooltipOverlay.className = 'tooltip-overlay line-tooltip';
             tooltipOverlay.id = 'globe-tooltip';
-            tooltipOverlay.style.cssText = 'position: fixed; background: rgba(15, 23, 42, 0.98); border: 1px solid #475569; color: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; max-width: 400px; z-index: 10000; pointer-events: auto; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
+            tooltipOverlay.style.cssText = 'position: fixed; background: rgba(15, 23, 42, 0.98); border: 1px solid #475569; color: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; max-width: 800px; min-width: 600px; z-index: 10000; pointer-events: auto; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
             document.body.appendChild(tooltipOverlay);
         }}
         return tooltipOverlay;
@@ -609,8 +610,24 @@ def generate_combined_html():
         const tooltip = createTooltipOverlay();
         tooltip.innerHTML = html;
         tooltip.style.display = 'block';
-        tooltip.style.left = (x + 10) + 'px';
-        tooltip.style.top = (y + 10) + 'px';
+        // Position tooltip, but keep it on screen
+        const tooltipWidth = 800;
+        const tooltipHeight = 400;
+        let leftPos = x + 10;
+        let topPos = y + 10;
+        
+        // Adjust if tooltip would go off screen
+        if (leftPos + tooltipWidth > window.innerWidth) {{
+            leftPos = x - tooltipWidth - 10;
+        }}
+        if (topPos + tooltipHeight > window.innerHeight) {{
+            topPos = window.innerHeight - tooltipHeight - 10;
+        }}
+        if (leftPos < 0) leftPos = 10;
+        if (topPos < 0) topPos = 10;
+        
+        tooltip.style.left = leftPos + 'px';
+        tooltip.style.top = topPos + 'px';
     }}
     
     function hideTooltip() {{
