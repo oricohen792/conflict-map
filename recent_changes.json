@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< HEAD
     "time": "08:24",
     "type": "NEW",
     "q": "Israel strikes Iran by January 11, 2026?",
@@ -85,11 +86,57 @@
   },
   {
     "time": "08:22",
+=======
+    "time": "05:51",
+    "type": "CHG",
+    "q": "US strikes Iran by March 31, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:51",
+    "type": "CHG",
+    "q": "US strikes Iran by June 30, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:51",
+    "type": "CHG",
+    "q": "Israel strikes Iran by January 31, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "05:51",
+    "type": "CHG",
+    "q": "Israel strikes Iran by January 16, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "05:51",
+    "type": "CHG",
+    "q": "Will Israel launch a major ground offensive in Lebanon by January 31?",
+    "change": "\u2193 7%"
+  },
+  {
+    "time": "05:51",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 31, 2026?",
+    "change": "\u2193 7%"
+  },
+  {
+    "time": "05:34",
+    "type": "CHG",
+    "q": "Russia-Ukraine Ceasefire before GTA VI?",
+    "change": "\u2191 3%"
+  },
+  {
+    "time": "05:34",
+>>>>>>> d0ea33eb4d1505aa39f7d6b8ea8a52a9893c5c24
     "type": "CHG",
     "q": "Will China invade Taiwan by end of 2026?",
     "change": "\u2191 1%"
   },
   {
+<<<<<<< HEAD
     "time": "08:22",
     "type": "CHG",
     "q": "Will the U.S. invade Venezuela by March 31, 2026?",
@@ -103,11 +150,75 @@
   },
   {
     "time": "08:22",
+=======
+    "time": "05:34",
+    "type": "CHG",
+    "q": "Will the U.S. invade Iran before 2027?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "05:34",
+    "type": "CHG",
+    "q": "US strikes Iran by March 31, 2026?",
+    "change": "\u2193 2%"
+  },
+  {
+    "time": "05:34",
+    "type": "CHG",
+    "q": "US strikes Iran by June 30, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "05:34",
+    "type": "CHG",
+    "q": "Will Israel strike Iraq by January 31?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:34",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 12, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:34",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 31, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Russia-Ukraine Ceasefire before GTA VI?",
+    "change": "\u2193 3%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Will China invades Taiwan before GTA VI?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Russia x Ukraine ceasefire by end of 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 11, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:03",
+>>>>>>> d0ea33eb4d1505aa39f7d6b8ea8a52a9893c5c24
     "type": "CHG",
     "q": "Will the U.S. invade Iran before 2027?",
     "change": "\u2193 4%"
   },
   {
+<<<<<<< HEAD
     "time": "08:22",
     "type": "CHG",
     "q": "Will Trump establish a Gaza \u201cBoard of Peace\u201d by March 31?",
@@ -118,5 +229,11 @@
     "type": "CHG",
     "q": "Israel x Iran ceasefire broken by March 31, 2026?",
     "change": "\u2191 7%"
+=======
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 12, 2026?",
+    "change": "\u2193 3%"
+>>>>>>> d0ea33eb4d1505aa39f7d6b8ea8a52a9893c5c24
   }
 ]
