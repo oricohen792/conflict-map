@@ -364,14 +364,24 @@ def generate_combined_html():
         maxZoom: 18,
         worldCopyJump: false,
         maxBounds: [[-85, -180], [85, 180]],
-        maxBoundsViscosity: 1.0
-    }}).setView([20, 0], 2); 
+        maxBoundsViscosity: 1.0,
+        crs: L.CRS.EPSG3857
+    }}).setView([20, 0], 2);
 
-    L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
+    const tileLayer = L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
         maxZoom: 18,
         noWrap: true,
-        bounds: [[-85, -180], [85, 180]]
+        continuousWorld: false
     }}).addTo(map);
+    
+    // Prevent map from wrapping
+    map.on('drag', function() {{
+        const bounds = map.getBounds();
+        const maxBounds = [[-85, -180], [85, 180]];
+        if (bounds.getWest() < -180 || bounds.getEast() > 180) {{
+            map.setMaxBounds(maxBounds);
+        }}
+    }});
 
     const markers = [];
 
