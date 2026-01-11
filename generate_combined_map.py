@@ -123,6 +123,15 @@ def generate_combined_html():
     
     current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     
+    # Helper function to format volume
+    def format_vol(vol):
+        if vol >= 1000000:
+            return f"${vol/1000000:.1f}M"
+        elif vol >= 1000:
+            return f"${vol/1000:.0f}K"
+        else:
+            return f"${int(vol)}"
+    
     # Calculate totals for map types
     map_type_totals = {}
     for map_type, map_info in all_map_data.items():
@@ -137,13 +146,6 @@ def generate_combined_html():
         config = map_info["config"]
         selected = 'selected' if map_type == 'conflict' else ''
         totals = map_type_totals[map_type]
-        def format_vol(vol):
-            if vol >= 1000000:
-                return f"${vol/1000000:.1f}M"
-            elif vol >= 1000:
-                return f"${vol/1000:.0f}K"
-            else:
-                return f"${int(vol)}"
         map_selector += f'        <option value="{map_type}" {selected}>{config["icon"]} {config["name"]} ({totals["events"]} events, {format_vol(totals["volume"])})</option>\n'
     map_selector += '    </select>'
     
@@ -167,13 +169,6 @@ def generate_combined_html():
         for cat in config["keywords"].keys():
             safe_id = cat.replace(" ", "_").replace("&", "")
             totals = category_totals.get(cat, {"events": 0, "volume": 0})
-            def format_vol(vol):
-                if vol >= 1000000:
-                    return f"${vol/1000000:.1f}M"
-                elif vol >= 1000:
-                    return f"${vol/1000:.0f}K"
-                else:
-                    return f"${int(vol)}"
             category_checks += f'<div class="filter-item"><input type="checkbox" id="{map_type}_{safe_id}" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="{map_type}_{safe_id}">{cat} <span style="color: #94a3b8; font-size: 0.85rem;">({totals["events"]} events, {format_vol(totals["volume"])})</span></label></div>'
         
         category_filters_html += f'<div id="category-filters-{map_type}" class="category-filters" style="display: none;">\n{category_checks}\n</div>\n'
