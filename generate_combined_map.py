@@ -128,8 +128,25 @@ def generate_combined_html():
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        #map {{ position: relative; }}
-        #globe-container {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; }}
+        #map {{ 
+            position: relative; 
+            width: 100%; 
+            height: 100vh; 
+            z-index: 1;
+        }}
+        #globe-container {{ 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 1;
+        }}
+        .leaflet-container {{
+            background: #0f172a !important;
+            height: 100% !important;
+            width: 100% !important;
+        }}
         .tooltip-overlay {{
             position: fixed;
             background: rgba(15, 23, 42, 0.98);
