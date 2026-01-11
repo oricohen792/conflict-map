@@ -342,7 +342,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:39:24 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:48:32 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -792,18 +792,47 @@
                 const sortedCats = Object.keys(eventsByCat).sort();
                 const tooltipId = `tooltip-${zone.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}`;
                 
+                // Collect all events for Top Volume tab
+                const allEvents = [];
+                Object.values(eventsByCat).forEach(catEvents => {
+                    allEvents.push(...catEvents);
+                });
+                const topVolumeEvents = [...allEvents].sort((a, b) => (b.vol || 0) - (a.vol || 0)).slice(0, 50); // Top 50 by volume
+                
                 tooltipHtml += `<div class="tooltip-tabs" id="${tooltipId}-tabs">`;
+                // Add Top Volume tab first
+                tooltipHtml += `<div class="tooltip-tab active" onclick="switchTooltipTab('${tooltipId}', -1)" id="${tooltipId}-tab-topvol">💰 Top Volume</div>`;
                 sortedCats.forEach((cat, idx) => {
                     const tabId = `${tooltipId}-tab-${idx}`;
-                    const activeClass = idx === 0 ? 'active' : '';
-                    tooltipHtml += `<div class="tooltip-tab ${activeClass}" onclick="switchTooltipTab('${tooltipId}', ${idx})" id="${tabId}">${cat}</div>`;
+                    tooltipHtml += `<div class="tooltip-tab" onclick="switchTooltipTab('${tooltipId}', ${idx})" id="${tabId}">${cat}</div>`;
+                });
+                tooltipHtml += `</div>`;
+                
+                // Top Volume tab content (first, active by default)
+                tooltipHtml += `<div class="tooltip-tab-content active" id="${tooltipId}-content-topvol">`;
+                topVolumeEvents.forEach(event => {
+                    const eventColor = getProbColor(event.price);
+                    let volStr;
+                    if (event.vol >= 1000000) {
+                        volStr = (event.vol / 1000000).toFixed(1) + 'M';
+                    } else if (event.vol >= 1000) {
+                        volStr = (event.vol / 1000).toFixed(1) + 'k';
+                    } else {
+                        volStr = Math.round(event.vol).toString();
+                    }
+                    const polyLink = event.url || `https://polymarket.com/event/${event.slug}`;
+                    tooltipHtml += `<div style="margin-bottom:4px; font-size: 0.8rem; padding: 4px; border-left: 2px solid ${eventColor};">
+                        <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${volStr}</strong>]</span> 
+                        <span style="color:#64748b; font-size:0.75rem;">[${event.cat}]</span>
+                        <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px; display:block; margin-top:2px;">${event.q}</a>
+                        <span style="color:${eventColor}; font-weight:800;">${Math.round(event.price * 100)}%</span>
+                    </div>`;
                 });
                 tooltipHtml += `</div>`;
                 
                 sortedCats.forEach((cat, idx) => {
                     const contentId = `${tooltipId}-content-${idx}`;
-                    const activeClass = idx === 0 ? 'active' : '';
-                    tooltipHtml += `<div class="tooltip-tab-content ${activeClass}" id="${contentId}">`;
+                    tooltipHtml += `<div class="tooltip-tab-content" id="${contentId}">`;
                     
                     const topics = {};
                     eventsByCat[cat].forEach(event => {
@@ -990,20 +1019,49 @@
             const sortedCats = Object.keys(eventsByCat).sort();
             const tooltipId = `tooltip-${zone.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}`;
             
+            // Collect all events for Top Volume tab
+            const allEvents = [];
+            Object.values(eventsByCat).forEach(catEvents => {
+                allEvents.push(...catEvents);
+            });
+            const topVolumeEvents = [...allEvents].sort((a, b) => (b.vol || 0) - (a.vol || 0)).slice(0, 50); // Top 50 by volume
+            
             // Create tabs
             tooltipHtml += `<div class="tooltip-tabs" id="${tooltipId}-tabs">`;
+            // Add Top Volume tab first
+            tooltipHtml += `<div class="tooltip-tab active" onclick="switchTooltipTab('${tooltipId}', -1)" id="${tooltipId}-tab-topvol">💰 Top Volume</div>`;
             sortedCats.forEach((cat, idx) => {
                 const tabId = `${tooltipId}-tab-${idx}`;
-                const activeClass = idx === 0 ? 'active' : '';
-                tooltipHtml += `<div class="tooltip-tab ${activeClass}" onclick="switchTooltipTab('${tooltipId}', ${idx})" id="${tabId}">${cat}</div>`;
+                tooltipHtml += `<div class="tooltip-tab" onclick="switchTooltipTab('${tooltipId}', ${idx})" id="${tabId}">${cat}</div>`;
+            });
+            tooltipHtml += `</div>`;
+            
+            // Top Volume tab content (first, active by default)
+            tooltipHtml += `<div class="tooltip-tab-content active" id="${tooltipId}-content-topvol">`;
+            topVolumeEvents.forEach(event => {
+                const eventColor = getProbColor(event.price);
+                let volStr;
+                if (event.vol >= 1000000) {
+                    volStr = (event.vol / 1000000).toFixed(1) + 'M';
+                } else if (event.vol >= 1000) {
+                    volStr = (event.vol / 1000).toFixed(1) + 'k';
+                } else {
+                    volStr = Math.round(event.vol).toString();
+                }
+                const polyLink = event.url || `https://polymarket.com/event/${event.slug}`;
+                tooltipHtml += `<div style="margin-bottom:4px; font-size: 0.8rem; padding: 4px; border-left: 2px solid ${eventColor};">
+                    <span style="font-weight:700; color:#94a3b8;">[Vol: <strong style="font-weight:900;">$${volStr}</strong>]</span> 
+                    <span style="color:#64748b; font-size:0.75rem;">[${event.cat}]</span>
+                    <a href="${polyLink}" target="_blank" style="margin-left:5px; margin-right:5px; display:block; margin-top:2px;">${event.q}</a>
+                    <span style="color:${eventColor}; font-weight:800;">${Math.round(event.price * 100)}%</span>
+                </div>`;
             });
             tooltipHtml += `</div>`;
             
             // Create tab contents
             sortedCats.forEach((cat, idx) => {
                 const contentId = `${tooltipId}-content-${idx}`;
-                const activeClass = idx === 0 ? 'active' : '';
-                tooltipHtml += `<div class="tooltip-tab-content ${activeClass}" id="${contentId}">`;
+                tooltipHtml += `<div class="tooltip-tab-content" id="${contentId}">`;
                 
                 const topics = {};
                 eventsByCat[cat].forEach(event => {
@@ -1193,30 +1251,65 @@
         }
 
         const tabs = tabsContainer.querySelectorAll('.tooltip-tab');
-        const allContents = [];
-        let idx = 0;
-        while (true) {
-            const content = document.getElementById(`${tooltipId}-content-${idx}`);
-            if (!content) break;
-            allContents.push(content);
-            idx++;
-        }
-
-        tabs.forEach((tab, idx) => {
-            if (idx === tabIndex) {
-                tab.classList.add('active');
-            } else {
-                tab.classList.remove('active');
+        
+        // Handle Top Volume tab (tabIndex === -1)
+        if (tabIndex === -1) {
+            tabs.forEach((tab, idx) => {
+                if (idx === 0) { // Top Volume is first tab
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Show Top Volume content
+            const topVolContent = document.getElementById(`${tooltipId}-content-topvol`);
+            const allContents = [];
+            let idx = 0;
+            while (true) {
+                const content = document.getElementById(`${tooltipId}-content-${idx}`);
+                if (!content) break;
+                allContents.push(content);
+                idx++;
             }
-        });
-
-        allContents.forEach((content, idx) => {
-            if (idx === tabIndex) {
-                content.classList.add('active');
-            } else {
+            
+            if (topVolContent) {
+                topVolContent.classList.add('active');
+            }
+            allContents.forEach(content => {
                 content.classList.remove('active');
+            });
+        } else {
+            // Handle category tabs
+            tabs.forEach((tab, idx) => {
+                if (idx === tabIndex + 1) { // +1 because Top Volume is at index 0
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            const allContents = [];
+            const topVolContent = document.getElementById(`${tooltipId}-content-topvol`);
+            if (topVolContent) {
+                topVolContent.classList.remove('active');
             }
-        });
+            let idx = 0;
+            while (true) {
+                const content = document.getElementById(`${tooltipId}-content-${idx}`);
+                if (!content) break;
+                allContents.push(content);
+                idx++;
+            }
+
+            allContents.forEach((content, idx) => {
+                if (idx === tabIndex) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
         
         // Reset hover state after a short delay to allow normal mouseout behavior
         if (marker) {
