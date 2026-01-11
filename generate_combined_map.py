@@ -294,22 +294,9 @@ def generate_combined_html():
     {category_filters_html}
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Choose Zone</h1>
+    <h1 style="margin-bottom: 8px;">Choose Zone <span id="total-events-count" style="font-size: 0.9rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
     <div id="zone-filters" style="max-height: 200px; overflow-y: auto;">
         ZONE_FILTERS_PLACEHOLDER
-    </div>
-</div>
-
-<div class="info-box">
-    <h1 id="map-title" style="font-size: 1.2rem;">Loading...</h1>
-    <p id="stats-text">Loading...</p>
-    <div style="font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-        <div style="padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 8px;">
-            <span style="color: #94a3b8;">Last Updated:</span>
-            <span style="color: #3b82f6; font-weight: 700;">{current_time}</span>
-        </div>
-        <span style="color: #94a3b8;">•</span>
-        <span id="map-description" style="color: #94a3b8;">Loading...</span>
     </div>
 </div>
 
@@ -350,11 +337,7 @@ def generate_combined_html():
         if (!mapInfo) return;
         
         const config = mapInfo.config;
-        
-        // Update title and description
-        document.getElementById('map-title').textContent = config.name;
-        document.getElementById('map-description').textContent = config.description;
-        
+
         // Show/hide category filters
         document.querySelectorAll('.category-filters').forEach(el => el.style.display = 'none');
         document.getElementById(`category-filters-${{mapType}}`).style.display = 'block';
@@ -475,7 +458,7 @@ def generate_combined_html():
         markers.length = 0;
 
         if (!selectedZone) {{
-            document.getElementById('stats-text').innerText = 'Please select a zone.';
+            document.getElementById('total-events-count').innerText = '(0 events)';
             return;
         }}
 
@@ -672,7 +655,7 @@ def generate_combined_html():
             visibleCount += events.length;
         }}
         
-        document.getElementById('stats-text').innerText = `Visualizing ${{visibleCount}} events.`;
+        document.getElementById('total-events-count').innerText = `(${{visibleCount}} events)`;
     }}
     
     function switchTooltipTab(tooltipId, tabIndex) {{
