@@ -286,6 +286,10 @@ def generate_combined_html():
 
 <div class="filter-box">
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
+    <div style="font-size: 0.75rem; color: #64748b; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span style="color: #94a3b8;">Last Updated:</span>
+        <span style="color: #3b82f6; font-weight: 700;">{current_time} UTC</span>
+    </div>
     <h1>Select Map Type</h1>
     {map_selector}
     
