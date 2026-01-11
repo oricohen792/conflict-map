@@ -325,7 +325,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:16:52 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:21:58 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -339,7 +339,7 @@
     
     <hr style="margin: 10px 0;">
     <h1>Categories</h1>
-    <div id="category-filters-conflict" class="category-filters" style="display: none;">
+    <div id="category-filters-conflict" class="category-filters" style="display: block;">
 <div class="filter-item"><input type="checkbox" id="conflict_Military" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Military">Military <span style="color: #94a3b8; font-size: 0.85rem;">(87 events, $42.2M)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Trade" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Trade">Trade <span style="color: #94a3b8; font-size: 0.85rem;">(16 events, $95K)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Drugs__Border" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Drugs__Border">Drugs & Border <span style="color: #94a3b8; font-size: 0.85rem;">(1 events, $27K)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Diplomatic" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Diplomatic">Diplomatic <span style="color: #94a3b8; font-size: 0.85rem;">(26 events, $28.8M)</span></label></div>
 </div>
 <div id="category-filters-sport" class="category-filters" style="display: none;">
@@ -569,12 +569,21 @@
         currentMapType = mapType;
         const mapInfo = allMapData[mapType];
         if (!mapInfo) return;
-        
+
         const config = mapInfo.config;
+
+        // Show/hide category filters for current map type
+        document.querySelectorAll('.category-filters').forEach(div => {
+            div.style.display = 'none';
+        });
+        const currentCategoryFilters = document.getElementById(`category-filters-${mapType}`);
+        if (currentCategoryFilters) {
+            currentCategoryFilters.style.display = 'block';
+        }
 
         // Update zone filters
         updateZoneFilters(mapType);
-        
+
         // Update visibility - this will show markers
         updateVisibility();
     }
@@ -632,31 +641,22 @@
         
         // After visibility updates, show tooltip for selected zone marker
         // Try multiple times with increasing delays to ensure marker is ready
-        setTimeout(() => {
-            let selectedMarker = markers.find(m => m.zoneName === zoneName);
+        function tryOpenTooltip(attempt = 0) {
+            const selectedMarker = markers.find(m => m.zoneName === zoneName);
             if (selectedMarker && selectedMarker.tooltipHtml) {
                 selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
                 selectedMarker.openPopup(selectedMarker.getLatLng());
+                console.log('Tooltip opened for zone:', zoneName);
+            } else if (attempt < 5) {
+                // Retry up to 5 times
+                setTimeout(() => tryOpenTooltip(attempt + 1), 200);
             } else {
-                // Retry after a bit more time
-                setTimeout(() => {
-                    selectedMarker = markers.find(m => m.zoneName === zoneName);
-                    if (selectedMarker && selectedMarker.tooltipHtml) {
-                        selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
-                        selectedMarker.openPopup(selectedMarker.getLatLng());
-                    } else {
-                        // One more retry
-                        setTimeout(() => {
-                            selectedMarker = markers.find(m => m.zoneName === zoneName);
-                            if (selectedMarker && selectedMarker.tooltipHtml) {
-                                selectedMarker.setPopupContent(selectedMarker.tooltipHtml);
-                                selectedMarker.openPopup(selectedMarker.getLatLng());
-                            }
-                        }, 300);
-                    }
-                }, 300);
+                console.warn('Could not find marker for zone:', zoneName);
             }
-        }, 300);
+        }
+        
+        // Start trying to open tooltip after a short delay
+        setTimeout(() => tryOpenTooltip(), 200);
     }
 
     function updateZoneCounts() {
