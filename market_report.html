@@ -325,7 +325,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:23:10 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:27:30 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -339,7 +339,7 @@
     
     <hr style="margin: 10px 0;">
     <h1>Categories</h1>
-    <div id="category-filters-conflict" class="category-filters" style="display: block;">
+    <div id="category-filters-conflict" class="category-filters" style="display: none;">
 <div class="filter-item"><input type="checkbox" id="conflict_Military" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Military">Military <span style="color: #94a3b8; font-size: 0.85rem;">(87 events, $42.2M)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Trade" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Trade">Trade <span style="color: #94a3b8; font-size: 0.85rem;">(16 events, $95K)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Drugs__Border" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Drugs__Border">Drugs & Border <span style="color: #94a3b8; font-size: 0.85rem;">(1 events, $27K)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Diplomatic" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Diplomatic">Diplomatic <span style="color: #94a3b8; font-size: 0.85rem;">(26 events, $28.8M)</span></label></div>
 </div>
 <div id="category-filters-sport" class="category-filters" style="display: none;">
@@ -577,13 +577,18 @@
             radio.checked = false;
         });
 
-        // Show/hide category filters for current map type
+        // Show/hide category filters for current map type - hide all first
         document.querySelectorAll('.category-filters').forEach(div => {
             div.style.display = 'none';
+            div.style.visibility = 'hidden';
         });
+        // Show only the current map type's categories
         const currentCategoryFilters = document.getElementById(`category-filters-${mapType}`);
         if (currentCategoryFilters) {
             currentCategoryFilters.style.display = 'block';
+            currentCategoryFilters.style.visibility = 'visible';
+        } else {
+            console.warn('Category filters not found for:', mapType);
         }
 
         // Update zone filters (this will regenerate zone list for new map type)
