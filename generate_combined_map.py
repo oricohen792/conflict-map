@@ -360,11 +360,18 @@ def generate_combined_html():
     const map = L.map('map', {{
         zoomControl: false,
         attributionControl: false,
-        minZoom: 1,
-        maxBounds: [[-90, -180], [90, 180]]
-    }}).setView([20, 0], 1); 
+        minZoom: 2,
+        maxZoom: 18,
+        worldCopyJump: false,
+        maxBounds: [[-85, -180], [85, 180]],
+        maxBoundsViscosity: 1.0
+    }}).setView([20, 0], 2); 
 
-    L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{ maxZoom: 20 }}).addTo(map);
+    L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
+        maxZoom: 18,
+        noWrap: true,
+        bounds: [[-85, -180], [85, 180]]
+    }}).addTo(map);
 
     const markers = [];
 
