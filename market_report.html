@@ -325,7 +325,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:30:01 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 22:32:22 UTC</span>
     </div>
     <h1>Map Type</h1>
     <select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 6px 10px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">
@@ -426,12 +426,18 @@
                 const bounds = L.latLngBounds(southWest, northEast);
                 
                 map = L.map('map', {
-                    zoomControl: false,
+                    zoomControl: true,
                     attributionControl: false,
                     minZoom: 2,
                     maxZoom: 18,
                     worldCopyJump: false,
-                    maxBounds: bounds
+                    maxBounds: bounds,
+                    dragging: true,
+                    touchZoom: true,
+                    doubleClickZoom: true,
+                    scrollWheelZoom: true,
+                    boxZoom: true,
+                    keyboard: true
                 }).setView([20, 0], 2);
                 
                 // Set maxBoundsViscosity if available (Leaflet 1.4.0+)
