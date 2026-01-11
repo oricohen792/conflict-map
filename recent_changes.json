@@ -1,5 +1,47 @@
 [
   {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Russia-Ukraine Ceasefire before GTA VI?",
+    "change": "\u2193 3%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Will China invades Taiwan before GTA VI?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Russia x Ukraine ceasefire by end of 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Will Israel strike Lebanon on January 11, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "US strikes Iran by January 11, 2026?",
+    "change": "\u2193 1%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 12, 2026?",
+    "change": "\u2193 3%"
+  },
+  {
+    "time": "05:03",
+    "type": "CHG",
+    "q": "Will US or Israel strike Iran by January 31, 2026?",
+    "change": "\u2191 1%"
+  },
+  {
     "time": "04:34",
     "type": "CHG",
     "q": "Russia x Ukraine ceasefire by end of 2026?",
@@ -76,47 +118,5 @@
     "type": "CHG",
     "q": "Will Trump establish a Gaza \u201cBoard of Peace\u201d by March 31?",
     "change": "\u2191 1%"
-  },
-  {
-    "time": "03:30",
-    "type": "CHG",
-    "q": "Israel x Iran ceasefire broken by March 31, 2026?",
-    "change": "\u2191 4%"
-  },
-  {
-    "time": "03:30",
-    "type": "CHG",
-    "q": "U.S. agrees to a new trade deal with \"India\" before 2027?",
-    "change": "\u2193 2%"
-  },
-  {
-    "time": "03:30",
-    "type": "CHG",
-    "q": "Israel x Hamas Ceasefire Phase II by January 31?",
-    "change": "\u2193 4%"
-  },
-  {
-    "time": "03:30",
-    "type": "CHG",
-    "q": "US strikes Iran by March 31, 2026?",
-    "change": "\u2191 5%"
-  },
-  {
-    "time": "03:30",
-    "type": "CHG",
-    "q": "Israel strikes Iran by January 31, 2026?",
-    "change": "\u2191 1%"
-  },
-  {
-    "time": "03:30",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 11, 2026?",
-    "change": "\u2193 1%"
-  },
-  {
-    "time": "03:30",
-    "type": "CHG",
-    "q": "Will Israel strike Lebanon on January 13, 2026?",
-    "change": "\u2193 7%"
   }
 ]
