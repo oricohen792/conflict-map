@@ -174,19 +174,7 @@ jobs:
           # Check refresh log if it exists
           if [ -f "refresh_log.json" ]; then
             echo "✓ Refresh log exists"
-            python3 -c "
-import json
-try:
-    with open('refresh_log.json') as f:
-        log = json.load(f)
-    if log:
-        last = log[-1]
-        print(f\"  Last refresh: {last.get('type', 'unknown')} at {last.get('timestamp', 'unknown')}\")
-        print(f\"  Duration: {last.get('duration_seconds', 'N/A')}s\")
-        print(f\"  Success: {last.get('success', False)}\")
-except:
-    pass
-" || echo "  Could not read refresh log"
+            python3 -c 'import json; f=open("refresh_log.json"); log=json.load(f); f.close(); last=log[-1] if log else {}; print(f"  Last refresh: {last.get(\"type\", \"unknown\")} at {last.get(\"timestamp\", \"unknown\")}"); print(f"  Duration: {last.get(\"duration_seconds\", \"N/A\")}s"); print(f"  Success: {last.get(\"success\", False)}")' || echo "  Could not read refresh log"
           fi
           
           echo "=== HTML Verification Complete ==="
