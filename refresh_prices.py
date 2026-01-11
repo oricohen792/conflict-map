@@ -4,15 +4,6 @@ import os
 import time
 from datetime import datetime, timezone
 
-# Optional monitoring - don't fail if module not available
-try:
-    from refresh_monitor import log_refresh
-    MONITORING_AVAILABLE = True
-except ImportError:
-    MONITORING_AVAILABLE = False
-    def log_refresh(*args, **kwargs):
-        pass  # No-op if monitoring not available
-
 def refresh_prices():
     manifest_file = "conflict_manifest.json"
     if not os.path.exists(manifest_file):
@@ -51,12 +42,10 @@ def refresh_prices():
             success = False
             error_msg = str(e)
 
-    # Track Changes
-    price_changes = []
+    # Update manifest with new prices
     updated_manifest = []
     # Use UTC for all timestamps to ensure consistency across timezones
     current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    current_time_short = datetime.now(timezone.utc).strftime("%H:%M")  # For change log
     
     for entry in manifest:
         m_id = entry.get("id")
@@ -64,33 +53,11 @@ def refresh_prices():
             latest = updated_data[m_id]
             new_price = float(latest.get("lastTradePrice", entry["price"]) or 0)
             
-            # Change detection (>= 1% shift)
-            diff = new_price - entry["price"]
-            if abs(diff) >= 0.01: 
-                symbol = "↑" if diff > 0 else "↓"
-                price_changes.append({
-                    "time": current_time_short,
-                    "type": "CHG",
-                    "q": entry["q"],
-                    "change": f"{symbol} {abs(int(diff*100))}%"
-                })
-            
             entry["price"] = new_price
             entry["vol"] = float(latest.get("volume", entry["vol"]) or 0)
             # Update timestamp for this market (full date-time)
             entry["updated"] = current_time
         updated_manifest.append(entry)
-
-    # Update Change Log
-    if price_changes:
-        change_log = []
-        if os.path.exists("recent_changes.json"):
-            with open("recent_changes.json", "r", encoding="utf-8") as f:
-                change_log = json.load(f)
-        
-        change_log = (price_changes + change_log)[:20]
-        with open("recent_changes.json", "w", encoding="utf-8") as f:
-            json.dump(change_log, f, indent=2)
 
     # Save updated manifest
     with open(manifest_file, "w", encoding="utf-8") as f:
@@ -101,9 +68,6 @@ def refresh_prices():
     html_content = cluster_markets.generate_map_html(updated_manifest)
     with open("market_report.html", "w", encoding="utf-8") as f:
         f.write(html_content)
-    
-    duration = time.time() - start_time
-    log_refresh("price", duration_seconds=duration, markets_count=len(updated_manifest), success=success, error=error_msg)
     
     if success:
         print("Done! Refreshed prices and updated market_report.html")

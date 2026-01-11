@@ -173,11 +173,6 @@ jobs:
             echo "⚠ WARNING: conflict_manifest.json not found"
           fi
           
-          # Check refresh log if it exists
-          if [ -f "refresh_log.json" ]; then
-            echo "✓ Refresh log exists"
-            python3 -c "import json; f=open('refresh_log.json'); log=json.load(f); f.close(); last=log[-1] if log else {}; print('  Last refresh:', last.get('type', 'unknown'), 'at', last.get('timestamp', 'unknown')); print('  Duration:', last.get('duration_seconds', 'N/A'), 's'); print('  Success:', last.get('success', False))" 2>/dev/null || echo "  Could not read refresh log"
-          fi
           
           echo "=== HTML Verification Complete ==="
       
@@ -194,7 +189,7 @@ jobs:
           echo "$UPDATE_TIMESTAMP" > .last_update_timestamp
           
           # Stage all files that might have changed
-          git add market_report.html conflict_manifest.json recent_changes.json .last_update_timestamp
+          git add market_report.html conflict_manifest.json .last_update_timestamp
           # Also commit the last full update timestamp file if it exists
           if [ -f ".last_full_update" ]; then
             git add .last_full_update
@@ -202,10 +197,6 @@ jobs:
           # Commit markets verified timestamp file if it exists
           if [ -f ".markets_verified_time" ]; then
             git add .markets_verified_time
-          fi
-          # Commit refresh log if it exists
-          if [ -f "refresh_log.json" ]; then
-            git add refresh_log.json
           fi
           
           # Check for staged changes (more reliable than git diff --quiet)

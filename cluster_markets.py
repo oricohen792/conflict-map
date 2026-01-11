@@ -5,15 +5,6 @@ import numpy as np
 import time
 from datetime import datetime, timezone
 
-# Optional monitoring - don't fail if module not available
-try:
-    from refresh_monitor import log_refresh
-    MONITORING_AVAILABLE = True
-except ImportError:
-    MONITORING_AVAILABLE = False
-    def log_refresh(*args, **kwargs):
-        pass  # No-op if monitoring not available
-
 def fetch_and_load_markets():
     markets_file = "active_markets.jsonl"
     if not os.path.exists(markets_file):
@@ -34,7 +25,6 @@ def main():
     print("Loading markets...")
     markets = fetch_and_load_markets()
     if not markets:
-        log_refresh("full", duration_seconds=time.time() - start_time, success=False, error="No markets loaded")
         return
     
     print(f"Loaded {len(markets)} markets.")
@@ -173,33 +163,6 @@ def main():
             })
 
     print(f"Found {len(line_data)} conflict bets between countries.")
-    
-    # Track New Markets
-    new_changes = []
-    old_ids = set()
-    if os.path.exists("conflict_manifest.json"):
-        with open("conflict_manifest.json", "r", encoding="utf-8") as f:
-            old_data = json.load(f)
-            old_ids = {m["id"] for m in old_data if "id" in m}
-    
-    for l in line_data:
-        if l["id"] not in old_ids:
-            new_changes.append({
-                "time": datetime.now(timezone.utc).strftime("%H:%M"),  # Keep short format for change log
-                "type": "NEW",
-                "q": l["q"],
-                "change": f"{int(l['price']*100)}%"
-            })
-
-    # Update Change Log
-    change_log = []
-    if os.path.exists("recent_changes.json"):
-        with open("recent_changes.json", "r", encoding="utf-8") as f:
-            change_log = json.load(f)
-    
-    change_log = (new_changes + change_log)[:20]
-    with open("recent_changes.json", "w", encoding="utf-8") as f:
-        json.dump(change_log, f, indent=2)
 
     # Save manifest for fast updates
     with open("conflict_manifest.json", "w", encoding="utf-8") as f:
@@ -209,9 +172,6 @@ def main():
     html_content = generate_map_html(line_data)
     with open("market_report.html", "w", encoding="utf-8") as f:
         f.write(html_content)
-    
-    duration = time.time() - start_time
-    log_refresh("full", duration_seconds=duration, markets_count=len(line_data), success=True)
     
     print("Done! Saved to market_report.html")
 
@@ -241,9 +201,16 @@ def generate_map_html(lines):
         
     json_lines = json.dumps(lines)
     
-    # Get "Last Updated" timestamp from committed file (when HTML was last committed)
+    # Get "Last Updated" timestamp - updated on every full update (when active_markets.jsonl exists)
     # This shows when the page was last updated/committed, not when HTML was generated
-    if os.path.exists(".last_update_timestamp"):
+    if os.path.exists("active_markets.jsonl"):
+        # Full update - update the timestamp to current time
+        last_update_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        # Save to committed file so it persists
+        with open(".last_update_timestamp", "w", encoding="utf-8") as f:
+            f.write(last_update_str)
+    elif os.path.exists(".last_update_timestamp"):
+        # Price refresh run - use existing timestamp
         with open(".last_update_timestamp", "r", encoding="utf-8") as f:
             last_update_str = f.read().strip()
     else:
