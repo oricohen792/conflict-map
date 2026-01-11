@@ -123,22 +123,58 @@ def generate_combined_html():
     
     current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     
+    # Calculate totals for map types
+    map_type_totals = {}
+    for map_type, map_info in all_map_data.items():
+        events = map_info["events"]
+        total_events = len(events)
+        total_volume = sum(e.get("vol", 0) for e in events)
+        map_type_totals[map_type] = {"events": total_events, "volume": total_volume}
+    
     # Generate map selector
     map_selector = '<select id="map-type-selector" onchange="switchMapType(this.value)" style="padding: 8px 12px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 12px;">\n'
     for map_type, map_info in all_map_data.items():
         config = map_info["config"]
         selected = 'selected' if map_type == 'conflict' else ''
-        map_selector += f'        <option value="{map_type}" {selected}>{config["icon"]} {config["name"]}</option>\n'
+        totals = map_type_totals[map_type]
+        def format_vol(vol):
+            if vol >= 1000000:
+                return f"${vol/1000000:.1f}M"
+            elif vol >= 1000:
+                return f"${vol/1000:.0f}K"
+            else:
+                return f"${int(vol)}"
+        map_selector += f'        <option value="{map_type}" {selected}>{config["icon"]} {config["name"]} ({totals["events"]} events, {format_vol(totals["volume"])})</option>\n'
     map_selector += '    </select>'
     
     # Generate category filters for each map type (will be shown/hidden)
     category_filters_html = ""
     for map_type, map_info in all_map_data.items():
         config = map_info["config"]
+        events = map_info["events"]
         category_checks = ""
+        
+        # Calculate totals for each category
+        category_totals = {}
+        for event in events:
+            cat = event.get("cat", "")
+            if cat:
+                if cat not in category_totals:
+                    category_totals[cat] = {"events": 0, "volume": 0}
+                category_totals[cat]["events"] += 1
+                category_totals[cat]["volume"] += event.get("vol", 0)
+        
         for cat in config["keywords"].keys():
             safe_id = cat.replace(" ", "_").replace("&", "")
-            category_checks += f"<div class='filter-item'><input type='checkbox' id='{map_type}_{safe_id}' checked onchange='updateZoneCounts(); updateVisibility()'> <label for='{map_type}_{safe_id}'>{cat}</label></div>"
+            totals = category_totals.get(cat, {"events": 0, "volume": 0})
+            def format_vol(vol):
+                if vol >= 1000000:
+                    return f"${vol/1000000:.1f}M"
+                elif vol >= 1000:
+                    return f"${vol/1000:.0f}K"
+                else:
+                    return f"${int(vol)}"
+            category_checks += f'<div class="filter-item"><input type="checkbox" id="{map_type}_{safe_id}" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="{map_type}_{safe_id}">{cat} <span style="color: #94a3b8; font-size: 0.85rem;">({totals["events"]} events, {format_vol(totals["volume"])})</span></label></div>'
         
         category_filters_html += f'<div id="category-filters-{map_type}" class="category-filters" style="display: none;">\n{category_checks}\n</div>\n'
     
@@ -384,7 +420,7 @@ def generate_combined_html():
             const volume = zone_volumes[z] || 0;
             const radio = document.createElement('div');
             radio.className = 'filter-item';
-            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${{safe_id}}" data-zone="${{z}}" ${{checked}} onchange="onZoneChange('${{z}}')"> <label for="zone_${{safe_id}}">${{z}} (${{count}}) - ${{formatVol(volume)}}</label>`;
+            radio.innerHTML = `<input type="radio" name="zone" class="zone-radio" id="zone_${{safe_id}}" data-zone="${{z}}" ${{checked}} onchange="onZoneChange('${{z}}')"> <label for="zone_${{safe_id}}">${{z}} <span style="color: #94a3b8; font-size: 0.85rem;">(${{count}} events, ${{formatVol(volume)}})</span></label>`;
             zoneFiltersDiv.appendChild(radio);
         }});
     }}
