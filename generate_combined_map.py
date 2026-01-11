@@ -374,11 +374,11 @@ def generate_combined_html():
     {map_selector}
     
     <hr style="margin: 10px 0;">
-    <h1>Categories <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
+    <h1>Categories</h1>
     {category_filters_html}
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Zones</h1>
+    <h1 style="margin-bottom: 8px;">Zones <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
     <div id="zone-filters" style="max-height: 200px; overflow-y: auto;">
         ZONE_FILTERS_PLACEHOLDER
     </div>
@@ -586,7 +586,7 @@ def generate_combined_html():
         if (intersects.length > 0) {{
             const marker = intersects[0].object;
             const zone = marker.zoneName;
-            const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+            const safe_id = zone.replace(/ /g, '_').replace(/\\./g, '');
             const radio = document.getElementById(`zone_${{safe_id}}`);
             if (radio) {{
                 radio.checked = true;
@@ -675,21 +675,34 @@ def generate_combined_html():
         }}
         
         // Update visibility to show markers in current mode
-        updateVisibility();
+        setTimeout(() => {{
+            updateVisibility();
+        }}, 200);
     }}
     
     // Initialize with map mode by default
-    const mapContainer = document.getElementById('map');
-    const globeContainer = document.getElementById('globe-container');
-    mapContainer.style.display = 'block';
-    globeContainer.style.display = 'none';
-    initMapMode();
-    
-    // Initialize map type and show markers
-    setTimeout(() => {{
-        switchMapType('conflict');
-        updateZoneCounts();
-    }}, 100);
+    window.addEventListener('load', function() {{
+        const mapContainer = document.getElementById('map');
+        const globeContainer = document.getElementById('globe-container');
+        if (mapContainer) mapContainer.style.display = 'block';
+        if (globeContainer) globeContainer.style.display = 'none';
+        
+        // Ensure globe toggle is unchecked (map mode)
+        const toggle = document.getElementById('globe-mode-toggle');
+        if (toggle) toggle.checked = false;
+        isGlobeMode = false;
+        
+        // Initialize map
+        initMapMode();
+        
+        // Initialize map type and show markers after map is ready
+        setTimeout(() => {{
+            if (map) {{
+                switchMapType('conflict');
+                updateZoneCounts();
+            }}
+        }}, 300);
+    }});
 
     function getProbColor(p) {{
         if (p >= 0.70) return '#22c55e';
@@ -739,7 +752,7 @@ def generate_combined_html():
         
         const sortedZones = Object.keys(all_zones).sort((a, b) => zone_volumes[b] - zone_volumes[a]);
         sortedZones.forEach((z, idx) => {{
-            const safe_id = z.replace(/ /g, '_').replace(/\./g, '');
+            const safe_id = z.replace(/ /g, '_').replace(/\\./g, '');
             const checked = ''; // Don't auto-select any zone
             const count = all_zones[z];
             const volume = zone_volumes[z] || 0;
@@ -1018,7 +1031,7 @@ def generate_combined_html():
                     }});
                     
                     marker.on('click', function(e) {{
-                        const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+                        const safe_id = zone.replace(/ /g, '_').replace(/\\./g, '');
                         const radio = document.getElementById(`zone_${{safe_id}}`);
                         if (radio) {{
                             radio.checked = true;
@@ -1142,7 +1155,7 @@ def generate_combined_html():
                 }});
                 
                 marker.on('click', function(e) {{
-                    const safe_id = zone.replace(/ /g, '_').replace(/\./g, '');
+                    const safe_id = zone.replace(/ /g, '_').replace(/\\./g, '');
                     const radio = document.getElementById(`zone_${{safe_id}}`);
                     if (radio) {{
                         radio.checked = true;

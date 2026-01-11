@@ -282,7 +282,7 @@
     <div class="close-filter" style="display:none;" onclick="document.querySelector('.filter-box').classList.remove('active')">&times;</div>
     <div style="font-size: 0.7rem; color: #64748b; padding: 6px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
         <span style="color: #94a3b8;">Last Updated:</span>
-        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:54:40 UTC</span>
+        <span style="color: #3b82f6; font-weight: 700;">2026-01-11 21:56:32 UTC</span>
     </div>
     <div style="margin-bottom: 12px; padding: 8px; background: #1e293b; border-radius: 6px; border: 1px solid #475569;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -304,7 +304,7 @@
     </select>
     
     <hr style="margin: 10px 0;">
-    <h1>Categories <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
+    <h1>Categories</h1>
     <div id="category-filters-conflict" class="category-filters" style="display: none;">
 <div class="filter-item"><input type="checkbox" id="conflict_Military" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Military">Military <span style="color: #94a3b8; font-size: 0.85rem;">(87 events, $42.2M)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Trade" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Trade">Trade <span style="color: #94a3b8; font-size: 0.85rem;">(16 events, $95K)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Drugs__Border" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Drugs__Border">Drugs & Border <span style="color: #94a3b8; font-size: 0.85rem;">(1 events, $27K)</span></label></div><div class="filter-item"><input type="checkbox" id="conflict_Diplomatic" checked onchange="updateZoneCounts(); updateVisibility()"> <label for="conflict_Diplomatic">Diplomatic <span style="color: #94a3b8; font-size: 0.85rem;">(26 events, $28.8M)</span></label></div>
 </div>
@@ -326,7 +326,7 @@
 
     
     <hr style="margin: 10px 0;">
-    <h1 style="margin-bottom: 8px;">Zones</h1>
+    <h1 style="margin-bottom: 8px;">Zones <span id="total-events-count" style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">(0 events)</span></h1>
     <div id="zone-filters" style="max-height: 200px; overflow-y: auto;">
         ZONE_FILTERS_PLACEHOLDER
     </div>
@@ -623,21 +623,34 @@
         }
         
         // Update visibility to show markers in current mode
-        updateVisibility();
+        setTimeout(() => {
+            updateVisibility();
+        }, 200);
     }
     
     // Initialize with map mode by default
-    const mapContainer = document.getElementById('map');
-    const globeContainer = document.getElementById('globe-container');
-    mapContainer.style.display = 'block';
-    globeContainer.style.display = 'none';
-    initMapMode();
-    
-    // Initialize map type and show markers
-    setTimeout(() => {
-        switchMapType('conflict');
-        updateZoneCounts();
-    }, 100);
+    window.addEventListener('load', function() {
+        const mapContainer = document.getElementById('map');
+        const globeContainer = document.getElementById('globe-container');
+        if (mapContainer) mapContainer.style.display = 'block';
+        if (globeContainer) globeContainer.style.display = 'none';
+        
+        // Ensure globe toggle is unchecked (map mode)
+        const toggle = document.getElementById('globe-mode-toggle');
+        if (toggle) toggle.checked = false;
+        isGlobeMode = false;
+        
+        // Initialize map
+        initMapMode();
+        
+        // Initialize map type and show markers after map is ready
+        setTimeout(() => {
+            if (map) {
+                switchMapType('conflict');
+                updateZoneCounts();
+            }
+        }, 300);
+    });
 
     function getProbColor(p) {
         if (p >= 0.70) return '#22c55e';
